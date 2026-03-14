@@ -36,6 +36,7 @@
       + [1. The 8-Bit Primitive vs. The 64-Bit Float](#1-the-8-bit-primitive-vs-the-64-bit-float)
       + [2. The Automatic Promotion Trap](#2-the-automatic-promotion-trap)
    * [Compilation vs Runtime errors](#compilation-vs-runtime-errors)
+   * [What is var?](#what-is-var)
    * [Naming Rules and Conventions](#naming-rules-and-conventions)
       + [The Hard Naming Rules](#the-hard-naming-rules)
    * [Data types of expressions](#data-types-of-expressions)
@@ -1192,6 +1193,58 @@ public class ErrorDemo {
 
 **JavaScript Comparison:** JavaScript generally encounters both syntax and type errors at runtime. You might have a perfectly valid piece of code run for 10 minutes, only to crash when it hits a line trying to call a method that doesn't exist.
 
+## What is var?
+
+Introduced in Java 10, **`var`** is a keyword used for **Local Variable Type Inference**. It allows you to declare a variable without explicitly naming its data type (like `String` or `int`). Instead, the Java compiler "guesses" the type based on the value you provide.
+
+### Simple Example:
+
+* **Old way:** `String name = "Pushkar";`
+* **With `var`:** `var name = "Pushkar";` (Java knows this is a `String`)
+
+### Why is it needed?
+
+1. **Reduces Boilerplate:** It removes repetitive code, especially when dealing with long class names.
+2. **Readability:** It shifts the focus from the **type** to the **variable name**, making the code cleaner.
+
+
+### When to use `var` over other types?
+
+* **Complex Types:** Use it when the type name is very long or repetitive.
+* *Instead of:* `MyCustomServiceConnectionFactory factory = new MyCustomServiceConnectionFactory();`
+* *Use:* `var factory = new MyCustomServiceConnectionFactory();`
+
+
+* **Clear Initialization:** Use it only when it’s obvious what the value is.
+* *Good:* `var list = new ArrayList<String>();`
+* *Bad:* `var result = service.getData();` (It's unclear what `result` is).
+
+### Rules for using `var`
+
+* **Only Local Variables:** You can only use `var` inside methods. You **cannot** use it for class fields, method parameters, or return types.
+* **Must Initialize:** You must assign a value immediately so the compiler can infer the type.
+* `var x;` // **Error**
+* `var x = 10;` // **Valid**
+
+### Is there a need to convert it to another type?
+
+**No.** `var` is not a dynamic type like in JavaScript. Once the code is compiled, `var` is replaced by the actual type (e.g., `int`). It is **statically typed**, meaning it cannot change its type during execution.
+
+#### Example:
+
+```java
+var age = 25; // Java sets this as an 'int'
+age = "old";  // ERROR: You cannot change an int to a String
+
+```
+
+If you need a different type, you would use standard casting, just as you would with any other variable:
+
+```java
+var price = 9.99; // Inferred as double
+int roundedPrice = (int) price; // Standard conversion/casting
+
+```
 
 ## Naming Rules and Conventions
 
