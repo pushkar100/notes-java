@@ -9,6 +9,7 @@
       + [1. The Primary (Public) Class](#1-the-primary-public-class)
       + [2. Other Classes in the File (Non-Public)](#2-other-classes-in-the-file-non-public)
       + [Summary Table](#summary-table)
+   * [Invoking other class methods from the `main` method](#invoking-other-class-methods-from-the-main-method)
    * [How many classes in a file?](#how-many-classes-in-a-file)
       + [The Rules](#the-rules)
       + [The Best Practice: One File, One Class](#the-best-practice-one-file-one-class)
@@ -883,6 +884,159 @@ If you are writing a data structure (like a Linked List) and need a `Node` class
 | **Public API** | Must be the only public class in that file. |
 | **Small Helpers** | Can be in the same file (non-public). |
 | **Tightly Coupled** | Use an **Inner** or **Nested** class. |
+
+
+## Invoking other class methods from the `main` method
+
+Every class can have a `main` method but we cannot invoke another method of the class from it without instantiating an object of the class! Why? (Hint: `static`).
+
+This is a classic point of confusion for developers, and it all boils down to one specific keyword in Java: `static`. As an engineer, the best way to understand this is to look at how Java manages memory when it starts your program.
+
+### 1. The Root of the Problem: The `static` Keyword
+
+When you write a Java program, the entry point is always:
+`public static void main(String[] args)`
+
+Notice the word `static`. In Java, `static` means that the method belongs to the **Class blueprint itself**, not to any specific **Object (instance)** created from that blueprint.
+
+Because `main` is static, the Java Virtual Machine (JVM) can call it immediately without needing to construct an object of your class first. However, this creates a strict physical boundary: **A static method cannot directly look at or call non-static things.** It doesn't know which object's methods to call because no object exists yet!
+
+Here is a visual of the isolation:
+
+```text
++---------------------------------------------------+
+|                  YOUR JAVA CLASS                  |
++---------------------------------------------------+
+| CLASS LEVEL (Static Context)                      |
+| -> public static void main()  <-- JVM starts here |
+| -> static void myStaticMethod()                   |
+|                                                   |
+|      [ BARRIER: Cannot cross without an object ]  |
+|                                                   |
+| OBJECT LEVEL (Instance Context)                   |
+| -> void myNormalMethod()                          |
+| -> int myVariable                                 |
++---------------------------------------------------+
+```
+
+If `main` tries to call `myNormalMethod()` directly, Java will throw a compiler error: *"non-static method cannot be referenced from a static context."*
+
+---
+
+### 2. The Two Solutions
+
+To access another method in the same class from `main`, you have two structural choices depending on what the method actually does.
+
+**Way 1: The Static Approach (Class-to-Class)**
+If the method you want to call is just a utility or a helper that doesn't rely on specific object data (like formatting a string or calculating a math formula), you simply make that method `static` too. Now, both methods live in the same "Class Level" and can talk to each other directly without any barriers.
+
+```text
+[Class Level] 
+main() --------calls-------> myStaticMethod()   (SUCCESS)
+```
+
+**Way 2: The Instance Approach (Class-to-Object)**
+If your method needs to manipulate data unique to an object (like a specific user's name, balance, or shopping cart), it *must* remain non-static. To call it from `main`, `main` must first build an object of the class using the `new` keyword, and then call the method on that specific object.
+
+```text
+[Class Level]
+main() 
+  |
+  |--(1) creates-->  [Object residing in Heap Memory]
+  |
+  |--(2) calls---->  Object.myNormalMethod()    (SUCCESS)
+```
+
+---
+### Summary of possibilities
+
+1. Can any class have a `main` method? **Yes**. Any standard class can contain a `public static void main(String[] args)` to act as a starting point. (Note: Top-level classes themselves cannot be marked private in Java, only public or default).
+
+2. Must `main` instantiate an object? **Yes**. Because main is `static` (it belongs to the blueprint), it must create a new object of the class to interact with any non-static (instance) methods or variables.
+
+### Top-level class meaning
+
+It is the outermost class defined in a `.java` file. It sits at the very "root" of the file's structure and is not enclosed or nested inside any other class.
+
+If you make a top-level class private, it means "hide this completely from the outside world." But if the file itself is hidden from the rest of your program, no other code can ever see it, instantiate it, or use it. It would be a completely useless, dead file.
+
+Therefore, Java only allows two access levels for top-level classes:
+- `public`: Any other file in your entire project can see and use this class. (Note: The name of the public class must exactly match the .java file name).
+- Default (no keyword): Only files sitting in the exact same folder (package) can see and use it.
+
+```
+File: Car.java
++-------------------------------------------------------------+
+|                                                             |
+|  public class Car {    <-------- THIS is the Top-Level Class|
+|                                                             |
+|                                                             |
+|      private class Engine {   <--- This is a Nested Class   |
+|          // I live inside Car                               |
+|      }                                                      |
+|                                                             |
+|  }                                                          |
+|                                                             |
++-------------------------------------------------------------+
+```
+
+Nested classes (like `Engine` in the diagram), however, can be private because they are simply hiding inside the protective shell of their top-level parent class!
+
+---
+
+### 3. Memory Implications (The "Why")
+
+While time complexity is purely O(1) for a standard method call in both cases, the space complexity and memory footprint differ:
+
+* **Static Method:** Resides in the Metaspace/Method Area of memory. It takes up a fixed amount of memory exactly once when the class loads. 
+* **Instance Method:** Requires allocating a `new` object on the Heap. If you instantiate an object solely to call a stateless helper method, you are unnecessarily consuming Heap space and creating future work for the Garbage Collector.
+
+**Golden Rule:** If the method relies on instance variables (internal state), it must be non-static. If it acts only on the arguments passed into it without saving state, make it `static`.
+
+---
+
+### 4. Solution Code
+
+Here is how both approaches look in practice:
+
+```java
+public class MyProgram {
+
+    // ---------------------------------------------------------
+    // APPROACH 1: The Static Way
+    // ---------------------------------------------------------
+    // We add the 'static' keyword. It belongs to the class itself.
+    public static void printGreeting() {
+        System.out.println("Hello from the static method!");
+    }
+
+    // ---------------------------------------------------------
+    // APPROACH 2: The Instance Way
+    // ---------------------------------------------------------
+    // No 'static' keyword. It belongs to individual objects of MyProgram.
+    public void calculateSomething(int a, int b) {
+        int result = a + b;
+        System.out.println("Result is: " + result);
+    }
+
+    // ---------------------------------------------------------
+    // The Entry Point
+    // ---------------------------------------------------------
+    public static void main(String[] args) {
+        
+        // Way 1: Calling a static method directly
+        // Because both are static, they share the exact same memory context.
+        printGreeting(); 
+        
+        // Way 2: Calling a non-static method
+        // Step A: We must construct an instance (object) of our class first.
+        MyProgram myApp = new MyProgram();
+        
+        // Step B: We call the method ON that specific object instance.
+        myApp.calculateSomething(5, 10);
+    }
+}
+```
 
 ## Print statements
 
