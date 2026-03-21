@@ -101,7 +101,7 @@
   * [Runnable used with threads](#runnable-used-with-threads)
   * [Callable with threads](#callable-with-threads)
   * [ScheduledExecutorService](#scheduledexecutorservice)
-  * [Avoiding deadlocks in threads](#avoiding-deadlocks-in-threads
+  * [Avoiding deadlocks in threads](#avoiding-deadlocks-in-threads)
   * [The volatile keyword](#the-volatile-keyword)
   * [Handling exceptions in threads](#handling-exceptions-in-threads)
   * [Future keyword](#future-keyword)
