@@ -105,7 +105,8 @@
          - [Step 3: Generate the HTML Report](#step-3-generate-the-html-report)
       + [3. Can we generate reports WITHOUT JaCoCo?](#3-can-we-generate-reports-without-jacoco)
          - [Alternative A: IDE Built-in Engines (The Easy Way)](#alternative-a-ide-built-in-engines-the-easy-way)
-         - [Alternative B: Source Code Instrumentation (The Legacy Way - OpenClover/Cobertura)](#alternative-b-source-code-instrumentation-the-legacy-way-openclovercobertura)
+         - [Alternative B: Source Code Instrumentation (The Legacy Way - OpenClover/Cobertura)](#alternative-b-source-code-instrumentation-the-legacy-way-openclovercobertura)       
+   * [Extending JUnit for integration testing](#extending-junit-for-integration-testing)
 
 <!-- TOC end -->
 
@@ -2615,3 +2616,144 @@ Instead of a wiretap in the engine, these tools actually rewrite your Java text 
 
 **Why don't we use this much anymore?**
 Because modifying the actual source code is dangerous. It makes compiling incredibly slow, and if the tool messes up, your code won't compile at all. JaCoCo's "invisible wiretap" approach is much cleaner and safer, which is why it became the industry standard.
+
+## Extending JUnit for integration testing
+
+You have mastered testing your code in complete isolation. But here is a harsh truth in software engineering: **Unit tests can all pass perfectly, and the app can still instantly crash in the real world.**
+
+Why? Because Unit Tests use "Mocks" (fakes). If your code perfectly asks a fake database to save a user, the test passes. But what if the *real* database requires a password you forgot to include? What if the SQL table doesn't even exist?
+
+This is where **Integration Testing** comes in.
+
+### 1. What is Integration Testing?
+
+If a Unit Test proves that a steering wheel works, and a separate Unit Test proves that the tires work, an **Integration Test** connects the steering wheel to the tires to prove that turning the wheel *actually turns the tires*.
+
+In Java, Integration Testing means you stop using Mockito. You cut the fake wires and connect your code to **real external systems** (like a real Database, a real File System, or a real Internet API) to see if they talk to each other correctly.
+
+**The ASCII Diagram (The Big Difference):**
+```text
+  [ UNIT TEST (Using Mocks) ]
+  Java Code ---> "Save User" ---> [ Fake Database ] 
+                                     (Always says "Yes!" even if your SQL is broken)
+                                     RESULT: PASS (But dangerously misleading)
+
+
+  [ INTEGRATION TEST (Real Systems) ]
+  Java Code ---> "Save User" ---> [ REAL Database Engine ]
+                                     (Actually tries to parse your SQL, checks
+                                      passwords, and writes data to a table)
+                                     RESULT: The TRUTH.
+```
+
+### 2. The Non-Trivial Concept: The "Disposable" Database
+
+**The Problem:** If Integration Tests use a *real* database, what happens if your test deletes a user, and it accidentally deletes a real customer from your company's live production database? That is a disaster!
+
+**The Solution:** We use an **In-Memory Database** (like H2). 
+This is a lightweight, fully-functional SQL database that lives entirely inside your computer's RAM. It is born the exact millisecond you run your test, your Java code interacts with it like a real database, and the moment the test is over, it completely vanishes into thin air.
+
+
+### 3. The Code Example (Connecting Java to a Database)
+
+Let's write an Integration Test where our Java code connects to an actual database, creates a table, inserts a user, and reads it back. 
+
+We will use basic Java SQL (`java.sql`) and standard JUnit.
+
+```java
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.sql.*;
+
+public class DatabaseIntegrationTest {
+
+    // The connection to our real (but disposable) database
+    private Connection databaseConnection;
+
+    // 1. SETUP: Create a fresh database and table before the test
+    @BeforeEach
+    public void setupDatabase() throws SQLException {
+        // Connect to a temporary H2 In-Memory Database
+        databaseConnection = DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", "");
+        
+        // Execute real SQL to create a table!
+        Statement stmt = databaseConnection.createStatement();
+        stmt.execute("CREATE TABLE users (id INT, name VARCHAR(50))");
+    }
+
+    // 2. THE TEST: Prove Java and the Database talk to each other
+    @Test
+    public void testJavaCanSaveAndReadFromDatabase() throws SQLException {
+        
+        // --- ACT: Insert data using Java ---
+        PreparedStatement insertStmt = databaseConnection.prepareStatement(
+            "INSERT INTO users (id, name) VALUES (1, 'Alice')"
+        );
+        insertStmt.executeUpdate(); // Actually writes to the DB!
+
+        // --- ACT: Read it back using Java ---
+        Statement readStmt = databaseConnection.createStatement();
+        ResultSet results = readStmt.executeQuery("SELECT name FROM users WHERE id = 1");
+        
+        // --- ASSERT: Did the database actually give us 'Alice' back? ---
+        results.next(); // Move to the first row
+        String savedName = results.getString("name");
+        
+        assertEquals("Alice", savedName);
+    }
+
+    // 3. TEARDOWN: Destroy the database so the next test is totally clean
+    @AfterEach
+    public void destroyDatabase() throws SQLException {
+        Statement stmt = databaseConnection.createStatement();
+        stmt.execute("DROP TABLE users");
+        databaseConnection.close();
+    }
+}
+```
+
+
+### 4. The Execution Sequence (Visualized)
+
+Here is exactly what happens when you hit "Run" on an Integration Test. Notice how much "heavier" and more realistic this is compared to a simple Unit Test.
+
+```text
+=============================================================================
+                  INTEGRATION TEST EXECUTION FLOW
+=============================================================================
+
+ [ @BeforeEach ]
+       |
+       |-- 1. Boot up H2 Database Engine in RAM.
+       |-- 2. Java sends SQL: "CREATE TABLE users"
+       v
+ [ @Test runs ]
+       |
+       |-- 3. Java sends SQL: "INSERT INTO users ('Alice')"
+       |      (Database writes this to its internal memory)
+       |
+       |-- 4. Java sends SQL: "SELECT name FROM users"
+       |      (Database searches its tables, packages the result)
+       |
+       |-- 5. Database sends "Alice" back to Java.
+       |
+       |-- 6. JUnit Asserts: Does "Alice" == "Alice"? ---> PASS!
+       v
+ [ @AfterEach ]
+       |
+       |-- 7. Java sends SQL: "DROP TABLE users"
+       |-- 8. Disconnect. RAM is cleared. Database ceases to exist.
+       v
+=============================================================================
+```
+
+
+### 5. When to use Unit vs. Integration?
+
+Because Integration Tests have to boot up external tools (like databases, web servers, or file systems), they are **slow**. A Unit Test takes 1 millisecond. An Integration Test might take 100 milliseconds or even a full second.
+
+**The Golden Rule:**
+* Use **Unit Tests** (with Mockito) for 80% of your code. Test your heavy math, your `if/else` logic, and your loops in isolation so they run at lightning speed.
+* Use **Integration Tests** for the remaining 20% of your code. Only use them at the exact "borders" of your app—the files that directly talk to the Database, or directly talk to an Internet API. 
+
+This gives you a perfect balance of blazing-fast execution speed and real-world safety!
