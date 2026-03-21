@@ -8984,8 +8984,283 @@ public class ThreadExample {
 | **`Integer`** | `Number` | Converting strings to numbers / Collections. |
 | **`Object`** | `Object` | The parent of every class in Java. |
 
-## HTTP related imports
+## Networking & HTTP
 
+### 1. Issue Explanation
+
+The fundamental "issue" in networking is: **How do two different computers talk to each other without getting confused?**
+
+Imagine you are at a restaurant. You (the **Client**) want a burger. The kitchen (the **Server**) has the ingredients to make it. However, you can't just walk into the kitchen and grab a burger; there are walls, locked doors, and health codes. 
+
+You need a **Protocol**—a set of rules for how to ask and how to receive.
+
+**The Problems to Solve:**
+* **Addressing:** How do I find the right "restaurant" (Server) among millions on the internet? (Solved by **IP Addresses** and **DNS**).
+* **The Door:** Which specific "window" am I speaking through? (Solved by **Ports**, usually Port 80 or 443 for web).
+* **The Language:** How do I format my request so the kitchen understands exactly what I want? (Solved by **HTTP**).
+
+**The "Disconnected" Reality Visual:**
+
+```text
+  [ MY LAPTOP ]                                      [ GOOGLE SERVER ]
+  (Requesting...)                                     (Waiting...)
+       |                                                   |
+       |  ? <--- How do I send a "Message" here? --->      |
+       |  ? <--- How do I know if it arrived?   --->      |
+       |                                                   |
+```
+
+---
+
+### 2. Solution Explanation: The HTTP Cycle
+
+**HTTP (HyperText Transfer Protocol)** is the "Menu and Order Slip" of the internet. It follows a simple **Request-Response** pattern.
+
+#### A. The Request (The Order Slip)
+When you type a URL into a browser, you are sending a text block that looks like this:
+
+```text
+GET /index.html HTTP/1.1
+Host: www.example.com
+User-Agent: Mozilla/5.0
+(Empty Line)
+```
+
+* **Verb (Method):** `GET` (Give me something), `POST` (I’m sending you something), `DELETE` (Remove something).
+* **Path:** `/index.html` (Which specific file/resource do you want?).
+* **Headers:** Extra info (What browser am I using? Do I accept English?).
+
+#### B. The Response (The Delivery)
+The server looks at your slip and sends back a status and the data:
+
+```text
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+<html><body>Hello World!</body></html>
+```
+
+* **Status Code:** `200 OK` (Success!), `404 Not Found` (Oops, missing), `500` (Server broke).
+
+#### C. Visualizing the Full Handshake
+
+
+
+```text
+      CLIENT (Browser)                         SERVER (Web App)
+     +----------------+                       +----------------+
+     |   1. Connect   |---------------------->|  2. Listening  |
+     | (TCP Handshake)|                       |    on Port 80  |
+     +----------------+                       +----------------+
+             |                                        |
+     +----------------+       HTTP REQUEST            |
+     |   3. Sends:    |---------------------->        |
+     | "GET /pizza"   |                       +----------------+
+     +----------------+                       | 4. Logic/DB    |
+             |                                | (Finds Pizza)  |
+             |                HTTP RESPONSE   +----------------+
+             |        <---------------------- |   5. Sends:    |
+     +----------------+                       | "200 OK [Data]"|
+     | 6. Renders Page|                       +----------------+
+     +----------------+                               |
+```
+
+---
+
+### 3. Non-Trivial Concept: The "Handler"
+
+In coding, a **Handler** is like a specific chef in the kitchen assigned to a specific task. 
+* One handler only makes Pizzas.
+* Another handler only makes Drinks.
+
+When a request comes in for `/pizza`, the server doesn't just run the whole program; it routes that request specifically to the "Pizza Handler." If you don't define a handler for a path, the server doesn't know what to do and sends back a `404`.
+
+---
+
+### 4. Solution Code (Java Example)
+
+Java comes with a built-in "Lightweight HTTP Server" in the `com.sun.net.httpserver` package. It’s perfect for learning because it doesn't require massive frameworks like Spring.
+
+```java
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+
+public class SimpleHttpServer {
+
+    public static void main(String[] args) throws IOException {
+        // 1. Create a server that listens on Port 8080
+        // Port 8080 is a common 'test' port so you don't interfere with real web traffic.
+        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+
+        // 2. Create "Contexts" (Assigning Handlers to specific paths/URLs)
+        // This is like telling the receptionist where to send the guest.
+        server.createContext("/hello", new HelloHandler());
+        server.createContext("/status", new StatusHandler());
+
+        // 3. Start the server
+        System.out.println("Server started on http://localhost:8080/hello");
+        server.setExecutor(null); // Use the default internal executor
+        server.start();
+    }
+
+    // --- HANDLER 1: For the /hello path ---
+    static class HelloHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String response = "<h1>Welcome!</h1><p>The HTTP Server is working!</p>";
+            
+            // Send HTTP Header: 200 (Success) and the length of the response
+            exchange.sendResponseHeaders(200, response.length());
+            
+            // Get the "pipe" (OutputStream) to send the data back to the browser
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close(); // Important: Close the pipe to tell the browser we are done!
+        }
+    }
+
+    // --- HANDLER 2: For the /status path ---
+    static class StatusHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String response = "System Status: Green (2026)";
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+}
+```
+
+**How to test this:**
+1.  Run the code above.
+2.  Open your web browser.
+3.  Type `http://localhost:8080/hello` into the address bar.
+4.  You will see your "Welcome!" message rendered as HTML!
+
+### Handling path parameters and HTTP verbs
+
+To truly understand HTTP networking, we need to look at how a server handles different "Verbs" (Methods) and how it extracts information from a user. 
+
+The two most common scenarios after a simple "GET" are:
+1.  **Path Parameters:** Identifying a specific resource (e.g., `/user/123`).
+2.  **POST Requests:** Receiving data from a user (e.g., a login form or a JSON object).
+
+#### 1. Issue: The "Static" vs. "Dynamic" Problem
+
+A simple server that just says "Hello" is static. In the real world, servers need to be **dynamic**. 
+
+* **The Routing Issue:** How do I handle `/profile/alice` and `/profile/bob` without writing a thousand handlers?
+* **The Body Issue:** When a user sends a "POST" request, the data isn't in the URL; it's hidden in the "Body" of the request. We need to read that body like a stream.
+
+**The "Inbound Data" Visual:**
+
+```text
+       [ THE REQUEST ENVELOPE ]
++------------------------------------------+
+| LINE 1: POST /submit-form HTTP/1.1       | <--- The Method & Path
++------------------------------------------+
+| HEADER: Content-Type: application/json   | <--- The "Instructions"
+| HEADER: Content-Length: 18               |
++------------------------------------------+
+| (Empty Line - The Divider)               |
++------------------------------------------+
+| BODY: {"username": "ace"}                | <--- The "Payload" (The Cargo)
++------------------------------------------+
+```
+
+---
+
+#### 2. Solution: Advanced Handling Logic
+
+To solve this, our **Handler** needs to perform a "Switch" or "Check" to see what the user is trying to do.
+
+#### Non-Trivial Concept: Input Streams
+When a user sends a POST request, the data doesn't arrive all at once in a single variable. It arrives as an **InputStream**. 
+Think of it like a garden hose. To see what's inside, you have to "drain" the hose into a bucket (a String or Byte Array) before you can read it. If you forget to read the stream, your program won't know what the user sent!
+
+
+#### 3. Solution Code: The "Multi-Tool" Handler
+
+This example shows a server that can identify which **Method** (GET or POST) is being used and how to read data sent by a user.
+
+```java
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
+
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+
+public class AdvancedHttpServer {
+
+    public static void main(String[] args) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+        
+        // Routing all /api requests to one smart handler
+        server.createContext("/api", new ApiHandler());
+        
+        System.out.println("Server live at http://localhost:8000/api");
+        server.start();
+    }
+
+    static class ApiHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Get the Method (GET, POST, etc.)
+            String method = exchange.getRequestMethod();
+            String response = "";
+
+            if ("GET".equals(method)) {
+                // Example: http://localhost:8000/api?id=1
+                String query = exchange.getRequestURI().getQuery();
+                response = "You sent a GET request with query: " + (query != null ? query : "None");
+                sendResponse(exchange, response, 200);
+
+            } else if ("POST".equals(method)) {
+                // NON-TRIVIAL: Reading the "Body" of the request
+                // We use a BufferedReader to 'drain' the InputStream hose
+                InputStream inputStream = exchange.getRequestBody();
+                String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+                
+                response = "Server received your POST data: " + body;
+                sendResponse(exchange, response, 201); // 201 means 'Created'
+            } else {
+                // If they try DELETE or PUT, we say "Not Allowed"
+                response = "Method not supported";
+                sendResponse(exchange, response, 405);
+            }
+        }
+
+        // Helper method to keep code clean
+        private void sendResponse(HttpExchange exchange, String text, int statusCode) throws IOException {
+            byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(statusCode, bytes.length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(bytes);
+            os.close();
+        }
+    }
+}
+```
+
+#### 4. Summary of the Flow
+
+1.  **The URI Check:** The server looks at the path (e.g., `/api`).
+2.  **The Method Check:** The code asks, `exchange.getRequestMethod()`. Is it a "Fetch" (GET) or a "Submission" (POST)?
+3.  **The Stream Read:** If it's a POST, we open the `RequestBody` stream and read the characters.
+4.  **The Status Code:** We pick the right number. 
+    * **200:** "Everything is fine."
+    * **201:** "I received your data and saved it."
+    * **405:** "You can't use that Method here."
+5.  **The Cleanup:** We **always** close the `OutputStream`. If you don't close it, the browser will keep a "loading" spinner forever because it thinks the server is still talking!
 
 ## Handling date and time
 
