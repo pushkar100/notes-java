@@ -1,697 +1,121 @@
 # Java for JavaScript Developers
 
 - [Java for JavaScript Developers](#java-for-javascript-developers)
-   * [Code structure, file, and comments](#code-structure-file-and-comments)
-      + [Program Structure & Basic Construct](#program-structure-basic-construct)
-      + [File Names](#file-names)
-      + [Types of Comments](#types-of-comments)
-   * [Scope of classes](#scope-of-classes)
-      + [1. The Primary (Public) Class](#1-the-primary-public-class)
-      + [2. Other Classes in the File (Non-Public)](#2-other-classes-in-the-file-non-public)
-      + [Summary Table](#summary-table)
-   * [How many classes in a file?](#how-many-classes-in-a-file)
-      + [The Rules](#the-rules)
-      + [The Best Practice: One File, One Class](#the-best-practice-one-file-one-class)
-      + [When would you actually need multiple classes in a file?](#when-would-you-actually-need-multiple-classes-in-a-file)
-         - [1. "Helper" Classes (Package-Private)](#1-helper-classes-package-private)
-         - [2. Static Inner Classes (The Builder Pattern)](#2-static-inner-classes-the-builder-pattern)
-         - [3. Inner Classes (Specific Logic)](#3-inner-classes-specific-logic)
-      + [Summary Table](#summary-table-1)
-   * [Invoking other class methods from the `main` method](#invoking-other-class-methods-from-the-main-method)
-   * [Print statements](#print-statements)
-      + [The Print Statements](#the-print-statements)
-      + [Breakdown of the Java Statement](#breakdown-of-the-java-statement)
-   * [Compilation and execution](#compilation-and-execution)
-      + [Compilation and Execution](#compilation-and-execution-1)
-   * [JVM vs JIT Compilation](#jvm-vs-jit-compilation)
-   * [Semicolons](#semicolons)
-   * [Variables and Data Types](#variables-and-data-types)
-      + [Static vs. Dynamic Typing](#static-vs-dynamic-typing)
-      + [Declaring, Assigning, and Basic Data Types](#declaring-assigning-and-basic-data-types)
-      + [Primitive vs. Object Types (The String Rule)](#primitive-vs-object-types-the-string-rule)
-      + [Escape Characters](#escape-characters)
-   * [float vs double](#float-vs-double)
-      + [The One Size Fits All vs. Precision Control](#the-one-size-fits-all-vs-precision-control)
-      + [The Java "Gotcha": The `f` Suffix](#the-java-gotcha-the-f-suffix)
-   * [Byte data type](#byte-data-type)
-      + [1. The 8-Bit Primitive vs. The 64-Bit Float](#1-the-8-bit-primitive-vs-the-64-bit-float)
-      + [2. The Automatic Promotion Trap](#2-the-automatic-promotion-trap)
-   * [Compilation vs Runtime errors](#compilation-vs-runtime-errors)
-   * [What is var?](#what-is-var)
-   * [Naming Rules and Conventions](#naming-rules-and-conventions)
-      + [The Hard Naming Rules](#the-hard-naming-rules)
-   * [Data types of expressions](#data-types-of-expressions)
-      + [Strict Evaluation vs. Type Coercion](#strict-evaluation-vs-type-coercion)
-   * [Mathematical operators](#mathematical-operators)
-      + [1. Integer Division (The Truncation Rule)](#1-integer-division-the-truncation-rule)
-      + [2. Exponentiation](#2-exponentiation)
-   * [Assignment operators](#assignment-operators)
-      + [1. The "Hidden Cast" in Java Compound Assignments](#1-the-hidden-cast-in-java-compound-assignments)
-      + [2. Missing Logical Assignment Operators in Java](#2-missing-logical-assignment-operators-in-java)
-   * [Logical operators](#logical-operators)
-      + [1. The Strict Boolean Rule](#1-the-strict-boolean-rule)
-      + [2. Return Values (Default Assignment)](#2-return-values-default-assignment)
-   * [Comparison operators](#comparison-operators)
-      + [1. No Strict Equality Operator (`===`)](#1-no-strict-equality-operator-)
-      + [2. The `==` Trap: Primitives vs. Objects](#2-the-trap-primitives-vs-objects)
-   * [Relational operators](#relational-operators)
-      + [1. The "Numbers Only" Rule](#1-the-numbers-only-rule)
-      + [2. Alphabetical Ordering (Strings)](#2-alphabetical-ordering-strings)
-   * [Bitwise operators](#bitwise-operators)
-      + [1. The 32-Bit Limit vs. True 64-Bit Math](#1-the-32-bit-limit-vs-true-64-bit-math)
-      + [2. Automatic Type Promotion (The `byte` Trap)](#2-automatic-type-promotion-the-byte-trap)
-   * [Ternary operator](#ternary-operator)
-      + [1. The Strict Boolean Condition](#1-the-strict-boolean-condition)
-      + [2. Matching Return Types](#2-matching-return-types)
-   * [Constant and Let variable handling in Java?](#constant-and-let-variable-handling-in-java)
-      + [The `let` Equivalent: Explicit Types and `var`](#the-let-equivalent-explicit-types-and-var)
-      + [The `const` Equivalent: The `final` Keyword](#the-const-equivalent-the-final-keyword)
-   * [Objects vs Primitives](#objects-vs-primitives)
-      + [The Rigid Wall in Java](#the-rigid-wall-in-java)
-      + [The Wrapper Class Quirk in Java](#the-wrapper-class-quirk-in-java)
-   * [Scope of objects and primitives](#scope-of-objects-and-primitives)
-      + [1. Primitive Scope (Stack Memory)](#1-primitive-scope-stack-memory)
-      + [2. Object Scope (Heap Memory)](#2-object-scope-heap-memory)
-      + [3. Java vs. JavaScript Comparison](#3-java-vs-javascript-comparison)
-      + [4. Best Practice: The "Shadowing" Trap](#4-best-practice-the-shadowing-trap)
-   * [Understanding objects](#understanding-objects)
-      + [1. Creating New Objects](#1-creating-new-objects)
-      + [2. Calling Methods](#2-calling-methods)
-      + [3. Object References](#3-object-references)
-      + [4. Comparing Objects (`==` vs `.equals()`)](#4-comparing-objects-vs-equals)
-      + [5. Copying Objects (Shallow vs. Deep)](#5-copying-objects-shallow-vs-deep)
-      + [6. Determining the Class](#6-determining-the-class)
-      + [7. Casting Objects](#7-casting-objects)
-      + [8. Converting to Primitives (Unboxing)](#8-converting-to-primitives-unboxing)
-   * [Autoboxing](#autoboxing)
-   * [Copy constructor (Cloning Objects)](#copy-constructor-cloning-objects)
-   * [Functions and methods](#functions-and-methods)
-      + [1. The "Everything is a Method" Rule](#1-the-everything-is-a-method-rule)
-      + [2. Strict Signatures (Return Types and Parameters)](#2-strict-signatures-return-types-and-parameters)
-      + [3. Functions as "First-Class Citizens"](#3-functions-as-first-class-citizens)
-      + [Summary Table](#summary-table-2)
-   * [Return keyword and return types](#return-keyword-and-return-types)
-      + [1. The Strict Return Contract](#1-the-strict-return-contract)
-      + [2. The "Every Path Must Return" Rule](#2-the-every-path-must-return-rule)
-      + [3. The `void` Keyword (Java has no `undefined`)](#3-the-void-keyword-java-has-no-undefined)
-      + [4. Code Example: Java vs. JavaScript](#4-code-example-java-vs-javascript)
-      + [Summary Table](#summary-table-3)
-   * [Writing functions that return different types](#writing-functions-that-return-different-types)
-      + [1. The JS-Like Way: Return `Object` (Not Recommended)](#1-the-js-like-way-return-object-not-recommended)
-      + [2. The "Java Way": Return a Custom Wrapper Class (Recommended)](#2-the-java-way-return-a-custom-wrapper-class-recommended)
-      + [3. JavaScript Comparison](#3-javascript-comparison)
-   * [Null and optional return values](#null-and-optional-return-values)
-      + [1. The "Only One Way" Rule](#1-the-only-one-way-rule)
-      + [2. Null vs. Primitives](#2-null-vs-primitives)
-      + [3. The Infamous NullPointerException (NPE)](#3-the-infamous-nullpointerexception-npe)
-      + [4. Modern Java: The `Optional` Type](#4-modern-java-the-optional-type)
-      + [Summary Table](#summary-table-4)
-   * [Pass-by-value and Pass-by-reference](#pass-by-value-and-pass-by-reference)
-      + [1. The Core Rule: Everything is a Value](#1-the-core-rule-everything-is-a-value)
-      + [2. Passing Primitives (Strictly Value)](#2-passing-primitives-strictly-value)
-      + [3. Passing Objects (The "Reference" Confusion)](#3-passing-objects-the-reference-confusion)
-      + [4. Summary Table](#4-summary-table)
-      + [Why does Java say "Pass-by-Value" then?](#why-does-java-say-pass-by-value-then)
-   * [String handling and manipulation](#string-handling-and-manipulation)
-      + [1. Comparing Strings: `==` vs `.equals()`](#1-comparing-strings-vs-equals)
-      + [2. Heavy Manipulation (`StringBuilder`)](#2-heavy-manipulation-stringbuilder)
-      + [3. Built-in Manipulation Methods](#3-built-in-manipulation-methods)
-      + [4. String Interpolation](#4-string-interpolation)
-      + [Common Java string manipulation methods](#common-java-string-manipulation-methods)
-      + [Common Java String Methods](#common-java-string-methods)
-   * [StringBuilder](#stringbuilder)
-      + [What is StringBuilder?](#what-is-stringbuilder)
-      + [Why is it Needed? (The Memory Problem)](#why-is-it-needed-the-memory-problem)
-      + [How it is Used](#how-it-is-used)
-      + [How to Effectively Use It (Best Practices)](#how-to-effectively-use-it-best-practices)
-      + [Methods of StringBuilder objects](#methods-of-stringbuilder-objects)
-      + [The Short Answer: No](#the-short-answer-no)
-      + [What Methods *Does* StringBuilder Have?](#what-methods-does-stringbuilder-have)
-      + [How to Perform Normal String Operations](#how-to-perform-normal-string-operations)
-      + [Choosing StringBuilder over a String](#choosing-stringbuilder-over-a-string)
-         - [1. Use `String` for Constants or Single-Line Concatenation](#1-use-string-for-constants-or-single-line-concatenation)
-         - [2. Use `StringBuilder` for Loops](#2-use-stringbuilder-for-loops)
-         - [3. Use `StringBuilder` for Large-Scale Construction](#3-use-stringbuilder-for-large-scale-construction)
-         - [Summary Table](#summary-table-5)
-         - [Complexity Comparison](#complexity-comparison)
-   * [Arrays](#arrays)
-      + [1. Fixed Size (The Hard Limit)](#1-fixed-size-the-hard-limit)
-      + [2. Strict Data Typing](#2-strict-data-typing)
-      + [3. Printing and Methods (No Push or Pop)](#3-printing-and-methods-no-push-or-pop)
-   * [ArrayList](#arraylist)
-      + [1. Why We Need It & The Benefits](#1-why-we-need-it-the-benefits)
-      + [2. How to Use It (The Object Rule)](#2-how-to-use-it-the-object-rule)
-      + [3. When to Use ArrayList vs. Standard Arrays](#3-when-to-use-arraylist-vs-standard-arrays)
-      + [4. Converting Between Them](#4-converting-between-them)
-   * [List](#list)
-      + [1. Standard Arrays vs. ArrayLists](#1-standard-arrays-vs-arraylists)
-      + [2. The Relationship: List vs. ArrayList](#2-the-relationship-list-vs-arraylist)
-      + [3. Comparison Table: Java vs. JavaScript](#3-comparison-table-java-vs-javascript)
-      + [4. When to use what?](#4-when-to-use-what)
-      + [Summary of Differences](#summary-of-differences)
-   * [Best practices - ArrayList vs List usage](#best-practices-arraylist-vs-list-usage)
-      + [1. The Practical Difference](#1-the-practical-difference)
-      + [2. Best Practices (The "Why")](#2-best-practices-the-why)
-         - [Use `List` for the "Contract"](#use-list-for-the-contract)
-         - [Use `ArrayList` for the "Engine"](#use-arraylist-for-the-engine)
-      + [Summary Checklist](#summary-checklist)
-   * [Multidimensional Arrays and ArrayLists](#multidimensional-arrays-and-arraylists)
-      + [1. Multidimensional Arrays (Fixed Size)](#1-multidimensional-arrays-fixed-size)
-      + [2. Nested ArrayLists (Dynamic Size)](#2-nested-arraylists-dynamic-size)
-      + [3. Key Differences Summary](#3-key-differences-summary)
-      + [4. Printing the Data](#4-printing-the-data)
-   * [Array and ArrayList methods](#array-and-arraylist-methods)
-      + [1. Standard Arrays (`int[]`, `String[]`)](#1-standard-arrays-int-string)
-      + [2. ArrayList (`ArrayList<String>`)](#2-arraylist-arrayliststring)
-   * [Type casting and converting](#type-casting-and-converting)
-      + [1. Implicit Casting (Widening - Safe)](#1-implicit-casting-widening-safe)
-      + [2. Explicit Casting (Narrowing - Risky)](#2-explicit-casting-narrowing-risky)
-      + [3. Converting Strings to Numbers (Parsing)](#3-converting-strings-to-numbers-parsing)
-      + [4. Converting Numbers to Strings](#4-converting-numbers-to-strings)
-   * [Specific type conversions](#specific-type-conversions)
-      + [1. String and int](#1-string-and-int)
-      + [2. String and double](#2-string-and-double)
-      + [3. boolean and number](#3-boolean-and-number)
-      + [4. char and String](#4-char-and-string)
-      + [5. String and boolean](#5-string-and-boolean)
-      + [How to Convert Using StringBuilder](#how-to-convert-using-stringbuilder)
-   * [Generics and how to create one](#generics-and-how-to-create-one)
-      + [The Core Difference: Dynamic vs. Type-Safe](#the-core-difference-dynamic-vs-type-safe)
-      + [1. Built-in Generics (The Collections Framework)](#1-built-in-generics-the-collections-framework)
-         - [Example A: Single Type (`ArrayList<E>`)](#example-a-single-type-arrayliste)
-         - [Example B: Multiple Types (`HashMap<K, V>`)](#example-b-multiple-types-hashmapk-v)
-      + [2. Creating Your Own Generic Class](#2-creating-your-own-generic-class)
-      + [3. The Big "Gotcha": No Primitives Allowed](#3-the-big-gotcha-no-primitives-allowed)
-      + [Why Do We Need Generics?](#why-do-we-need-generics)
-      + [When to Use Generics over Built-in Objects](#when-to-use-generics-over-built-in-objects)
-   * [Diamond operator used with Generics](#diamond-operator-used-with-generics)
-      + [1. The Shortcut (Type Inference)](#1-the-shortcut-type-inference)
-      + [2. The Danger of Omitting the `<>` completely](#2-the-danger-of-omitting-the-completely)
-   * [Creating data structures with flexible types](#creating-data-structures-with-flexible-types)
-      + [1. The "JS Way": Using the `Object` Superclass](#1-the-js-way-using-the-object-superclass)
-      + [2. Why the "JS Way" is a Bad Practice in Java](#2-why-the-js-way-is-a-bad-practice-in-java)
-      + [3. The Java Best Practices](#3-the-java-best-practices)
-   * [Collections and why we need them](#collections-and-why-we-need-them)
-      + [1. The Core Difference: Specialized Tools](#1-the-core-difference-specialized-tools)
-      + [2. Why We Need Collections](#2-why-we-need-collections)
-      + [3. Common Collections and Use Cases](#3-common-collections-and-use-cases)
-         - [A. ArrayList (The Dynamic List)](#a-arraylist-the-dynamic-list)
-         - [B. HashSet (The Unique Set)](#b-hashset-the-unique-set)
-         - [C. HashMap (The Key-Value Store)](#c-hashmap-the-key-value-store)
-         - [D. LinkedList (The Fast Inserter)](#d-linkedlist-the-fast-inserter)
-      + [4. Summary Table](#4-summary-table-1)
-   * [ArrayList collection](#arraylist-collection)
-      + [1. The Core Purpose: Dynamic Sizing](#1-the-core-purpose-dynamic-sizing)
-      + [2. Objects Only (No Primitives)](#2-objects-only-no-primitives)
-      + [3. Common Method Comparison](#3-common-method-comparison)
-      + [4. Comparison Summary](#4-comparison-summary)
-   * [HashSet collection](#hashset-collection)
-      + [1. The Core Concept: Uniqueness and Speed](#1-the-core-concept-uniqueness-and-speed)
-      + [2. Key Differences from JavaScript](#2-key-differences-from-javascript)
-      + [3. Common Method Comparison](#3-common-method-comparison-1)
-      + [4. Code Example: Java vs. JavaScript](#4-code-example-java-vs-javascript-1)
-      + [5. When to use HashSet?](#5-when-to-use-hashset)
-   * [HashMap collection](#hashmap-collection)
-      + [1. The Core Concept: Key-Value Mapping](#1-the-core-concept-key-value-mapping)
-      + [2. Key Differences from JavaScript](#2-key-differences-from-javascript-1)
-      + [3. Common Method Comparison](#3-common-method-comparison-2)
-      + [4. Code Example: Java vs. JavaScript](#4-code-example-java-vs-javascript-2)
-      + [5. When to use HashMap?](#5-when-to-use-hashmap)
-   * [LinkedList collection](#linkedlist-collection)
-      + [1. The Core Concept: The "Chain" vs. The "Box"](#1-the-core-concept-the-chain-vs-the-box)
-      + [2. Performance Trade-offs](#2-performance-trade-offs)
-      + [3. Key Differences from JavaScript](#3-key-differences-from-javascript)
-      + [4. Common Method Comparison](#4-common-method-comparison)
-      + [5. Java Code Example](#5-java-code-example)
-      + [When to use LinkedList?](#when-to-use-linkedlist)
-   * [Representing stacks and queues](#representing-stacks-and-queues)
-      + [1. Representing a Stack (LIFO - Last In, First Out)](#1-representing-a-stack-lifo-last-in-first-out)
-      + [2. Representing a Queue (FIFO - First In, First Out)](#2-representing-a-queue-fifo-first-in-first-out)
-      + [3. Key Differences Summary](#3-key-differences-summary-1)
-      + [Which one should you use for LeetCode?](#which-one-should-you-use-for-leetcode)
-   * [Representing Heaps](#representing-heaps)
-      + [1. The Default: Min-Heap](#1-the-default-min-heap)
-      + [2. The Max-Heap (Using a Comparator)](#2-the-max-heap-using-a-comparator)
-      + [3. Key Differences Summary](#3-key-differences-summary-2)
-      + [4. Comparison with Custom Objects](#4-comparison-with-custom-objects)
-   * [Most common errors and handling exceptions](#most-common-errors-and-handling-exceptions)
-      + [1. The Most Common Crash: NullPointerException (NPE)](#1-the-most-common-crash-nullpointerexception-npe)
-      + [2. The Biggest Difference: Checked vs. Unchecked Exceptions](#2-the-biggest-difference-checked-vs-unchecked-exceptions)
-      + [3. Handling Errors: try / catch](#3-handling-errors-try-catch)
-   * [Conditionals](#conditionals)
-      + [1. The Biggest Difference: No "Truthy" or "Falsy"](#1-the-biggest-difference-no-truthy-or-falsy)
-      + [2. Comparing Strings in Conditionals](#2-comparing-strings-in-conditionals)
-      + [3. The `switch` Statement](#3-the-switch-statement)
-      + [4. Comparing objects in conditionals](#4-comparing-objects-in-conditionals)
-         - [1. The `==` Operator (Memory Reference)](#1-the-operator-memory-reference)
-         - [2. The `.equals()` Method (Content Equality)](#2-the-equals-method-content-equality)
-         - [3. The Custom Object Rule (Overriding)](#3-the-custom-object-rule-overriding)
-      + [Summary Tables](#summary-tables)
-   * [Loops](#loops)
-      + [1. The Core Differences](#1-the-core-differences)
-      + [2. How to Loop Over Different Structures in Java](#2-how-to-loop-over-different-structures-in-java)
-         - [A. Arrays and ArrayLists](#a-arrays-and-arraylists)
-         - [B. Chars of a String](#b-chars-of-a-string)
-         - [C. Chars of a StringBuilder (Is it possible?)](#c-chars-of-a-stringbuilder-is-it-possible)
-         - [D. Values of a HashSet](#d-values-of-a-hashset)
-         - [E. HashMap (Keys, Values, and Entries)](#e-hashmap-keys-values-and-entries)
-   * [Classic loops](#classic-loops)
-      + [1. The Classic `for` Loop](#1-the-classic-for-loop)
-      + [2. The `while` Loop with a Counter](#2-the-while-loop-with-a-counter)
-      + [The Big "Gotcha" for JavaScript Developers](#the-big-gotcha-for-javascript-developers)
-   * [break and continue keywords](#break-and-continue-keywords)
-      + [1. Basic usage (Same as JS)](#1-basic-usage-same-as-js)
-      + [2. The Big Difference: Labeled Break and Continue](#2-the-big-difference-labeled-break-and-continue)
-      + [3. Usage in Switch Statements](#3-usage-in-switch-statements)
-   * [Lambdas (Arrow functions) and Streams (used in map, filter, and foreach)](#lambdas-arrow-functions-and-streams-used-in-map-filter-and-foreach)
-      + [1. Lambdas (Arrow Functions)](#1-lambdas-arrow-functions)
-      + [2. Streams (Data Pipelines)](#2-streams-data-pipelines)
-      + [Summary Table](#summary-table-6)
-      + [Using Streams for Array and ArrayLists operations](#using-streams-for-array-and-arraylists-operations)
-         - [1. The Source: Converting to a Stream](#1-the-source-converting-to-a-stream)
-         - [2. The Operations (Intermediate & Terminal)](#2-the-operations-intermediate-terminal)
-         - [3. The Terminal: Converting Back](#3-the-terminal-converting-back)
-            * [Example A: ArrayList Pipeline (List to Stream to List)](#example-a-arraylist-pipeline-list-to-stream-to-list)
-            * [Example B: Array Pipeline (Array to Stream to Array)](#example-b-array-pipeline-array-to-stream-to-array)
-            * [Example C: The Reduce Operation](#example-c-the-reduce-operation)
-      + [What is the `Collect` object?](#what-is-the-collect-object)
-         - [The Need](#the-need)
-         - [Common Ways to Use It](#common-ways-to-use-it)
-   * [Maps vs HashMaps and collecting them from streams](#maps-vs-hashmaps-and-collecting-them-from-streams)
-      + [What is the need?](#what-is-the-need)
-      + [How does it differ from HashMap?](#how-does-it-differ-from-hashmap)
-      + [When to use what?](#when-to-use-what)
-      + [Example: Using Collections with Map and HashMap](#example-using-collections-with-map-and-hashmap)
-      + [Example: Converting a Stream to a Map (using Collectors)](#example-converting-a-stream-to-a-map-using-collectors)
-      + [What is the :: operator?](#what-is-the-operator)
-         - [How it is useful in `collect()`](#how-it-is-useful-in-collect)
-         - [Useful Examples for Maps](#useful-examples-for-maps)
-         - [Summary of common `::` patterns](#summary-of-common-patterns)
-      + [IllegalStateException and the collect method](#illegalstateexception-and-the-collect-method)
-         - [The Problem](#the-problem)
-         - [The Fix (Merge Function)](#the-fix-merge-function)
-   * [Enums and Annotations](#enums-and-annotations)
-      + [1. Enums (Enumerations)](#1-enums-enumerations)
-      + [2. Annotations (Metadata)](#2-annotations-metadata)
-      + [Summary Table](#summary-table-7)
-   * [Reflections to handle annotations](#reflections-to-handle-annotations)
-      + [1. The Main Use Case: Reading Annotations](#1-the-main-use-case-reading-annotations)
-      + [2. Breaking Encapsulation (Accessing Private Data)](#2-breaking-encapsulation-accessing-private-data)
-      + [Summary Table](#summary-table-8)
-   * [Classes and instances](#classes-and-instances)
-      + [1. The Rigid Blueprint Rule](#1-the-rigid-blueprint-rule)
-      + [2. Classes as Data Types](#2-classes-as-data-types)
-      + [3. The One-Class-Per-File Rule](#3-the-one-class-per-file-rule)
-      + [Summary Table](#summary-table-9)
-   * [Class methods and constructors](#class-methods-and-constructors)
-      + [1. The Constructor Method](#1-the-constructor-method)
-      + [2. Overloading Constructors (Multiple Constructors)](#2-overloading-constructors-multiple-constructors)
-      + [3. Calling Another Constructor (`this()`)](#3-calling-another-constructor-this)
-      + [4. Overriding Methods (`@Override`)](#4-overriding-methods-override)
-      + [Summary Table](#summary-table-10)
-      + [Why overload constructors?](#why-overload-constructors)
-         - [The Java Way: Explicit Pathways](#the-java-way-explicit-pathways)
-         - [The JavaScript Comparison](#the-javascript-comparison)
-         - [Summary of "Why" in Java:](#summary-of-why-in-java)
-      + [Why override methods?](#why-override-methods)
-      + [The Java Way: Safe Polymorphism](#the-java-way-safe-polymorphism)
-      + [The JavaScript Comparison](#the-javascript-comparison-1)
-      + [Summary of "Why" in Java:](#summary-of-why-in-java-1)
-   * [The this keyword and class method or field access](#the-this-keyword-and-class-method-or-field-access)
-      + [1. The Stability of `this`](#1-the-stability-of-this)
-      + [2. When `this` is Optional (Shadowing)](#2-when-this-is-optional-shadowing)
-      + [3. Using `this` for Constructors](#3-using-this-for-constructors)
-      + [4. Accessing Static Members](#4-accessing-static-members)
-      + [Summary Table](#summary-table-11)
-      + [Invoking class methods](#invoking-class-methods)
-         - [1. Invoking Methods in the Same Class](#1-invoking-methods-in-the-same-class)
-         - [2. Invoking Parent Methods (`super`)](#2-invoking-parent-methods-super)
-         - [3. Static vs. Instance Invocation](#3-static-vs-instance-invocation)
-         - [4. Method Overloading (The Java Power-up)](#4-method-overloading-the-java-power-up)
-         - [Summary Table](#summary-table-12)
-   * [Access modifiers in classes](#access-modifiers-in-classes)
-      + [1. The Four Java Access Modifiers](#1-the-four-java-access-modifiers)
-      + [2. Code Example: Java vs. JavaScript](#2-code-example-java-vs-javascript)
-      + [3. Key Differences Summary](#3-key-differences-summary-3)
-      + [Why is this important in Java?](#why-is-this-important-in-java)
-   * [Static fields and methods](#static-fields-and-methods)
-      + [1. The Core Concept: Shared Memory](#1-the-core-concept-shared-memory)
-      + [2. The Big Differences from JavaScript](#2-the-big-differences-from-javascript)
-      + [3. Code Example: Java vs. JavaScript](#3-code-example-java-vs-javascript)
-      + [4. The `static` Initialization Block](#4-the-static-initialization-block)
-   * [Inheritance](#inheritance)
-      + [1. The Core Difference: Classical vs. Prototypal](#1-the-core-difference-classical-vs-prototypal)
-      + [2. The Single Inheritance Rule](#2-the-single-inheritance-rule)
-      + [3. Constructors and the `super()` Keyword](#3-constructors-and-the-super-keyword)
-      + [4. Code Example: Java vs. JavaScript](#4-code-example-java-vs-javascript-3)
-      + [5. The Invisible Parent (`java.lang.Object`)](#5-the-invisible-parent-javalangobject)
-      + [Summary Table](#summary-table-13)
-   * [Abstract classes](#abstract-classes)
-      + [1. What is an Abstract Class?](#1-what-is-an-abstract-class)
-      + [2. Abstract Methods (The "Must-Do" List)](#2-abstract-methods-the-must-do-list)
-      + [3. Java vs. JavaScript Comparison](#3-java-vs-javascript-comparison-1)
-      + [Should we use abstract classes?](#should-we-use-abstract-classes)
-         - [Use Abstract Classes When...](#use-abstract-classes-when)
-         - [Do NOT Use Abstract Classes When...](#do-not-use-abstract-classes-when)
-         - [Best Practice](#best-practice)
-      + [Summary Table](#summary-table-14)
-   * [When to choose composition over inheritance?](#when-to-choose-composition-over-inheritance)
-      + [1. The Big Difference: Strict Wiring vs. Dynamic Mixins](#1-the-big-difference-strict-wiring-vs-dynamic-mixins)
-      + [2. Code Example: Java vs. JavaScript](#2-code-example-java-vs-javascript-1)
-      + [3. Summary Table](#3-summary-table)
-   * [Dependency injection](#dependency-injection)
-      + [1. What is Dependency Injection (DI) and Why Do We Need It?](#1-what-is-dependency-injection-di-and-why-do-we-need-it)
-      + [2. The Big Difference: Manual Wiring vs. Java Frameworks](#2-the-big-difference-manual-wiring-vs-java-frameworks)
-      + [3. Code Example: The Evolution of DI](#3-code-example-the-evolution-of-di)
-         - [A. The Bad Way (No DI)](#a-the-bad-way-no-di)
-         - [B. The Manual Way (Basic DI)](#b-the-manual-way-basic-di)
-         - [C. The Modern Java Way (Automated DI via Frameworks)](#c-the-modern-java-way-automated-di-via-frameworks)
-      + [Summary Table](#summary-table-15)
-   * [Classes and the final keyword ](#classes-and-the-final-keyword)
-      + [1. Final Variables (The `const` equivalent)](#1-final-variables-the-const-equivalent)
-      + [2. Final Methods (Preventing Overrides)](#2-final-methods-preventing-overrides)
-      + [3. Final Classes (Preventing Inheritance)](#3-final-classes-preventing-inheritance)
-      + [Summary Table](#summary-table-16)
-   * [Interfaces](#interfaces)
-      + [1. What, Why, and How (Java vs. JS)](#1-what-why-and-how-java-vs-js)
-      + [2. Comparison: Interface vs. Abstract Class vs. Composition](#2-comparison-interface-vs-abstract-class-vs-composition)
-      + [3. Pros and Cons](#3-pros-and-cons)
-         - [**Interfaces**](#interfaces-1)
-         - [**Abstract Classes**](#abstract-classes-1)
-         - [**Composition**](#composition)
-      + [Summary Rule of Thumb](#summary-rule-of-thumb)
-      + [Tangled family tree problem](#tangled-family-tree-problem)
-         - [1. The Inheritance Mess (Is-A)](#1-the-inheritance-mess-is-a)
-         - [2. The Clean Way: Interface + Composition (Has-A)](#2-the-clean-way-interface-composition-has-a)
-   * [Classes and generics](#classes-and-generics)
-      + [Why do we need generics?](#why-do-we-need-generics-1)
-         - [The "Vague" Way (Risky)](#the-vague-way-risky)
-         - [The "Generic" Way (Safe)](#the-generic-way-safe)
-         - [The Result](#the-result)
-      + [1. The Core Concept: Type Parameters](#1-the-core-concept-type-parameters)
-      + [2. Type Erasure (The "Under the Hood" Difference)](#2-type-erasure-the-under-the-hood-difference)
-      + [3. Summary Table](#3-summary-table-1)
-      + [4. Comparison: Java vs. TypeScript](#4-comparison-java-vs-typescript)
-      + [A generic method can exist inside a non-generic class](#a-generic-method-can-exist-inside-a-non-generic-class)
-         - [How it works](#how-it-works)
-         - [Why do this?](#why-do-this)
-      + [Classes and methods using multiple generics](#classes-and-methods-using-multiple-generics)
-         - [1. Classes with Multiple Generics](#1-classes-with-multiple-generics)
-         - [2. Methods with Multiple Generics](#2-methods-with-multiple-generics)
-         - [Summary](#summary)
-   * [Bounded and multiple generics](#bounded-and-multiple-generics)
-   * [Class getters and setters](#class-getters-and-setters)
-      + [1. The Basic Syntax](#1-the-basic-syntax)
-      + [2. Why do we need them? (The "Gatekeeper" Concept)](#2-why-do-we-need-them-the-gatekeeper-concept)
-      + [3. Read-Only and Write-Only Fields](#3-read-only-and-write-only-fields)
-      + [4. Java vs. JavaScript Comparison](#4-java-vs-javascript-comparison)
-   * [Code smells with getters and setters](#code-smells-with-getters-and-setters)
-      + [1. When it's a "Code Smell"](#1-when-its-a-code-smell)
-      + [2. The Best Practice: "Tell, Don't Ask"](#2-the-best-practice-tell-dont-ask)
-      + [3. When to USE Getters and Setters](#3-when-to-use-getters-and-setters)
-      + [4. When to NOT use them](#4-when-to-not-use-them)
-      + [5. The Modern Solution: Java Records](#5-the-modern-solution-java-records)
-      + [Summary Rule of Thumb](#summary-rule-of-thumb-1)
-   * [DTOs and Records](#dtos-and-records)
-      + [The "Good" DTO Example](#the-good-dto-example)
-      + [Why this is considered "Good":](#why-this-is-considered-good)
-      + [The Modern Alternative (Record)](#the-modern-alternative-record)
-   * [OOP principles in Java](#oop-principles-in-java)
-      + [1. Encapsulation (Data Hiding)](#1-encapsulation-data-hiding)
-      + [2. Abstraction (The "What" vs. "How")](#2-abstraction-the-what-vs-how)
-      + [3. Polymorphism (Many Forms)](#3-polymorphism-many-forms)
-      + [4. Generalization (Inheritance)](#4-generalization-inheritance)
-      + [Summary Table](#summary-table-17)
-   * [SOLID design patterns](#solid-design-patterns)
-      + [1. S: Single Responsibility Principle (SRP)](#1-s-single-responsibility-principle-srp)
-      + [2. O: Open/Closed Principle (OCP)](#2-o-openclosed-principle-ocp)
-      + [3. L: Liskov Substitution Principle (LSP)](#3-l-liskov-substitution-principle-lsp)
-      + [4. I: Interface Segregation Principle (ISP)](#4-i-interface-segregation-principle-isp)
-      + [5. D: Dependency Inversion Principle (DIP)](#5-d-dependency-inversion-principle-dip)
-      + [Summary Table](#summary-table-18)
-   * [Common Java design patterns beyond SOLID](#common-java-design-patterns-beyond-solid)
-      + [1. The Singleton Pattern](#1-the-singleton-pattern)
-      + [2. The Factory Pattern](#2-the-factory-pattern)
-      + [3. The Builder Pattern](#3-the-builder-pattern)
-      + [4. The Observer Pattern](#4-the-observer-pattern)
-      + [5. The Strategy Pattern](#5-the-strategy-pattern)
-      + [Summary Table](#summary-table-19)
-      + [Advanced patterns](#advanced-patterns)
-         - [The Proxy Pattern](#the-proxy-pattern)
-         - [The Adapter Pattern](#the-adapter-pattern)
-      + [**Summary Difference**](#summary-difference)
-   * [Best practice for writing a utility function](#best-practice-for-writing-a-utility-function)
-      + [1. The Structure: Static Classes](#1-the-structure-static-classes)
-      + [2. Java vs. JavaScript Comparison](#2-java-vs-javascript-comparison)
-      + [3. When to use what?](#3-when-to-use-what)
-      + [Summary](#summary-1)
-   * [Best practice for storing constants](#best-practice-for-storing-constants)
-      + [1. The Standard: `static final`](#1-the-standard-static-final)
-      + [2. For Fixed Sets: The `enum`](#2-for-fixed-sets-the-enum)
-      + [3. Java vs. JavaScript Comparison](#3-java-vs-javascript-comparison-2)
-      + [Summary Best Practices](#summary-best-practices)
-   * [Best practice for maintaining configuration](#best-practice-for-maintaining-configuration)
-      + [1. The Java Way: `.properties` or `.yml`](#1-the-java-way-properties-or-yml)
-      + [2. Best Practice: Configuration Objects (Type Safety)](#2-best-practice-configuration-objects-type-safety)
-      + [3. Java vs. JavaScript Comparison](#3-java-vs-javascript-comparison-3)
-      + [4. Why the Java Way?](#4-why-the-java-way)
-      + [Summary Rule of Thumb](#summary-rule-of-thumb-2)
-   * [OOP vs Functional Programming](#oop-vs-functional-programming)
-      + [Java OOP (The Backbone)](#java-oop-the-backbone)
-      + [**Java FP (The Modern Tool)**](#java-fp-the-modern-tool)
-      + [**Quick Comparison**](#quick-comparison)
-   * [Garbage collection ](#garbage-collection)
-      + [The Real-World Analogy: The "Party House"](#the-real-world-analogy-the-party-house)
-      + [1. Java: Generational Garbage Collection](#1-java-generational-garbage-collection)
-      + [2. Java vs. JavaScript: Comparison](#2-java-vs-javascript-comparison-1)
-      + [3. Key Difference: The "Reachability" Rule](#3-key-difference-the-reachability-rule)
-      + [Best Practice for your CMS](#best-practice-for-your-cms)
-   * [Avoiding memory leaks in Java](#avoiding-memory-leaks-in-java)
-      + [1. Beware of `static` Collections](#1-beware-of-static-collections)
-      + [2. Close Your Resources (Try-with-Resources)](#2-close-your-resources-try-with-resources)
-      + [3. Clear `ThreadLocal` Variables](#3-clear-threadlocal-variables)
-      + [4. Inner Class References](#4-inner-class-references)
-      + [5. Improper `equals()` and `hashCode()`](#5-improper-equals-and-hashcode)
-      + [Summary Checklist ](#summary-checklist-1)
-      + [IntelliJ heap dumps and VisualVM](#intellij-heap-dumps-and-visualvm)
-         - [1. VisualVM (The "Live Monitor")](#1-visualvm-the-live-monitor)
-         - [2. IntelliJ Profiler (The "Integrated Surgeon")](#2-intellij-profiler-the-integrated-surgeon)
-         - [3. How to find a Leak (The Strategy)](#3-how-to-find-a-leak-the-strategy)
-         - [Summary Table](#summary-table-20)
-   * [Java packages and imports](#java-packages-and-imports)
-      + [1. The Core Concept: Folders are Namespaces](#1-the-core-concept-folders-are-namespaces)
-      + [2. The Differences](#2-the-differences)
-      + [3. Code Comparison](#3-code-comparison)
-      + [4. Key Java "Imports" to Know](#4-key-java-imports-to-know)
-      + [Summary for your app](#summary-for-your-app)
-   * [Packages vs folders](#packages-vs-folders)
-      + [1. The 1:1 Relationship](#1-the-11-relationship)
-      + [2. How it differs from a "Regular" Folder](#2-how-it-differs-from-a-regular-folder)
-      + [3. Sub-packages are NOT "Sub-folders" to Java](#3-sub-packages-are-not-sub-folders-to-java)
-      + [4. Summary: The "Mailbox" Analogy](#4-summary-the-mailbox-analogy)
-   * [Java utils and the import functionality](#java-utils-and-the-import-functionality)
-      + [1. The Core Concept: The Standard Library](#1-the-core-concept-the-standard-library)
-      + [2. Key Differences](#2-key-differences)
-      + [3. Code Comparison: Importing and Using](#3-code-comparison-importing-and-using)
-      + [4. Wildcards and the `java.lang` Exception](#4-wildcards-and-the-javalang-exception)
-      + [5. Why `java.util` is so important for your app](#5-why-javautil-is-so-important-for-your-app)
-   * [Most common util imports](#most-common-util-imports)
-      + [1. The Dynamic List: `List` + `ArrayList`](#1-the-dynamic-list-list-arraylist)
-      + [2. The Key-Value Store: `Map` + `HashMap`](#2-the-key-value-store-map-hashmap)
-      + [3. The Unique Set: `Set` + `HashSet`](#3-the-unique-set-set-hashset)
-      + [4. The Sorting Duo: `Collections` + `Comparator`](#4-the-sorting-duo-collections-comparator)
-      + [5. Input Handling: `Scanner`](#5-input-handling-scanner)
-      + [Summary Table: Which to combine?](#summary-table-which-to-combine)
-   * [Most common lang imports - Automatic](#most-common-lang-imports-automatic)
-      + [1. The Core Data Type: `String`](#1-the-core-data-type-string)
-      + [2. Mutable Strings: `StringBuilder`](#2-mutable-strings-stringbuilder)
-      + [3. System Operations: `System`](#3-system-operations-system)
-      + [4. Mathematical Functions: `Math`](#4-mathematical-functions-math)
-      + [5. Wrapper Classes: `Integer`, `Double`, `Boolean`](#5-wrapper-classes-integer-double-boolean)
-      + [6. Process Control: `Thread` and `Runnable`](#6-process-control-thread-and-runnable)
-      + [Summary Checklist](#summary-checklist-2)
-   * [HTTP related imports](#http-related-imports)
-   * [Handling date and time](#handling-date-and-time)
-      + [1. The Strategy: Choosing the Right Class](#1-the-strategy-choosing-the-right-class)
-      + [2. General Workflow: The Three Pillars](#2-general-workflow-the-three-pillars)
-         - [A. Creation (Obtaining time)](#a-creation-obtaining-time)
-         - [B. Manipulation (Immutable Math)](#b-manipulation-immutable-math)
-         - [C. Formatting (Displaying to User)](#c-formatting-displaying-to-user)
-      + [3. Best Practices for your app](#3-best-practices-for-your-app)
-         - [Rule 1: Always store in UTC](#rule-1-always-store-in-utc)
-         - [Rule 2: Use `Period` and `Duration` for Math](#rule-2-use-period-and-duration-for-math)
-         - [Rule 3: Use the Database Driver](#rule-3-use-the-database-driver)
-      + [4. Comparison with JavaScript](#4-comparison-with-javascript)
-   * [Java multi-threading and concurrency](#java-multi-threading-and-concurrency)
-      + [The Core Concept: Multi-threading](#the-core-concept-multi-threading)
-      + [Java vs. JavaScript: Comparison](#java-vs-javascript-comparison)
-      + [Java Code Example: Creating a Thread](#java-code-example-creating-a-thread)
-      + [The "Danger" Zone: Shared Mutable State](#the-danger-zone-shared-mutable-state)
-      + [Best Practice: Don't Create Threads Manually](#best-practice-dont-create-threads-manually)
-   * [Java threads vs JS event loop](#java-threads-vs-js-event-loop)
-      + [1. The Architecture](#1-the-architecture)
-      + [2. Key Differences Table](#2-key-differences-table)
-      + [3. Visual Comparison (ASCII)](#3-visual-comparison-ascii)
-      + [4. Code Comparison](#4-code-comparison)
-      + [Summary](#summary-2)
-   * [How threads work](#how-threads-work)
-      + [1. The Process (The Factory)](#1-the-process-the-factory)
-      + [2. The Thread (The Worker)](#2-the-thread-the-worker)
-      + [3. Visual Representation (ASCII Diagram)](#3-visual-representation-ascii-diagram)
-      + [4. Key Differences Table](#4-key-differences-table)
-      + [5. Java Code Example: Shared vs. Private Scope](#5-java-code-example-shared-vs-private-scope)
-      + [Summary](#summary-3)
-   * [When to use threads?](#when-to-use-threads)
-      + [1. When to use Threads?](#1-when-to-use-threads)
-      + [2. When NOT to use Threads?](#2-when-not-to-use-threads)
-      + [3. Java Threads vs. Node.js Event Loop](#3-java-threads-vs-nodejs-event-loop)
-      + [4. Reasons NOT to use Threads (The "Gotchas")](#4-reasons-not-to-use-threads-the-gotchas)
-      + [Summary Table](#summary-table-21)
-   * [Avoiding race conditions in threads](#avoiding-race-conditions-in-threads)
-      + [1. The `synchronized` Keyword](#1-the-synchronized-keyword)
-      + [2. Atomic Variables](#2-atomic-variables)
-      + [3. Explicit Locks (`ReentrantLock`)](#3-explicit-locks-reentrantlock)
-      + [Summary Comparison](#summary-comparison)
-      + [Why this matters for your CMS](#why-this-matters-for-your-cms)
-   * [ExecutorService or a Thread Pool](#executorservice-or-a-thread-pool)
-      + [1. What is it?](#1-what-is-it)
-      + [2. Why use it?](#2-why-use-it)
-      + [3. How to use it?](#3-how-to-use-it)
-         - [A. Create the Pool](#a-create-the-pool)
-         - [B. Submit Tasks](#b-submit-tasks)
-         - [C. Shut it Down](#c-shut-it-down)
-      + [4. Real-World Comparison (The Coffee Shop)](#4-real-world-comparison-the-coffee-shop)
-      + [5. Best Practice for production](#5-best-practice-for-production)
-   * [Runnable used with threads](#runnable-used-with-threads)
-      + [1. The Purpose: "What" vs. "Who"](#1-the-purpose-what-vs-who)
-      + [2. How it works in the code](#2-how-it-works-in-the-code)
-      + [3. Why use `Runnable` instead of extending `Thread`?](#3-why-use-runnable-instead-of-extending-thread)
-      + [4. Java vs. JavaScript Comparison](#4-java-vs-javascript-comparison-1)
-      + [5. The Modern Way: Lambdas](#5-the-modern-way-lambdas)
-   * [Callable with threads](#callable-with-threads)
-      + [1. Runnable vs. Callable](#1-runnable-vs-callable)
-      + [2. The "Receipt": Future](#2-the-receipt-future)
-      + [3. Java vs. JavaScript: The Promise Comparison](#3-java-vs-javascript-the-promise-comparison)
-      + [4. The Modern Way: `CompletableFuture`](#4-the-modern-way-completablefuture)
-   * [ScheduledExecutorService](#scheduledexecutorservice)
-      + [1. How to Create It](#1-how-to-create-it)
-      + [2. Common Scheduling Methods](#2-common-scheduling-methods)
-         - [A. Run Once (Delayed)](#a-run-once-delayed)
-         - [B. Fixed Rate (Regular Intervals)](#b-fixed-rate-regular-intervals)
-         - [C. Fixed Delay (Pause Between Runs)](#c-fixed-delay-pause-between-runs)
-      + [3. Java vs. JavaScript: The Comparison](#3-java-vs-javascript-the-comparison)
-      + [Summary of Best Practices](#summary-of-best-practices)
-   * [Avoiding deadlocks in threads](#avoiding-deadlocks-in-threads)
-      + [1. How a Deadlock Happens (The "Deadly Embrace")](#1-how-a-deadlock-happens-the-deadly-embrace)
-      + [2. How to Avoid Deadlocks](#2-how-to-avoid-deadlocks)
-         - [A. Lock Ordering (The Best Defense)](#a-lock-ordering-the-best-defense)
-         - [B. Use `tryLock()` with a Timeout](#b-use-trylock-with-a-timeout)
-         - [C. Keep Synchronized Blocks Small](#c-keep-synchronized-blocks-small)
-      + [3. Summary of Strategies](#3-summary-of-strategies)
-      + [Real-world CMS Tip](#real-world-cms-tip)
-   * [The volatile keyword](#the-volatile-keyword)
-      + [1. The Problem: Memory Visibility](#1-the-problem-memory-visibility)
-      + [2. The Solution: `volatile`](#2-the-solution-volatile)
-      + [3. The Limitation: It is NOT "Thread-Safe"](#3-the-limitation-it-is-not-thread-safe)
-      + [4. When to use `volatile`?](#4-when-to-use-volatile)
-      + [Summary Rule](#summary-rule)
-   * [Handling exceptions in threads](#handling-exceptions-in-threads)
-      + [1. The Problem: The "Silent Death"](#1-the-problem-the-silent-death)
-      + [2. Solution A: The Internal Try-Catch (Standard)](#2-solution-a-the-internal-try-catch-standard)
-      + [3. Solution B: UncaughtExceptionHandler (The "Global" Way)](#3-solution-b-uncaughtexceptionhandler-the-global-way)
-      + [4. Solution C: Future.get() (For Callables)](#4-solution-c-futureget-for-callables)
-      + [Summary Table: Java vs. JavaScript](#summary-table-java-vs-javascript)
-      + [Why this matters for your CMS](#why-this-matters-for-your-cms-1)
-   * [Future keyword](#future-keyword)
-      + [1. The Core Workflow: "Order and Receipt"](#1-the-core-workflow-order-and-receipt)
-      + [2. Key Methods of a Future](#2-key-methods-of-a-future)
-      + [3. Code Example: Returning a Value from a Thread](#3-code-example-returning-a-value-from-a-thread)
-      + [4. Java vs. JavaScript Comparison](#4-java-vs-javascript-comparison-2)
-      + [5. Why use it?](#5-why-use-it)
-      + [Best Practice Tip](#best-practice-tip)
-   * [Non-blocking completable future](#non-blocking-completable-future)
-      + [1. The Core Difference: Push vs. Pull](#1-the-core-difference-push-vs-pull)
-      + [2. Common Non-Blocking Methods](#2-common-non-blocking-methods)
-      + [3. Code Example: A Non-Blocking Pipeline](#3-code-example-a-non-blocking-pipeline)
-      + [4. How the Threads Work](#4-how-the-threads-work)
-      + [5. Why use this in your CMS?](#5-why-use-this-in-your-cms)
-   * [Virtual threads](#virtual-threads)
-      + [1. The Concept: "Carrier" vs. "Virtual"](#1-the-concept-carrier-vs-virtual)
-      + [2. When to use Virtual Threads over Regular Threads?](#2-when-to-use-virtual-threads-over-regular-threads)
-         - [Use Virtual Threads When: (I/O Bound)](#use-virtual-threads-when-io-bound)
-         - [Use Regular Threads When: (CPU Bound)](#use-regular-threads-when-cpu-bound)
-      + [3. Java vs. JavaScript: The Breakthrough](#3-java-vs-javascript-the-breakthrough)
-      + [4. Code Example: Millions of Threads](#4-code-example-millions-of-threads)
-      + [5. Why not use them for everything?](#5-why-not-use-them-for-everything)
-   * [Sample thread implementation with best practices](#sample-thread-implementation-with-best-practices)
-      + [Modern Java Thread-Safe Service](#modern-java-thread-safe-service)
-      + [Why this is the "Minimum Viable Knowledge":](#why-this-is-the-minimum-viable-knowledge)
-      + [Summary Table: Java Concurrency "Cheat Sheet"](#summary-table-java-concurrency-cheat-sheet)
-   * [Thread-safe data structures](#thread-safe-data-structures)
-      + [1. ConcurrentHashMap](#1-concurrenthashmap)
-      + [2. CopyOnWriteArrayList](#2-copyonwritearraylist)
-      + [3. BlockingQueue (specifically LinkedBlockingQueue)](#3-blockingqueue-specifically-linkedblockingqueue)
-      + [Summary Cheat Sheet](#summary-cheat-sheet)
-   * [Sample design of a image processing service with threads](#sample-design-of-a-image-processing-service-with-threads)
-      + [1. The Core Architecture: Decoupled Pipeline](#1-the-core-architecture-decoupled-pipeline)
-      + [2. Strategic Thread Management](#2-strategic-thread-management)
-      + [3. Execution & Data Handling](#3-execution-data-handling)
-         - [Function Signatures & Invocation](#function-signatures-invocation)
-      + [4. Lock Management & Thread Safety](#4-lock-management-thread-safety)
-      + [5. Performance Concerns (The "Staff" Perspective)](#5-performance-concerns-the-staff-perspective)
-   * [Maven and Gradle](#maven-and-gradle)
-      + [1. The Core Concept: The Build Lifecycle](#1-the-core-concept-the-build-lifecycle)
-      + [2. Maven vs. Gradle vs. NPM](#2-maven-vs-gradle-vs-npm)
-      + [3. Code Comparison: Adding a Dependency](#3-code-comparison-adding-a-dependency)
-      + [4. Key Java Concepts for your CMS](#4-key-java-concepts-for-your-cms)
-      + [5. Which one should you choose?](#5-which-one-should-you-choose)
-   * [Databases - JDBC and JPA](#databases-jdbc-and-jpa)
-      + [1. The Core Concept](#1-the-core-concept)
-      + [2. Key Differences](#2-key-differences-1)
-      + [3. Code Comparison: Fetching a User](#3-code-comparison-fetching-a-user)
-      + [4. Which to use in your CMS?](#4-which-to-use-in-your-cms)
-      + [5. Summary Checklist](#5-summary-checklist)
-   * [Hibernate](#hibernate)
-      + [1. The Core Concept](#1-the-core-concept-1)
-      + [2. Key Differences](#2-key-differences-2)
-      + [3. Code Comparison: Defining a Relationship](#3-code-comparison-defining-a-relationship)
-      + [4. The "Magic" of Dirty Checking](#4-the-magic-of-dirty-checking)
-      + [5. Why use Hibernate in your CMS?](#5-why-use-hibernate-in-your-cms)
-      + [N+1 query problems in hibernate](#n1-query-problems-in-hibernate)
-      + [The Real-World Scenario](#the-real-world-scenario)
-      + [Why does this happen?](#why-does-this-happen)
-      + [How to Fix It (The Senior Way)](#how-to-fix-it-the-senior-way)
-         - [1. Join Fetch (Best for simple cases)](#1-join-fetch-best-for-simple-cases)
-         - [2. Entity Graphs](#2-entity-graphs)
-         - [3. Batch Fetching](#3-batch-fetching)
-      + [Summary Checklist](#summary-checklist-3)
-   * [Java history, versions and JDK](#java-history-versions-and-jdk)
-      + [1. A Brief History: From Oak to Java](#1-a-brief-history-from-oak-to-java)
-      + [2. Understanding the Jargon: SDK, JDK, JRE](#2-understanding-the-jargon-sdk-jdk-jre)
-      + [3. Major Version Milestones](#3-major-version-milestones)
-      + [4. Why did the versions jump so fast?](#4-why-did-the-versions-jump-so-fast)
-      + [5. Summary: Why Java Still Rules the Backend](#5-summary-why-java-still-rules-the-backend)
-   * [How the JVM works](#how-the-jvm-works)
-      + [1. The Workflow: Code to Execution](#1-the-workflow-code-to-execution)
-      + [2. Core Components of the JVM](#2-core-components-of-the-jvm)
-         - [A. The Class Loader System](#a-the-class-loader-system)
-         - [B. Runtime Data Areas (The Memory)](#b-runtime-data-areas-the-memory)
-         - [C. The Execution Engine](#c-the-execution-engine)
-      + [3. Key JVM Features for Developers](#3-key-jvm-features-for-developers)
-      + [4. Summary: The JVM Lifecycle](#4-summary-the-jvm-lifecycle)
-   * [JVM visualized](#jvm-visualized)
-      + [The JVM Architecture](#the-jvm-architecture)
-      + [Key Sections Explained](#key-sections-explained)
-      + [Why this matters for your Senior/Staff Interview:](#why-this-matters-for-your-seniorstaff-interview)
-   * [Java frameworks](#java-frameworks)
-      + [1. The "Big Three" Categories](#1-the-big-three-categories)
-         - [A. The Industry Standard: Spring & Spring Boot](#a-the-industry-standard-spring-spring-boot)
-         - [B. The High-Performance Contenders: Quarkus & Micronaut](#b-the-high-performance-contenders-quarkus-micronaut)
-         - [C. The Web Layer: Jakarta EE (formerly J2EE)](#c-the-web-layer-jakarta-ee-formerly-j2ee)
-      + [2. Specialized Frameworks for your CMS](#2-specialized-frameworks-for-your-cms)
-      + [3. How they work: The "Inversion of Control" (IoC)](#3-how-they-work-the-inversion-of-control-ioc)
-      + [4. Code Example: Spring Boot (The "Staff" Standard)](#4-code-example-spring-boot-the-staff-standard)
-      + [Summary: Why so many?](#summary-why-so-many)
+  * [Code structure, file, and comments](#code-structure--file--and-comments)
+  * [Scope of classes](#scope-of-classes)
+  * [How many classes in a file?](#how-many-classes-in-a-file-)
+  * [Invoking other class methods from the `main` method](#invoking-other-class-methods-from-the--main--method)
+  * [Print statements](#print-statements)
+  * [Compilation and execution](#compilation-and-execution)
+  * [JVM vs JIT Compilation](#jvm-vs-jit-compilation)
+  * [Semicolons](#semicolons)
+  * [Variables and Data Types](#variables-and-data-types)
+  * [float vs double](#float-vs-double)
+  * [Byte data type](#byte-data-type)
+  * [What is var?](#what-is-var-)
+  * [Naming Rules and Conventions](#naming-rules-and-conventions)
+  * [Data types of expressions](#data-types-of-expressions)
+  * [Mathematical operators](#mathematical-operators)
+  * [Assignment operators](#assignment-operators)
+  * [Logical operators](#logical-operators)
+  * [Comparison operators](#comparison-operators)
+  * [Relational operators](#relational-operators)
+  * [Bitwise operators](#bitwise-operators)
+  * [Ternary operator](#ternary-operator)
+  * [Constant and Let variable handling in Java?](#constant-and-let-variable-handling-in-java-)
+  * [Objects vs Primitives](#objects-vs-primitives)
+  * [Scope of objects and primitives](#scope-of-objects-and-primitives)
+  * [Understanding objects](#understanding-objects)
+  * [Autoboxing](#autoboxing)
+  * [Copy constructor (Cloning Objects)](#copy-constructor--cloning-objects-)
+  * [Functions and methods](#functions-and-methods)
+  * [Writing functions that return different types](#writing-functions-that-return-different-types)
+  * [Null and optional return values](#null-and-optional-return-values)
+  * [Pass-by-value and Pass-by-reference](#pass-by-value-and-pass-by-reference)
+  * [String handling and manipulation](#string-handling-and-manipulation)
+  * [StringBuilder](#stringbuilder)
+  * [Arrays](#arrays)
+  * [ArrayList](#arraylist)
+  * [List](#list)
+  * [Best practices - ArrayList vs List usage](#best-practices---arraylist-vs-list-usage)
+  * [Multidimensional Arrays and ArrayLists](#multidimensional-arrays-and-arraylists)
+  * [Array and ArrayList methods](#array-and-arraylist-methods)
+  * [Type casting and converting](#type-casting-and-converting)
+  * [Specific type conversions](#specific-type-conversions)
+  * [Generics and how to create one](#generics-and-how-to-create-one)
+  * [Diamond operator used with Generics](#diamond-operator-used-with-generics)
+  * [Creating data structures with flexible types](#creating-data-structures-with-flexible-types)
+  * [Collections and why we need them](#collections-and-why-we-need-them)
+  * [ArrayList collection](#arraylist-collection)
+  * [HashSet collection](#hashset-collection)
+  * [HashMap collection](#hashmap-collection)
+  * [LinkedList collection](#linkedlist-collection)
+  * [Representing Heaps](#representing-heaps)
+  * [Most common errors and handling exceptions](#most-common-errors-and-handling-exceptions)
+  * [Conditionals](#conditionals)
+  * [Loops](#loops)
+  * [Classic loops](#classic-loops)
+  * [break and continue keywords](#break-and-continue-keywords)
+  * [Lambdas (Arrow functions) and Streams (used in map, filter, and foreach)](#lambdas--arrow-functions--and-streams--used-in-map--filter--and-foreach-)
+  * [Maps vs HashMaps and collecting them from streams](#maps-vs-hashmaps-and-collecting-them-from-streams)
+  * [Enums and Annotations](#enums-and-annotations)
+  * [Reflections to handle annotations](#reflections-to-handle-annotations)
+  * [Classes and instances](#classes-and-instances)
+  * [Class methods and constructors](#class-methods-and-constructors)
+  * [The this keyword and class method or field access](#the-this-keyword-and-class-method-or-field-access)
+  * [Access modifiers in classes](#access-modifiers-in-classes)
+  * [Static fields and methods](#static-fields-and-methods)
+  * [Abstract classes](#abstract-classes)
+  * [When to choose composition over inheritance?](#when-to-choose-composition-over-inheritance-)
+  * [Dependency injection](#dependency-injection)
+  * [Classes and the final keyword](#classes-and-the-final-keyword)
+  * [Interfaces](#interfaces)
+  * [Classes and generics](#classes-and-generics)
+  * [Bounded and multiple generics](#bounded-and-multiple-generics)
+  * [Class getters and setters](#class-getters-and-setters)
+  * [Code smells with getters and setters](#code-smells-with-getters-and-setters)
+  * [DTOs and Records](#dtos-and-records)
+  * [OOP principles in Java](#oop-principles-in-java)
+  * [SOLID design patterns](#solid-design-patterns)
+  * [Common Java design patterns beyond SOLID](#common-java-design-patterns-beyond-solid)
+  * [Best practice for writing a utility function](#best-practice-for-writing-a-utility-function)
+  * [Best practice for storing constants](#best-practice-for-storing-constants)
+  * [Best practice for maintaining configuration](#best-practice-for-maintaining-configuration)
+  * [OOP vs Functional Programming](#oop-vs-functional-programming)
+  * [Garbage collection](#garbage-collection)
+  * [Avoiding memory leaks in Java](#avoiding-memory-leaks-in-java)
+  * [Java packages and imports](#java-packages-and-imports)
+  * [Packages vs folders](#packages-vs-folders)
+  * [Java utils and the import functionality](#java-utils-and-the-import-functionality)
+  * [Most common util imports](#most-common-util-imports)
+  * [Most common lang imports - Automatic](#most-common-lang-imports---automatic)
+  * [Networking & HTTP](#networking---http)
+  * [Handling date and time](#handling-date-and-time)
+  * [Java Serialization](#java-serialization)
+  * [Java multi-threading and concurrency](#java-multi-threading-and-concurrency)
+  * [Java threads vs JS event loop](#java-threads-vs-js-event-loop)
+  * [How threads work](#how-threads-work)
+  * [When to use threads?](#when-to-use-threads-)
+  * [Avoiding race conditions in threads](#avoiding-race-conditions-in-threads)
+  * [ExecutorService or a Thread Pool](#executorservice-or-a-thread-pool)
+  * [Runnable used with threads](#runnable-used-with-threads)
+  * [Callable with threads](#callable-with-threads)
+  * [ScheduledExecutorService](#scheduledexecutorservice)
+  * [Avoiding deadlocks in threads](#avoiding-deadlocks-in-threads
+  * [The volatile keyword](#the-volatile-keyword)
+  * [Handling exceptions in threads](#handling-exceptions-in-threads)
+  * [Future keyword](#future-keyword)
+  * [Non-blocking completable future](#non-blocking-completable-future)
+  * [Virtual threads](#virtual-threads)
+  * [Sample thread implementation with best practices](#sample-thread-implementation-with-best-practices)
+  * [Thread-safe data structures](#thread-safe-data-structures)
+  * [Maven and Gradle](#maven-and-gradle)
+  * [Databases - JDBC and JPA](#databases---jdbc-and-jpa)
+  * [Hibernate](#hibernate)
+  * [Java history, versions and JDK](#java-history--versions-and-jdk)
+  * [How the JVM works](#how-the-jvm-works)
+  * [JVM visualized](#jvm-visualized)
+  * [Java frameworks](#java-frameworks)
 
 ## Code structure, file, and comments
 
@@ -727,7 +151,6 @@ console.log(greeting);
 
 ```
 
----
 
 ### File Names
 
@@ -736,7 +159,6 @@ Java has strict rules linking the code to the file system. If you have a `public
 * **Java:** The `HelloWorld` class above *must* be saved in a file named exactly `HelloWorld.java`.
 * **JavaScript:** File names are completely arbitrary (e.g., `script.js` or `app.js`).
 
----
 
 ### Types of Comments
 
@@ -757,7 +179,6 @@ Both languages share standard single-line and multi-line comments. However, Java
 
 In Java, "scope" is defined by **access modifiers**. Because the compiler uses the file structure to manage the classpath, the rules for the primary class and secondary classes are very specific.
 
----
 
 ### 1. The Primary (Public) Class
 
@@ -778,7 +199,6 @@ public class User {
 
 ```
 
----
 
 ### 2. Other Classes in the File (Non-Public)
 
@@ -799,7 +219,6 @@ class UserInternalConfig { ... } // Only visible to classes inside com.cms.model
 
 ```
 
----
 
 ### Summary Table
 
@@ -819,7 +238,6 @@ In Java, the rules for class-to-file ratios are strict because the compiler uses
 * **Filename Constraint:** If there is a `public` class, the filename **must** match the name of that public class exactly (e.g., `User.java` must contain `public class User`).
 * **Non-Public Classes:** You can have as many "package-private" (no access modifier) classes as you want in that same file.
 
----
 
 ### The Best Practice: One File, One Class
 
@@ -831,7 +249,6 @@ In professional environments (like your CMS project), the standard is **one top-
 2. **Build Efficiency:** Java compilers work best when they can map classes to files 1:1.
 3. **Code Reviews:** It is much easier to track changes in Git when a file represents a single logical entity.
 
----
 
 ### When would you actually need multiple classes in a file?
 
@@ -874,7 +291,6 @@ public class Post {
 
 If you are writing a data structure (like a Linked List) and need a `Node` class that requires access to the outer class's variables.
 
----
 
 ### Summary Table
 
@@ -921,7 +337,6 @@ Here is a visual of the isolation:
 
 If `main` tries to call `myNormalMethod()` directly, Java will throw a compiler error: *"non-static method cannot be referenced from a static context."*
 
----
 
 ### 2. The Two Solutions
 
@@ -947,7 +362,6 @@ main()
   |--(2) calls---->  Object.myNormalMethod()    (SUCCESS)
 ```
 
----
 ### Summary of possibilities
 
 1. Can any class have a `main` method? **Yes**. Any standard class can contain a `public static void main(String[] args)` to act as a starting point. (Note: Top-level classes themselves cannot be marked private in Java, only public or default).
@@ -982,7 +396,6 @@ File: Car.java
 
 Nested classes (like `Engine` in the diagram), however, can be private because they are simply hiding inside the protective shell of their top-level parent class!
 
----
 
 ### 3. Memory Implications (The "Why")
 
@@ -993,7 +406,6 @@ While time complexity is purely O(1) for a standard method call in both cases, t
 
 **Golden Rule:** If the method relies on instance variables (internal state), it must be non-static. If it acts only on the arguments passed into it without saving state, make it `static`.
 
----
 
 ### 4. Solution Code
 
@@ -1061,7 +473,6 @@ console.log("Hello, World!");
 
 ```
 
----
 
 ### Breakdown of the Java Statement
 
@@ -1200,7 +611,6 @@ int length = message.length(); // String objects have methods like .length()
 
 *JavaScript Comparison:* JavaScript blurs this line, treating strings as primitives but automatically wrapping them in objects so you can use methods on them. Java does no such wrapping for its primitives.
 
----
 
 ### Escape Characters
 
@@ -1289,7 +699,6 @@ byte maxVal = 127;
 **JavaScript Comparison:**
 JavaScript does not have a primitive `byte` type for standard variables. If you type `let x = 10;`, it takes up 64 bits of memory as a standard float. To actually manipulate raw 8-bit data in JS, you have to use special TypedArray objects, like `Int8Array` or `Uint8Array` (unsigned, 0 to 255).
 
----
 
 ### 2. The Automatic Promotion Trap
 
@@ -1546,7 +955,6 @@ double result2 = 5.0 / 2;  // Result is 2.5
 **JavaScript Comparison:**
 Because JavaScript treats all numbers as a single floating-point `Number` type, division behaves like standard calculator math. `5 / 2` will always give you `2.5`.
 
----
 
 ### 2. Exponentiation
 
@@ -1597,7 +1005,6 @@ myByte += 5;
 **JavaScript Comparison:**
 Because JavaScript just uses one dynamic `Number` type, you never have to worry about this type-casting behavior. `myNumber = myNumber + 5` and `myNumber += 5` are functionally identical in JS.
 
----
 
 ### 2. Missing Logical Assignment Operators in Java
 
@@ -1672,7 +1079,6 @@ if (count && name) {
 
 ```
 
----
 
 ### 2. Return Values (Default Assignment)
 
@@ -1798,7 +1204,6 @@ let jsLogic = a > flag; // true (JS converts true to 1)
 
 ```
 
----
 
 ### 2. Alphabetical Ordering (Strings)
 
@@ -1868,7 +1273,6 @@ let shifted = largeNumber << 2;
 
 ```
 
----
 
 ### 2. Automatic Type Promotion (The `byte` Trap)
 
@@ -1929,7 +1333,6 @@ let status = (userCount) ? "Active" : "Inactive";
 
 ```
 
----
 
 ### 2. Matching Return Types
 
@@ -1996,7 +1399,6 @@ message = 100; // Perfecty fine in JS (Dynamic typing)
 
 ```
 
----
 
 ### The `const` Equivalent: The `final` Keyword
 
@@ -2063,7 +1465,6 @@ int length = name.length(); // Works perfectly
 **JavaScript Comparison:**
 JavaScript heavily blurs this line using a feature called "auto-boxing." While JS has primitives (like string and number), the moment you try to use a method on them, JS silently wraps them in an Object in the background, executes the method, and destroys the object. That is why `let age = 30; age.toString();` works flawlessly in JS.
 
----
 
 ### The Wrapper Class Quirk in Java
 
@@ -2142,7 +1543,6 @@ void createData() {
 | **Pass by...** | **Always Value** (but for objects, the "value" is the address). | **Pass by Reference** for objects. |
 | **Nullability** | Primitives cannot be null. | Anything can be `null` or `undefined`. |
 
----
 
 ### 4. Best Practice: The "Shadowing" Trap
 
@@ -2196,7 +1596,6 @@ let myUser = { name: "Pushkar" };
 
 ```
 
----
 
 ### 2. Calling Methods
 
@@ -2209,7 +1608,6 @@ myUser.sayHello(); // This only works if 'sayHello' is defined in the User class
 
 ```
 
----
 
 ### 3. Object References
 
@@ -2226,7 +1624,6 @@ System.out.println(u1.name); // Outputs "Sandeep"
 
 ```
 
----
 
 ### 4. Comparing Objects (`==` vs `.equals()`)
 
@@ -2246,7 +1643,6 @@ System.out.println(s1.equals(s2)); // true (same content)
 
 ```
 
----
 
 ### 5. Copying Objects (Shallow vs. Deep)
 
@@ -2261,7 +1657,6 @@ copy.name = original.name;
 
 ```
 
----
 
 ### 6. Determining the Class
 
@@ -2278,7 +1673,6 @@ System.out.println(myUser.getClass().getName()); // "User"
 
 ```
 
----
 
 ### 7. Casting Objects
 
@@ -2295,7 +1689,6 @@ System.out.println(specific.name);
 
 ```
 
----
 
 ### 8. Converting to Primitives (Unboxing)
 
@@ -2448,7 +1841,6 @@ In JavaScript, functions are just values. You can assign a function to a variabl
 
 **Java methods are not objects or values.** You cannot assign a method to a variable. If you want to pass a "behavior" around in Java, you have to either pass an entire Object that contains that method, or use Java's newer Lambda expressions (which, under the hood, are just quietly creating Objects for you).
 
----
 
 ### Summary Table
 
@@ -2479,7 +1871,6 @@ Java reads your code at compile-time. If you declare a return type, **every poss
 If a Java method is just doing work (like logging to the console or modifying a variable) and shouldn't return anything, you cannot just leave the return type blank. You **must** declare the return type as `void`.
 In a `void` method, you can use the `return;` keyword by itself to exit the method early, but you cannot attach a value to it.
 
----
 
 ### 4. Code Example: Java vs. JavaScript
 
@@ -2527,7 +1918,6 @@ function multiplyPositive(a, b) {
 
 ```
 
----
 
 ### Summary Table
 
@@ -2656,7 +2046,6 @@ In JavaScript, you have two ways to say "nothing": `undefined` (the variable was
 
 **Java only has `null`.** There is no `undefined` keyword in the Java language.
 
----
 
 ### 1. The "Only One Way" Rule
 
@@ -2684,7 +2073,6 @@ public class Example {
 
 ```
 
----
 
 ### 2. Null vs. Primitives
 
@@ -2701,7 +2089,6 @@ String text = null; // ALLOWED: String is an object
 
 ```
 
----
 
 ### 3. The Infamous NullPointerException (NPE)
 
@@ -2720,7 +2107,6 @@ int len = name.length();
 
 ```
 
----
 
 ### 4. Modern Java: The `Optional` Type
 
@@ -2740,7 +2126,6 @@ public Optional<String> findUsername(int id) {
 
 ```
 
----
 
 ### Summary Table
 
@@ -2755,7 +2140,6 @@ public Optional<String> findUsername(int id) {
 
 This is one of the most debated topics in Java because the answer is technically: **Java is strictly Pass-by-Value only.** However, it *feels* like pass-by-reference when you are dealing with objects. This is the exact same behavior as JavaScript, but the terminology Java uses is much more precise because of how it manages memory.
 
----
 
 ### 1. The Core Rule: Everything is a Value
 
@@ -2766,7 +2150,6 @@ Java works the same way, but with a strict distinction:
 * **Primitives (`int`, `boolean`, etc.):** The actual value (like `5`) is copied.
 * **Objects:** The **memory address** (the pointer) is copied.
 
----
 
 ### 2. Passing Primitives (Strictly Value)
 
@@ -2789,7 +2172,6 @@ public class Main {
 
 ```
 
----
 
 ### 3. Passing Objects (The "Reference" Confusion)
 
@@ -2828,7 +2210,6 @@ public class Main {
 
 ```
 
----
 
 ### 4. Summary Table
 
@@ -2981,7 +2362,6 @@ Because standard Java Strings are immutable, every time you use `+` or `+=` to m
 
 If you do `text += "a"` 10,000 times in a loop, Java creates and abandons 10,000 separate objects in memory. `StringBuilder` solves this by maintaining a single, expandable array of characters in memory. It just updates its internal array instead of making new objects.
 
----
 
 ### How it is Used
 
@@ -3003,7 +2383,6 @@ String finalMessage = sb.toString();
 
 ```
 
----
 
 ### How to Effectively Use It (Best Practices)
 
@@ -3047,7 +2426,6 @@ In Java, `StringBuilder` and `String` are completely different classes. You cann
 
 Because JavaScript does not have a `StringBuilder` class (all string manipulation happens directly on the standard string), this is a very common point of confusion when learning Java.
 
----
 
 ### What Methods *Does* StringBuilder Have?
 
@@ -3060,7 +2438,6 @@ Because JavaScript does not have a `StringBuilder` class (all string manipulatio
 
 It only shares a tiny handful of basic "read" methods with the `String` class, specifically: `.length()`, `.charAt()`, `.indexOf()`, and `.substring()`.
 
----
 
 ### How to Perform Normal String Operations
 
@@ -3139,7 +2516,6 @@ StringBuilder sb = new StringBuilder(10240);
 | **Memory** | High waste in loops | Low waste (reuses buffer) |
 | **Thread Safe** | Yes | No |
 
----
 
 #### Complexity Comparison
 
@@ -3199,7 +2575,6 @@ numbers.push(10, 20, 30, 40); // Automatically resizes
 
 ```
 
----
 
 ### 2. Strict Data Typing
 
@@ -3217,7 +2592,6 @@ words[0] = "Hello";
 
 ```
 
----
 
 ### 3. Printing and Methods (No Push or Pop)
 
@@ -3366,7 +2740,6 @@ namesList.add("Sandeep"); // Grows automatically
 
 ```
 
----
 
 ### 2. The Relationship: List vs. ArrayList
 
@@ -3386,7 +2759,6 @@ fruits.add("Apple");
 
 ```
 
----
 
 ### 3. Comparison Table: Java vs. JavaScript
 
@@ -3397,7 +2769,6 @@ fruits.add("Apple");
 | **Syntax** | `arr[0] = "x"` | `list.add("x")` | `arr.push("x")` |
 | **Access** | `arr[0]` | `list.get(0)` | `arr[0]` |
 
----
 
 ### 4. When to use what?
 
@@ -3405,7 +2776,6 @@ fruits.add("Apple");
 * **Use `ArrayList`:** 95% of the time. Use it whenever you need a dynamic list of items that you will frequently access by their index (e.g., a list of Users, a list of search results).
 * **Use `List` as the variable type:** Always use `List<String> list = ...` instead of `ArrayList<String> list = ...`. This follows the "Program to an Interface" principle, making your code more professional and easier to maintain.
 
----
 
 ### Summary of Differences
 
@@ -3451,7 +2821,6 @@ You only mention `ArrayList` when you are actually creating the object with the 
 * **Fast Reading:** Use it when you need to jump to a specific index often (like `list.get(5)`).
 * **Standard Storage:** Use it as your default choice for storing any collection of data.
 
----
 
 ### Summary Checklist
 
@@ -3494,7 +2863,6 @@ matrix[0].push(99); // JS rows can grow independently
 
 ```
 
----
 
 ### 2. Nested ArrayLists (Dynamic Size)
 
@@ -3521,7 +2889,6 @@ int value = adj.get(0).get(1); // 20
 
 ```
 
----
 
 ### 3. Key Differences Summary
 
@@ -3532,7 +2899,6 @@ int value = adj.get(0).get(1); // 20
 | **Memory** | Very efficient (contigous) | Less efficient (lots of objects) | Managed by engine |
 | **Syntax** | `arr[i][j]` | `list.get(i).get(j)` | `arr[i][j]` |
 
----
 
 ### 4. Printing the Data
 
@@ -3611,7 +2977,6 @@ System.out.println(myDouble); // Outputs 9.0
 **JavaScript Comparison:**
 Because JS only has one standard `Number` type (a 64-bit float), you never have to worry about the byte size of the number you are assigning.
 
----
 
 ### 2. Explicit Casting (Narrowing - Risky)
 
@@ -3637,7 +3002,6 @@ System.out.println(myInt); // Outputs 9
 **JavaScript Comparison:**
 JS doesn't use casting syntax `(int)` to chop off decimals. You would typically use a built-in math method, like `Math.trunc(9.78)` or `Math.floor(9.78)`.
 
----
 
 ### 3. Converting Strings to Numbers (Parsing)
 
@@ -3662,7 +3026,6 @@ double price = Double.parseDouble("19.99");
 **JavaScript Comparison:**
 JS developers frequently use the unary plus operator (`+"32"`) or the `Number("32")` constructor to coerce strings into numbers. Java requires the explicit `parseInt` method.
 
----
 
 ### 4. Converting Numbers to Strings
 
@@ -3783,7 +3146,6 @@ String textActive = String.valueOf(isActive); // "true"
 
 ```
 
----
 
 ### How to Convert Using StringBuilder
 
@@ -3822,7 +3184,6 @@ Here is a breakdown of how Generics work in Java compared to JavaScript.
 
 **Java requires Generics (`<T>`) for type safety.** Before Generics were introduced, Java collections (like `ArrayList`) held generic `Object` types, meaning you could accidentally mix strings and numbers, which would crash your program later when you tried to use them. Generics allow you to write a reusable class, but **strictly lock down its data type** at the moment you create it.
 
----
 
 ### 1. Built-in Generics (The Collections Framework)
 
@@ -3868,7 +3229,6 @@ userStatus.put("Bob", false);
 
 ```
 
----
 
 ### 2. Creating Your Own Generic Class
 
@@ -4040,7 +3400,6 @@ mixedList.add(false);
 
 ```
 
----
 
 ### 2. Why the "JS Way" is a Bad Practice in Java
 
@@ -4059,7 +3418,6 @@ int age = (Integer) item;
 
 ```
 
----
 
 ### 3. The Java Best Practices
 
@@ -4112,7 +3470,6 @@ In JavaScript, an Array is a "Swiss Army Knife"—it’s a list, a stack, and a 
 * **JS:** Uses `Array` for lists and `Object` or `Map` for key-values.
 * **Java:** Uses the **Collections Framework** (a set of Interfaces and Classes) to provide specific behaviors like uniqueness, ordering, or sorting.
 
----
 
 ### 2. Why We Need Collections
 
@@ -4121,7 +3478,6 @@ We need them because standard Java arrays are **fixed-size**.
 * If you define `int[] arr = new int[5]`, you can never add a 6th element.
 * Collections (like `ArrayList`) handle the "magic" of resizing behind the scenes, exactly like JavaScript arrays do naturally.
 
----
 
 ### 3. Common Collections and Use Cases
 
@@ -4183,7 +3539,6 @@ String capital = capitalCities.get("UK"); // "London"
 
 * **JS Equivalent:** No native equivalent; JS arrays handle this under the hood.
 
----
 
 ### 4. Summary Table
 
@@ -4235,7 +3590,6 @@ Because `ArrayList` is a formal class, you interact with it using methods rather
 | **Remove item** | `list.splice(index, 1)` | `list.remove(index)` |
 | **Get size** | `list.length` | `list.size()` |
 
----
 
 ### 4. Comparison Summary
 
@@ -4258,7 +3612,6 @@ The "Hash" in `HashSet` refers to **Hashing**. Instead of searching through a li
 * **Type Safety:** In JS, you can have `new Set([1, "two"])`. In Java, you must use Generics to lock the set to a specific type, and you must use Wrapper Classes (like `Integer`) instead of primitives (`int`).
 * **Order:** Neither JS `Set` nor Java `HashSet` guarantee sorting, but JS `Set` actually *does* remember the **insertion order**. Java’s `HashSet` does **not**; the items might come out in a completely different order than they went in.
 
----
 
 ### 3. Common Method Comparison
 
@@ -4271,7 +3624,6 @@ The "Hash" in `HashSet` refers to **Hashing**. Instead of searching through a li
 | **Get Size** | `s.size` | `s.size();` |
 | **Clear All** | `s.clear();` | `s.clear();` |
 
----
 
 ### 4. Code Example: Java vs. JavaScript
 
@@ -4334,7 +3686,6 @@ In a `HashMap`, you use a unique "Key" to store and retrieve a "Value." Just lik
 * **No Property Syntax:** In JS, you can use dot notation (`map.key`). In Java, you **must** use methods like `.put()` and `.get()`.
 * **Order:** Standard JavaScript objects and `Map` objects generally maintain insertion order. A Java `HashMap` makes **no guarantee** about the order; it organizes items based on their "Hash" to maximize speed.
 
----
 
 ### 3. Common Method Comparison
 
@@ -4348,7 +3699,6 @@ In a `HashMap`, you use a unique "Key" to store and retrieve a "Value." Just lik
 | **Remove** | `m.delete("Age");` | `m.remove("Age");` |
 | **Size** | `m.size` | `m.size();` |
 
----
 
 ### 4. Code Example: Java vs. JavaScript
 
@@ -4395,7 +3745,6 @@ console.log(capitalCities.get("India")); // "New Delhi"
 
 ```
 
----
 
 ### 5. When to use HashMap?
 
@@ -4425,7 +3774,6 @@ Because of this structure, `LinkedList` has very specific performance strengths 
 * **No Native JS Equivalent:** In JS, you just use `[]`. Under the hood, JS engines optimize arrays so well that you rarely need a manual LinkedList. In Java, you choose it explicitly when performance at the "ends" of the list matters.
 * **Doubly Linked:** Java's `LinkedList` is "Doubly Linked," meaning each node has a pointer to both the **next** and the **previous** item.
 
----
 
 ### 4. Common Method Comparison
 
@@ -4436,7 +3784,6 @@ Because of this structure, `LinkedList` has very specific performance strengths 
 | **Remove first** | `arr.shift()` | `list.removeFirst()` |
 | **Access by index** | `arr[index]` | `list.get(index)` (Slow!) |
 
----
 
 ### 5. Java Code Example
 
@@ -4479,7 +3826,6 @@ In JavaScript, you typically use a standard Array `[]` for everything, using `.p
 
 In Java, there is no single "Stack" or "Queue" class that everyone uses for everything. Instead, Java uses **Interfaces**. You pick a class (like `LinkedList` or `ArrayDeque`) and "treat" it as a Stack or Queue.
 
----
 
 ### 1. Representing a Stack (LIFO - Last In, First Out)
 
@@ -4515,7 +3861,6 @@ stack.pop();
 
 ```
 
----
 
 ### 2. Representing a Queue (FIFO - First In, First Out)
 
@@ -4551,7 +3896,6 @@ let served = queue.shift();
 
 ```
 
----
 
 ### 3. Key Differences Summary
 
@@ -4598,7 +3942,6 @@ System.out.println(minHeap.poll()); // 5
 
 ```
 
----
 
 ### 2. The Max-Heap (Using a Comparator)
 
@@ -4622,7 +3965,6 @@ System.out.println(maxHeap.peek()); // 20
 
 ```
 
----
 
 ### 3. Key Differences Summary
 
@@ -4673,7 +4015,6 @@ int nameLength = myName.length();
 **JavaScript Comparison:**
 JS behaves similarly with `null` or `undefined`, throwing a `TypeError`. However, JS provides optional chaining (`myName?.length`) to safely bypass this. Java lacks a direct equivalent to the `?.` operator, forcing you to write explicit `if (myName != null)` checks.
 
----
 
 ### 2. The Biggest Difference: Checked vs. Unchecked Exceptions
 
@@ -4788,7 +4129,6 @@ if (name != null && !name.isEmpty()) {
 
 ```
 
----
 
 ### 2. Comparing Strings in Conditionals
 
@@ -4811,7 +4151,6 @@ if (status.equals("Active")) {
 
 ```
 
----
 
 ### 3. The `switch` Statement
 
@@ -4946,7 +4285,6 @@ The major differences appear when you want to iterate *directly* over items in a
 * **No `for...in` Loop:** JavaScript uses `for...in` to loop over the keys of an object. Because Java objects are strictly defined classes, you cannot dynamically loop over their properties like this.
 * **`.forEach()` Lambda Syntax:** Both languages have a `.forEach()` method for collections, but Java uses an arrow `->` instead of JS's `=>` for the inline function.
 
----
 
 ### 2. How to Loop Over Different Structures in Java
 
@@ -5095,7 +4433,6 @@ while (count < 3) {
 
 ```
 
----
 
 ### The Big "Gotcha" for JavaScript Developers
 
@@ -5146,7 +4483,6 @@ for (int i = 0; i < list.size(); i++) { // Uses size()
 
 In both Java and JavaScript, `break` and `continue` function identically for basic loops. However, Java has a powerful "Labeled" version of these keywords that is much more common and structured than the similar feature in JS.
 
----
 
 ### 1. Basic usage (Same as JS)
 
@@ -5164,7 +4500,6 @@ for (int i = 0; i < 5; i++) {
 
 ```
 
----
 
 ### 2. The Big Difference: Labeled Break and Continue
 
@@ -5192,7 +4527,6 @@ for (int i = 0; i < 3; i++) {
 **JavaScript Comparison:**
 While JS technically has labels, they are rarely used and considered "code smell." In Java, they are a standard, accepted way to handle nested loop escapes safely.
 
----
 
 ### 3. Usage in Switch Statements
 
@@ -5251,7 +4585,6 @@ names.forEach(name => console.log(name));
 
 ```
 
----
 
 ### 2. Streams (Data Pipelines)
 
@@ -5316,7 +4649,6 @@ You open the pipeline differently depending on whether you are starting with a s
 * **From an ArrayList:** Call `.stream()` directly on the list.
 * **From a Standard Array:** Use the helper class `Arrays.stream(yourArray)`.
 
----
 
 #### 2. The Operations (Intermediate & Terminal)
 
@@ -5329,7 +4661,6 @@ Intermediate operations (like `map` and `filter`) just set up the rules. Nothing
 | **Reduce** (Combine items) | `.reduce(0, (a, b) -> a + b)` | `.reduce((a, b) => a + b, 0)` |
 | **ForEach** (Do action) | `.forEach(x -> System.out.println(x))` | `.forEach(x => console.log(x))` |
 
----
 
 #### 3. The Terminal: Converting Back
 
@@ -5404,7 +4735,6 @@ Without `collect`, a Stream is just a set of instructions that hasn't been execu
 2. **Repackage data:** Change the data format (e.g., turn a List of Users into a Map where the Key is the User ID).
 3. **Summarize:** Join strings together or calculate averages/totals while finishing the stream.
 
----
 
 #### Common Ways to Use It
 
@@ -5605,7 +4935,6 @@ Here is a breakdown of how Java and JavaScript handle Enums and Annotations.
 
 The short version: **Java has both built directly into the language natively. JavaScript has neither** (though TypeScript adds Enums, and JS has a proposal for "Decorators").
 
----
 
 ### 1. Enums (Enumerations)
 
@@ -5668,7 +4997,6 @@ let myStatus = Status.ACTIVE;
 
 ```
 
----
 
 ### 2. Annotations (Metadata)
 
@@ -5760,7 +5088,6 @@ public class Main {
 
 ```
 
----
 
 ### 2. Breaking Encapsulation (Accessing Private Data)
 
@@ -5800,7 +5127,6 @@ public class Main {
 
 ```
 
----
 
 ### Summary Table
 
@@ -5861,7 +5187,6 @@ myUser.email = "test@test.com"; // JS happily accepts this new property dynamica
 
 ```
 
----
 
 ### 2. Classes as Data Types
 
@@ -5879,7 +5204,6 @@ User admin = new User();
 
 ```
 
----
 
 ### 3. The One-Class-Per-File Rule
 
@@ -5888,7 +5212,6 @@ While JavaScript lets you define 50 classes in a single `utils.js` file, Java en
 * A Java file can only have **one** `public` class.
 * The name of the file **must exactly match** the name of that public class (e.g., the `public class User` must live inside `User.java`).
 
----
 
 ### Summary Table
 
@@ -5924,7 +5247,6 @@ class User {
 
 ```
 
----
 
 ### 2. Overloading Constructors (Multiple Constructors)
 
@@ -5957,7 +5279,6 @@ User u2 = new User("Bob", 30);
 
 ```
 
----
 
 ### 3. Calling Another Constructor (`this()`)
 
@@ -5987,7 +5308,6 @@ class User {
 
 ```
 
----
 
 ### 4. Overriding Methods (`@Override`)
 
@@ -6015,7 +5335,6 @@ class Manager extends Employee {
 
 ```
 
----
 
 ### Summary Table
 
@@ -6084,7 +5403,6 @@ let systemAdmin = new UserProfile("Bob", "Admin");
 
 ```
 
----
 
 #### Summary of "Why" in Java:
 
@@ -6162,7 +5480,6 @@ myAlert.send();
 
 ```
 
----
 
 ### Summary of "Why" in Java:
 
@@ -6180,7 +5497,6 @@ In JavaScript, if you pass a class method as a callback (e.g., to a `setTimeout`
 
 In Java, **`this` never loses its context.** If a method is running inside a `User` object, `this` is that `User` object, period.
 
----
 
 ### 2. When `this` is Optional (Shadowing)
 
@@ -6208,7 +5524,6 @@ class Player {
 
 ```
 
----
 
 ### 3. Using `this` for Constructors
 
@@ -6233,7 +5548,6 @@ class User {
 
 ```
 
----
 
 ### 4. Accessing Static Members
 
@@ -6257,7 +5571,6 @@ class Counter {
 
 ```
 
----
 
 ### Summary Table
 
@@ -6293,7 +5606,6 @@ class Calculator {
 
 ```
 
----
 
 #### 2. Invoking Parent Methods (`super`)
 
@@ -6318,7 +5630,6 @@ class Child extends Parent {
 
 ```
 
----
 
 #### 3. Static vs. Instance Invocation
 
@@ -6356,7 +5667,6 @@ class Printer {
 
 ```
 
----
 
 #### Summary Table
 
@@ -6380,7 +5690,6 @@ In Java, access control is a foundational, strictly enforced security feature. J
 * **`protected` (The Family Heirloom):** Can be accessed by any class in the same folder (package), AND by any Child class (even if the child lives in a completely different folder).
 * **Default / Package-Private (The Neighborhood):** If you don't type *any* modifier, Java defaults to this. The field or method can only be seen by other classes living in the exact same folder (package). Child classes in different folders cannot see it.
 
----
 
 ### 2. Code Example: Java vs. JavaScript
 
@@ -6426,7 +5735,6 @@ class User {
 
 ```
 
----
 
 ### 3. Key Differences Summary
 
@@ -6458,7 +5766,6 @@ In Java, static fields are often used for counters (e.g., tracking how many time
 * **Calling on an Instance:** In JS, if you try to call a static method on an instance (`myUser.myStaticMethod()`), it will fail and return `undefined`. In Java, the compiler **will allow it**, but it is considered terrible practice. Your IDE will give you a yellow warning telling you to use the Class name instead.
 * **Strict Declaration:** Just like regular variables, Java static variables must be declared inside the class blueprint before compilation. In JS, you can randomly attach a static property to a class later on (`User.newStaticProp = "Hello"`).
 
----
 
 ### 3. Code Example: Java vs. JavaScript
 
@@ -6529,7 +5836,6 @@ User.printTotal(); // 2
 
 ```
 
----
 
 ### 4. The `static` Initialization Block
 
@@ -6650,7 +5956,6 @@ class Manager extends Employee {
 
 ```
 
----
 
 ### 5. The Invisible Parent (`java.lang.Object`)
 
@@ -6671,7 +5976,6 @@ In JavaScript, you don't have a native `abstract` keyword. If you want to preven
 
 In Java, **Abstract Classes** are a formal, built-in feature used to create "incomplete" blueprints. They are designed to be inherited, and they allow you to force child classes to implement specific methods.
 
----
 
 ### 1. What is an Abstract Class?
 
@@ -6715,7 +6019,6 @@ class Circle extends Shape {
 
 ```
 
----
 
 ### 3. Java vs. JavaScript Comparison
 
@@ -6880,7 +6183,6 @@ smartPhone.takePhoto();
 
 **The Solution:** You inject the `Engine` from the outside (usually through the constructor). Now, the `Car` doesn't care how the `Engine` is made; it just uses it.
 
----
 
 ### 2. The Big Difference: Manual Wiring vs. Java Frameworks
 
@@ -6891,7 +6193,6 @@ In Java, enterprise applications have thousands of strictly typed classes. Manua
 **The Java Way:** Java developers almost universally use frameworks—most notably **Spring Boot**—to handle DI automatically. This is called an **Inversion of Control (IoC) Container**.
 You simply use Annotations to tell Spring, *"Hey, I need an Engine here."* When the app starts, Spring automatically finds the right `Engine` blueprint, builds it, and injects it for you.
 
----
 
 ### 3. Code Example: The Evolution of DI
 
@@ -6992,7 +6293,6 @@ public class Main {
 
 ```
 
----
 
 ### 2. Final Methods (Preventing Overrides)
 
@@ -7020,7 +6320,6 @@ class CustomConfig extends SecurityConfig {
 
 ```
 
----
 
 ### 3. Final Classes (Preventing Inheritance)
 
@@ -7040,7 +6339,6 @@ final class SecretAlgorithm {
 
 ```
 
----
 
 ### Summary Table
 
@@ -7096,7 +6394,6 @@ This is the "Golden Triangle" of Java design. Here is the simple breakdown:
 | **Abstract Class** | **"Is-A"** | When classes are part of the same family and share base code (e.g., `Car` and `Truck` are both `Vehicles`). |
 | **Composition** | **"Has-A"** | When you want to build a complex object by plugging in smaller, finished objects (e.g., a `Car` has an `Engine`). |
 
----
 
 ### 3. Pros and Cons
 
@@ -7115,7 +6412,6 @@ This is the "Golden Triangle" of Java design. Here is the simple breakdown:
 * **Pros:** Most flexible; you can swap components at runtime; avoids the "tangled family tree" mess of inheritance.
 * **Cons:** Requires more "boilerplate" code to wire everything together.
 
----
 
 ### Summary Rule of Thumb
 
@@ -7236,7 +6532,6 @@ This is a major difference for senior engineers:
 * **Java:** Generics only exist for the **compiler**. Once the code is compiled, Java "erases" the types (turning `<T>` into `Object`) to stay compatible with older versions of Java.
 * **JavaScript:** Since it's dynamic, there is no type to erase. If you use TypeScript, it also performs erasure, stripping the types away before turning it into plain JS.
 
----
 
 ### 3. Summary Table
 
@@ -7382,7 +6677,6 @@ In Java, **Getters and Setters** are the standard way to implement **Encapsulati
 
 Instead of letting anyone touch your class variables directly (which is risky), you make the variables `private` and provide `public` methods to read (**get**) or update (**set**) them.
 
----
 
 ### 1. The Basic Syntax
 
@@ -7405,7 +6699,6 @@ public class User {
 
 ```
 
----
 
 ### 2. Why do we need them? (The "Gatekeeper" Concept)
 
@@ -7464,7 +6757,6 @@ user.setPoints(currentPoints + 10);   // Acting
 
 ```
 
----
 
 ### 2. The Best Practice: "Tell, Don't Ask"
 
@@ -7493,14 +6785,12 @@ There are still valid places for them, especially in enterprise Java (like the C
 * **Framework Compatibility:** Many Java libraries (like Hibernate or Jackson) **require** standard `get/set` methods to map your data automatically.
 * **Validation:** When you need to ensure a value stays within a range (e.g., `setAge` only allowing 0-120).
 
----
 
 ### 4. When to NOT use them
 
 * **Internal State:** If a variable is only used inside the class (like a `counter` or a `status` flag), keep it `private` and don't provide a getter or setter.
 * **Immutable Objects:** For objects that shouldn't change after creation (like a `Configuration` or a `UserReceipt`), provide **only Getters** and set the values via the Constructor.
 
----
 
 ### 5. The Modern Solution: Java Records
 
@@ -7574,7 +6864,6 @@ public class CreatePostRequest {
 
 ```
 
----
 
 ### Why this is considered "Good":
 
@@ -7582,7 +6871,6 @@ public class CreatePostRequest {
 * **Framework Friendly:** Tools that turn Java objects into JSON look specifically for methods starting with `get` and `set`.
 * **Controlled Mutation:** By using setters, you can add logging or breakpoints to see exactly when and where a value is being changed during a request.
 
----
 
 ### The Modern Alternative (Record)
 
@@ -7625,7 +6913,6 @@ class Account {
 
 ```
 
----
 
 ### 2. Abstraction (The "What" vs. "How")
 
@@ -7636,7 +6923,6 @@ class Account {
 * **Interface (Can-Do):** Use for shared abilities between unrelated objects (e.g., `Bird` and `Plane` both `Flyable`).
 * **Composition (Has-A):** Use to build objects like Legos. Preferred over inheritance to avoid "tangled trees."
 
----
 
 ### 3. Polymorphism (Many Forms)
 
@@ -7658,7 +6944,6 @@ void move() { System.out.println("Child moves differently"); }
 
 ```
 
----
 
 ### 4. Generalization (Inheritance)
 
@@ -7666,7 +6951,6 @@ void move() { System.out.println("Child moves differently"); }
 * **Why:** Code reuse. You write it once in the Parent, and all Children get it.
 * **When NOT to use:** If the relationship isn't a strict "Is-A" (e.g., don't make `Person` extend `Arm`). Use Composition instead.
 
----
 
 ### Summary Table
 
@@ -7681,7 +6965,6 @@ void move() { System.out.println("Child moves differently"); }
 
 SOLID principles are the backbone of professional Java development. Because Java is a **statically typed** language, these patterns are strictly enforced by the compiler. In JavaScript, these are often "suggestions," but in Java, failing to follow them leads to code that literally won't compile or becomes impossible to test.
 
----
 
 ### 1. S: Single Responsibility Principle (SRP)
 
@@ -7708,7 +6991,6 @@ class EmailService { void send(User u) { ... } }
 
 **JS Comparison:** In JS/Node, you might have one massive middleware function. SRP encourages moving that logic into separate modules.
 
----
 
 ### 2. O: Open/Closed Principle (OCP)
 
@@ -7736,7 +7018,6 @@ class UPIPayment implements Payment { public void pay() { ... } }
 
 ```
 
----
 
 ### 3. L: Liskov Substitution Principle (LSP)
 
@@ -7760,7 +7041,6 @@ class Penguin extends Bird {
 
 **JS Comparison:** JS is more forgiving due to dynamic typing, but in Java, this is a major source of runtime crashes in large systems.
 
----
 
 ### 4. I: Interface Segregation Principle (ISP)
 
@@ -7786,7 +7066,6 @@ class Robot implements Workable {
 
 ```
 
----
 
 ### 5. D: Dependency Inversion Principle (DIP)
 
@@ -7815,7 +7094,6 @@ class CmsService {
 
 **JS Comparison:** In JS, you might just `require()` a specific file. In Java, using DIP allows you to easily "mock" the database for unit testing.
 
----
 
 ### Summary Table
 
@@ -7831,7 +7109,6 @@ class CmsService {
 
 In Java, design patterns are more formal than in JavaScript. In JS, you often use functions and objects to achieve patterns implicitly. In Java, patterns are explicit structures used to solve the problems created by strict types and inheritance.
 
----
 
 ### 1. The Singleton Pattern
 
@@ -7862,7 +7139,6 @@ public class DatabaseConfig {
 
 **JS Comparison:** In JS, you just export a single object from a module (`export const config = {}`). Node’s module system caches this, making it a Singleton by default without any special code.
 
----
 
 ### 2. The Factory Pattern
 
@@ -7889,7 +7165,6 @@ class NotificationFactory {
 
 **JS Comparison:** You’d likely just use a simple function that returns an object or a class instance based on a string. Java's version is more rigid to ensure the returned object strictly follows the Interface.
 
----
 
 ### 3. The Builder Pattern
 
@@ -7932,7 +7207,6 @@ UserProfile profile = new UserProfile.Builder("Pushkar")
 
 **JS Comparison:** In JS, you just pass a single configuration object: `new UserProfile({ name: 'Pushkar', age: 32 })`. Java needs the Builder because it doesn't support named arguments in constructors.
 
----
 
 ### 4. The Observer Pattern
 
@@ -7958,7 +7232,6 @@ class NewsAgency {
 
 **JS Comparison:** This is essentially how **Event Listeners** work in the DOM or `EventEmitter` works in Node.js.
 
----
 
 ### 5. The Strategy Pattern
 
@@ -7984,7 +7257,6 @@ class Sorter {
 
 **JS Comparison:** In JS, you would just pass a callback function as an argument (e.g., `array.sort((a, b) => a - b)`). The Strategy pattern is essentially "Functions as Objects."
 
----
 
 ### Summary Table
 
@@ -8060,7 +7332,6 @@ class PowerAdapter implements IndianPlug {
 
 In JavaScript, you typically write utility functions as standalone exports in a `utils.js` file. In Java, because everything must belong to a class, you use **Static Utility Classes**.
 
----
 
 ### 1. The Structure: Static Classes
 
@@ -8094,7 +7365,6 @@ String result = StringUtils.capitalize("pushkar");
 
 ```
 
----
 
 ### 2. Java vs. JavaScript Comparison
 
@@ -8105,7 +7375,6 @@ String result = StringUtils.capitalize("pushkar");
 | **State** | Stateless (Pure functions) | Stateless (Pure functions) |
 | **Instantiation** | Blocked via `private` constructor | Naturally blocked (functions aren't classes) |
 
----
 
 ### 3. When to use what?
 
@@ -8114,7 +7383,6 @@ String result = StringUtils.capitalize("pushkar");
 
 **JS Comparison:** In Node/JS, you can easily mock a function imported from a module. In Java, mocking `StringUtils.capitalize()` requires heavy-duty libraries like PowerMock, so keep your utils "pure" and math-heavy.
 
----
 
 ### Summary
 
@@ -8124,7 +7392,6 @@ In Java, a utility function is a **static method** inside a **private-constructo
 
 In JavaScript, you typically use `const` at the top of a file or in a dedicated `constants.js` object. In Java, constants are strictly managed using **Static Final** fields or **Enums**.
 
----
 
 ### 1. The Standard: `static final`
 
@@ -8148,7 +7415,6 @@ public class AppConstants {
 
 ```
 
----
 
 ### 2. For Fixed Sets: The `enum`
 
@@ -8185,7 +7451,6 @@ void updatePost(PostStatus status) {
 | **Location** | Inside a class or interface | Top of file or `constants.js` |
 | **Naming** | `SCREAMING_SNAKE_CASE` | `SCREAMING_SNAKE_CASE` |
 
----
 
 ### Summary Best Practices
 
@@ -8216,7 +7481,6 @@ db.timeout=5000
 
 ```
 
----
 
 ### 2. Best Practice: Configuration Objects (Type Safety)
 
@@ -8238,7 +7502,6 @@ public class CmsConfig {
 
 ```
 
----
 
 ### 3. Java vs. JavaScript Comparison
 
@@ -8249,7 +7512,6 @@ public class CmsConfig {
 | **Validation** | Uses Bean Validation (`@NotNull`) | Manual checks or `Joi` / `Zod` |
 | **Profiles** | Built-in "Profiles" (Dev/Prod) | Custom logic or `cross-env` |
 
----
 
 ### 4. Why the Java Way?
 
@@ -8257,7 +7519,6 @@ public class CmsConfig {
 * **Environment Overrides:** You can define a default in your file, but override it using an Environment Variable. Java will automatically see `CMS_API_KEY` and use it to overwrite the value in your `CmsConfig` object.
 * **Fail-Fast:** If your app requires a `db.url` and it's missing, a well-configured Java app will refuse to start. In JS, the app might start and only crash when it finally tries to connect to the DB.
 
----
 
 ### Summary Rule of Thumb
 
@@ -8313,7 +7574,6 @@ List<String> upperNames = names.stream()
 
 In both languages, Garbage Collection (GC) is the "cleaning crew" that reclaims memory from objects your code no longer needs. The difference lies in the **control** and the **complexity** of the cleaning.
 
----
 
 ### The Real-World Analogy: The "Party House"
 
@@ -8323,7 +7583,6 @@ Imagine a small apartment. Every time you drop a piece of trash, your roommate i
 **Java (The Professional Industrial Cleaning Crew):**
 Imagine a massive mansion (The Heap). The crew doesn't clean every time you drop a wrapper. They wait until the bins are 75% full, then they rush in with specialized equipment (different GC algorithms). Sometimes they tell everyone to "Stop moving!" for a split second (Stop-the-World) while they clear out the heavy junk.
 
----
 
 ### 1. Java: Generational Garbage Collection
 
@@ -8354,7 +7613,6 @@ public void process() {
 | **Heap Size** | You must define it (e.g., -Xmx2g). | Grows and shrinks dynamically based on the OS. |
 | **Performance** | Can handle massive heaps (64GB+) with low "pauses." | Can struggle/lag if the heap gets too large. |
 
----
 
 ### 3. Key Difference: The "Reachability" Rule
 
@@ -8362,7 +7620,6 @@ Both use **Reachability**. If an object can't be reached by any "live" part of y
 
 **The Java Twist:** In Java, you have different types of references. A **WeakReference** tells the GC: "I'm using this, but if you really need the memory, go ahead and delete it." JavaScript (ES6+) now has `WeakMap` and `WeakSet`, which behave similarly.
 
----
 
 ### Best Practice for your CMS
 
@@ -8377,7 +7634,6 @@ In Java, memory leaks don't mean memory is "disappearing"—it means objects tha
 
 Coming from JavaScript, the concepts are similar, but Java's use of **Static** fields and **Thread Locals** adds unique risks.
 
----
 
 ### 1. Beware of `static` Collections
 
@@ -8386,7 +7642,6 @@ A `static` field lives as long as the application is running. If you add objects
 * **The Trap:** Using a `static HashMap` as a cache and never implementing an eviction policy (like removing old entries).
 * **The Fix:** Use a **WeakHashMap** or a dedicated caching library like **Caffeine** that has an "expiry" time.
 
----
 
 ### 2. Close Your Resources (Try-with-Resources)
 
@@ -8405,7 +7660,6 @@ try (FileInputStream fis = new FileInputStream("image.jpg")) {
 
 ```
 
----
 
 ### 3. Clear `ThreadLocal` Variables
 
@@ -8424,7 +7678,6 @@ try {
 
 ```
 
----
 
 ### 4. Inner Class References
 
@@ -8433,7 +7686,6 @@ In Java, a non-static inner class holds an implicit reference to its outer class
 * **The Trap:** Creating a background thread inside an Activity or Service using an anonymous inner class.
 * **The Fix:** Make inner classes `static`. Static inner classes do not hold a reference to the outer "parent" instance.
 
----
 
 ### 5. Improper `equals()` and `hashCode()`
 
@@ -8442,7 +7694,6 @@ If you use custom objects as keys in a `HashMap` but don't implement `equals()` 
 * **The Trap:** Adding the same `User` object to a `HashSet` multiple times because Java thinks they are different objects.
 * **The Fix:** Always use your IDE to generate `equals` and `hashCode` based on unique fields (like an ID).
 
----
 
 ### Summary Checklist 
 
@@ -8457,7 +7708,6 @@ If you use custom objects as keys in a `HashMap` but don't implement `equals()` 
 
 When your app starts consuming too much RAM, you use **Profilers** to look inside the "Party House" and see who is hogging the floor space.
 
----
 
 #### 1. VisualVM (The "Live Monitor")
 
@@ -8471,7 +7721,6 @@ A standalone tool (often bundled with the JDK) used for real-time monitoring of 
 
 
 
----
 
 #### 2. IntelliJ Profiler (The "Integrated Surgeon")
 
@@ -8484,7 +7733,6 @@ A built-in tool in IntelliJ IDEA (Ultimate) that is more convenient for develope
 
 
 
----
 
 #### 3. How to find a Leak (The Strategy)
 
@@ -8493,7 +7741,6 @@ Once you have a dump open in either tool, look for these two things:
 1. **Biggest Objects:** Sort by "Retained Size." This shows you which objects are actually holding onto the most memory.
 2. **Incoming References:** Right-click an object and select "Path to GC Root." This tells you **why** the object isn't being deleted. (e.g., "Oh, it's being held by a `static List` in `ImageService`!")
 
----
 
 #### Summary Table
 
@@ -8513,7 +7760,6 @@ In Java, a package is essentially a directory on your disk. Every file in that d
 * **Java Package:** `package com.cms.utils;`
 * **JS Equivalent:** `folder/path/file.js`
 
----
 
 ### 2. The Differences
 
@@ -8524,7 +7770,6 @@ In Java, a package is essentially a directory on your disk. Every file in that d
 | **Importing** | Imports the **Class Name**. | Imports the **File Path**. |
 | **Naming** | Reverse domain name (`com.google...`). | Project-relative or NPM name. |
 
----
 
 ### 3. Code Comparison
 
@@ -8560,7 +7805,6 @@ import { User } from '../models/User.js'; // Import by relative path
 
 ```
 
----
 
 ### 4. Key Java "Imports" to Know
 
@@ -8568,7 +7812,6 @@ import { User } from '../models/User.js'; // Import by relative path
 * **Wildcards:** You can import everything in a folder with `import com.cms.models.*;`. *Note: Most Java style guides (and IntelliJ) prefer explicit imports over wildcards.*
 * **The "Default" Package:** Java automatically imports everything in `java.lang.*` (like `String` or `System`), which is why you never have to import them manually.
 
----
 
 ### Summary for your app
 
@@ -8585,7 +7828,6 @@ In Java, your source code structure **must** mirror your package structure exact
 * **Code:** `package com.pushkar.cms;`
 * **Disk:** `src/main/java/com/pushkar/cms/`
 
----
 
 ### 2. How it differs from a "Regular" Folder
 
@@ -8598,7 +7840,6 @@ While a package lives in a folder, it acts as a **Namespace**. This is where it 
 | **Naming** | Anything goes (e.g., `my-files`). | Usually "Reverse Domain" (e.g., `com.google.project`). Dots represent sub-folders. |
 | **Uniqueness** | You can have two `User.js` files in different folders. | You can have two `User.java` classes, but their "Fully Qualified Names" (Package + Class) must be different. |
 
----
 
 ### 3. Sub-packages are NOT "Sub-folders" to Java
 
@@ -8609,7 +7850,6 @@ This is the most confusing part for developers coming from other languages. Even
 
 To the Java compiler, these are two distinct "islands." If a class in `cms` wants to use a class in `utils`, it **must import it**, even though it's technically in a "sub-folder." There is no "parent-child" inheritance for packages.
 
----
 
 ### 4. Summary: The "Mailbox" Analogy
 
@@ -8630,7 +7870,6 @@ While JavaScript has built-in globals (like `Array` or `Map`) that are always av
 * **Java:** You must "invite" the utility into your file.
 * **JS:** It’s already "in the room" (global scope).
 
----
 
 ### 2. Key Differences
 
@@ -8641,7 +7880,6 @@ While JavaScript has built-in globals (like `Array` or `Map`) that are always av
 | **Conflict Resolution** | Full naming (e.g., `java.util.List`). | Last one defined wins or use namespaces. |
 | **Static Utils** | Provided by classes (e.g., `Collections.sort`). | Static methods on prototypes (e.g., `Array.from`). |
 
----
 
 ### 3. Code Comparison: Importing and Using
 
@@ -8674,14 +7912,12 @@ posts.push("Hello World");
 
 ```
 
----
 
 ### 4. Wildcards and the `java.lang` Exception
 
 * **The Wildcard:** If you need many things from the utility package, you can use `import java.util.*;`. This tells Java, "Look in this folder for anything I mention."
 * **The `java.lang` Exception:** Java has one package it imports **automatically** for you: `java.lang`. This contains basics like `String`, `System`, and `Integer`. You only have to manually import things from other packages like `java.util` or `java.io`.
 
----
 
 ### 5. Why `java.util` is so important for your app
 
@@ -8697,7 +7933,6 @@ In Java, `java.util` is rarely used in isolation. You typically combine specific
 
 Here are the most common combinations you will use when building a CMS or any backend service.
 
----
 
 ### 1. The Dynamic List: `List` + `ArrayList`
 
@@ -8722,7 +7957,6 @@ public class PostManager {
 
 ```
 
----
 
 ### 2. The Key-Value Store: `Map` + `HashMap`
 
@@ -8747,7 +7981,6 @@ public class SessionCache {
 
 ```
 
----
 
 ### 3. The Unique Set: `Set` + `HashSet`
 
@@ -8771,7 +8004,6 @@ public class CategoryFilter {
 
 ```
 
----
 
 ### 4. The Sorting Duo: `Collections` + `Comparator`
 
@@ -8799,7 +8031,6 @@ public class SortPosts {
 
 ```
 
----
 
 ### 5. Input Handling: `Scanner`
 
@@ -8822,7 +8053,6 @@ public class SimpleInput {
 
 ```
 
----
 
 ### Summary Table: Which to combine?
 
@@ -8841,7 +8071,6 @@ In Java, the `java.lang` package is unique because it is **automatically importe
 
 Even though you don't manually import them, you use these classes in almost every line of code. Here are the most common classes and combinations within `java.lang`.
 
----
 
 ### 1. The Core Data Type: `String`
 
@@ -8862,7 +8091,6 @@ public class StringExample {
 
 ```
 
----
 
 ### 2. Mutable Strings: `StringBuilder`
 
@@ -8884,7 +8112,6 @@ public class BuilderExample {
 
 ```
 
----
 
 ### 3. System Operations: `System`
 
@@ -8907,7 +8134,6 @@ public class SystemExample {
 
 ```
 
----
 
 ### 4. Mathematical Functions: `Math`
 
@@ -8927,7 +8153,6 @@ public class MathExample {
 
 ```
 
----
 
 ### 5. Wrapper Classes: `Integer`, `Double`, `Boolean`
 
@@ -8951,7 +8176,6 @@ public class WrapperExample {
 
 ```
 
----
 
 ### 6. Process Control: `Thread` and `Runnable`
 
@@ -8971,7 +8195,6 @@ public class ThreadExample {
 
 ```
 
----
 
 ### Summary Checklist
 
@@ -9010,7 +8233,6 @@ You need a **Protocol**—a set of rules for how to ask and how to receive.
        |                                                   |
 ```
 
----
 
 ### 2. Solution Explanation: The HTTP Cycle
 
@@ -9065,7 +8287,6 @@ Content-Type: text/html
      +----------------+                               |
 ```
 
----
 
 ### 3. Non-Trivial Concept: The "Handler"
 
@@ -9075,7 +8296,6 @@ In coding, a **Handler** is like a specific chef in the kitchen assigned to a sp
 
 When a request comes in for `/pizza`, the server doesn't just run the whole program; it routes that request specifically to the "Pizza Handler." If you don't define a handler for a path, the server doesn't know what to do and sends back a `404`.
 
----
 
 ### 4. Solution Code (Java Example)
 
@@ -9175,7 +8395,6 @@ A simple server that just says "Hello" is static. In the real world, servers nee
 +------------------------------------------+
 ```
 
----
 
 #### 2. Solution: Advanced Handling Logic
 
@@ -9268,7 +8487,6 @@ In modern Java, we handle date and time using the **`java.time`** package. It fo
 
 The most important rule for a Senior Engineer is: **Never use the old `java.util.Date` or `java.util.Calendar` classes.** They are mutable, thread-unsafe, and lead to bugs.
 
----
 
 ### 1. The Strategy: Choosing the Right Class
 
@@ -9280,7 +8498,6 @@ The "best practice" depends on whether you are dealing with a human's perspectiv
 | **Human (Local)** | Birthdays, "Store opens at 9 AM," Post dates. | **`LocalDate`**, **`LocalTime`**, **`LocalDateTime`** |
 | **Human (Global)** | Flight departures, Meeting invites across cities. | **`ZonedDateTime`** |
 
----
 
 ### 2. General Workflow: The Three Pillars
 
@@ -9315,7 +8532,6 @@ String display = today.format(fmt); // "14/03/2026"
 
 ```
 
----
 
 ### 3. Best Practices for your app
 
@@ -9341,7 +8557,6 @@ Avoid doing manual math with milliseconds.
 
 Modern JDBC and JPA (Hibernate) drivers support `java.time` directly. You can map a `LocalDateTime` field to a `TIMESTAMP` column without any manual conversion.
 
----
 
 ### 4. Comparison with JavaScript
 
@@ -9419,7 +8634,6 @@ STEP 1: SERIALIZATION                          STEP 2: DESERIALIZATION
 * **Performance:** It is relatively slow and creates large byte streams compared to modern formats like JSON or Protocol Buffers.
 * **Cross-Language:** It only works if both ends are running Java.
 
----
 
 ### 3. Solution Code
 
@@ -9492,7 +8706,6 @@ In **JavaScript**, you have one worker (the Main Thread). When you do an `async`
 
 In **Java**, you can hire multiple workers (Threads). Each thread has its own "Stack" and can execute code independently. On a modern CPU with 8 cores, Java can literally perform 8 different calculations at the exact same time.
 
----
 
 ### Java vs. JavaScript: Comparison
 
@@ -9503,7 +8716,6 @@ In **Java**, you can hire multiple workers (Threads). Each thread has its own "S
 | **Memory** | Threads **share** memory (leads to Race Conditions). | Isolated memory (Workers use message passing). |
 | **Complexity** | High (requires Locks and Synchronization). | Low (mostly managed by the environment). |
 
----
 
 ### Java Code Example: Creating a Thread
 
@@ -9524,7 +8736,6 @@ public class MultiThreadingDemo {
 
 ```
 
----
 
 ### The "Danger" Zone: Shared Mutable State
 
@@ -9544,7 +8755,6 @@ class Counter {
 
 ```
 
----
 
 ### Best Practice: Don't Create Threads Manually
 
@@ -9577,7 +8787,6 @@ JavaScript is single-threaded. It uses an **Event Loop** to manage concurrency. 
 **Java (Thread Model)**
 Java uses **Native Threads**. Each thread is a separate execution path mapped directly to an Operating System thread. Java can perform multiple tasks at the exact same millisecond by utilizing multiple CPU cores.
 
----
 
 ### 2. Key Differences Table
 
@@ -9589,7 +8798,6 @@ Java uses **Native Threads**. Each thread is a separate execution path mapped di
 | **Shared State** | No race conditions (only one thread). | High risk of Race Conditions (shared memory). |
 | **Ideal For** | I/O intensive apps (Chat, Web Servers). | CPU intensive apps (Video encoding, Big Data). |
 
----
 
 ### 3. Visual Comparison (ASCII)
 
@@ -9609,7 +8817,6 @@ Imagine a café with **ten** waiters.
 3. Because there are 9 other waiters, 9 other people can still be served simultaneously.
 4. If 11 people come, the 11th person must wait for a waiter to become free.
 
----
 
 ### 4. Code Comparison
 
@@ -9634,7 +8841,6 @@ System.out.println("End");
 
 ```
 
----
 
 ### Summary
 
@@ -9663,7 +8869,6 @@ A Thread is a "lightweight" unit of execution within a process. A single Java pr
 * **Private Memory:** Each thread has its own **Stack** (where local variables and method calls live).
 * **Cost:** Creating a thread is much "cheaper" than a process.
 
----
 
 ### 3. Visual Representation (ASCII Diagram)
 
@@ -9684,7 +8889,6 @@ _________________________________________________________________
 
 ```
 
----
 
 ### 4. Key Differences Table
 
@@ -9696,7 +8900,6 @@ _________________________________________________________________
 | **Context Switching** | Slow (OS must swap out entire memory state). | Fast (OS only swaps the stack pointer). |
 | **Failure** | One process crash does not kill others. | One thread crash (Exception) can kill the whole process. |
 
----
 
 ### 5. Java Code Example: Shared vs. Private Scope
 
@@ -9741,7 +8944,6 @@ In a CMS application, the **Process** is the running server instance. The **Thre
 
 Deciding between Java’s multi-threaded model and Node.js’s event-driven model depends entirely on the **bottleneck** of your application.
 
----
 
 ### 1. When to use Threads?
 
@@ -9752,7 +8954,6 @@ Use threads when your task is **CPU-bound**. These are tasks that require intens
 * **Encryption/Hashing:** Intense security operations.
 * **Parallel Execution:** When you have 4 tasks that each take 1 second, and you want them finished in 1 second total (by using 4 separate CPU cores).
 
----
 
 ### 2. When NOT to use Threads?
 
@@ -9764,7 +8965,6 @@ Avoid manual thread management for tasks that are **I/O-bound**. This is when yo
 
 **Reasoning:** In these cases, threads are overkill. A thread sitting idle consumes about 1MB of RAM. If you have 1,000 requests waiting on a slow API, you've wasted 1GB of RAM just for "waiters" to stand around doing nothing.
 
----
 
 ### 3. Java Threads vs. Node.js Event Loop
 
@@ -9776,7 +8976,6 @@ In Java, all threads share the same memory (the Heap). If you have a massive sea
 **True Parallelism:**
 Node.js is great at handling 10,000 "waiting" connections. But if one of those requests involves a heavy `for` loop that takes 2 seconds to calculate, **the entire Node.js server freezes** for every other user because the Event Loop is blocked. Java just moves that heavy loop to a background thread, and the rest of the server stays snappy.
 
----
 
 ### 4. Reasons NOT to use Threads (The "Gotchas")
 
@@ -9796,7 +8995,6 @@ While powerful, threads bring significant risks:
 * **Context Switching Overhead:** If you create too many threads (e.g., 5,000 threads on an 8-core CPU), the CPU spends more time "swapping" between threads than actually running your code.
 * **Complexity:** Debugging a multi-threaded app is significantly harder because bugs might only happen once every 1,000 runs (non-deterministic).
 
----
 
 ### Summary Table
 
@@ -9811,7 +9009,6 @@ In Java, avoiding race conditions is all about **Synchronization**. When multipl
 
 Here are the three most common ways to prevent race conditions, moving from the simplest to the most advanced.
 
----
 
 ### 1. The `synchronized` Keyword
 
@@ -9838,7 +9035,6 @@ public class SafeCounter {
 * **Pros:** Very easy to use and understand.
 * **Cons:** It can be slow. If a thread is "holding the lock" for a long time, other threads are blocked and doing nothing.
 
----
 
 ### 2. Atomic Variables
 
@@ -9863,7 +9059,6 @@ public class AtomicCounter {
 * **Pros:** Much faster than `synchronized` because it is "lock-free." No thread ever sleeps; they just keep trying until the update succeeds.
 * **Cons:** Only works for single variables, not complex logic.
 
----
 
 ### 3. Explicit Locks (`ReentrantLock`)
 
@@ -9893,7 +9088,6 @@ public class LockCounter {
 * **Pros:** You can use `lock.tryLock()` which returns false if the lock is held, allowing your thread to do other work instead of blocking.
 * **Cons:** More boilerplate code; if you forget to call `unlock()`, your app will freeze.
 
----
 
 ### Summary Comparison
 
@@ -9913,13 +9107,11 @@ In Java, creating a new thread is a "heavy" operation. It requires the OS to all
 
 The **ExecutorService** solves this by using a **Thread Pool**.
 
----
 
 ### 1. What is it?
 
 The `ExecutorService` is a framework that manages a "pool" of pre-hired worker threads. Instead of creating a new thread for every task, you submit your task to a **Blocking Queue**. The pool of threads picks up tasks from the queue as they become available.
 
----
 
 ### 2. Why use it?
 
@@ -9927,7 +9119,6 @@ The `ExecutorService` is a framework that manages a "pool" of pre-hired worker t
 * **Performance:** You save the time required to create and destroy threads because the workers stay alive.
 * **Separation of Concerns:** You focus on the **Task** (what to do), and the Executor handles the **Execution** (how/when to run it).
 
----
 
 ### 3. How to use it?
 
@@ -9966,7 +9157,6 @@ executor.shutdown(); // Stop accepting new tasks, finish pending ones.
 
 ```
 
----
 
 ### 4. Real-World Comparison (The Coffee Shop)
 
@@ -9976,7 +9166,6 @@ executor.shutdown(); // Stop accepting new tasks, finish pending ones.
 | **Scaling** | If 1,000 customers arrive, you hire 1,000 waiters. The shop collapses. | 1,000 customers form a line (Queue). The 5 waiters serve them one by one. |
 | **Speed** | Slow (hiring/training takes time). | Fast (waiters are already standing there). |
 
----
 
 ### 5. Best Practice for production
 
@@ -9995,7 +9184,6 @@ Think of it like a job description.
 
 By implementing `Runnable`, you are defining exactly what code should run when a thread starts.
 
----
 
 ### 2. How it works in the code
 
@@ -10020,7 +9208,6 @@ In Java, a class can only extend **one** other class (Single Inheritance). If yo
 * **Composition (Best Practice):** Implementing `Runnable` leaves your class free to extend another class.
 * **Decoupling:** You can pass the same `Runnable` task to many different threads or to a **Thread Pool** (`ExecutorService`).
 
----
 
 ### 4. Java vs. JavaScript Comparison
 
@@ -10031,7 +9218,6 @@ If you are coming from JavaScript, a `Runnable` is very similar to a **Callback 
 | **The Task** | `Runnable` (specifically the `run()` method) | A function `() => { ... }` |
 | **Execution** | `new Thread(runnable).start()` | `setTimeout(callback)` or `Promise` |
 
----
 
 ### 5. The Modern Way: Lambdas
 
@@ -10060,7 +9246,6 @@ As you saw, `Runnable` doesn't return anything (`void`). But in a CMS, you often
 * **`Runnable`**: Has a `run()` method. Returns **nothing**. Cannot throw checked exceptions.
 * **`Callable<V>`**: Has a `call()` method. Returns **a value of type V**. Can throw exceptions.
 
----
 
 ### 2. The "Receipt": Future
 
@@ -10089,7 +9274,6 @@ System.out.println("The thread returned: " + result);
 
 ```
 
----
 
 ### 3. Java vs. JavaScript: The Promise Comparison
 
@@ -10102,7 +9286,6 @@ For a full-stack engineer, the best way to understand this is by comparing it to
 | **Getting the Value** | `.get()` (Blocks!) | `.then()` or `await` (Non-blocking) |
 | **Modern Java Equivalent** | `CompletableFuture` | `Promise` (almost identical behavior) |
 
----
 
 ### 4. The Modern Way: `CompletableFuture`
 
@@ -10129,7 +9312,6 @@ In your CMS, you would use this for things like:
 * **Cleanup:** Deleting temporary upload files every 24 hours.
 * **Emailing:** Sending a batch of newsletters 10 minutes from now.
 
----
 
 ### 1. How to Create It
 
@@ -10141,7 +9323,6 @@ ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
 ```
 
----
 
 ### 2. Common Scheduling Methods
 
@@ -10180,7 +9361,6 @@ scheduler.scheduleWithFixedDelay(() -> {
 
 ```
 
----
 
 ### 3. Java vs. JavaScript: The Comparison
 
@@ -10191,7 +9371,6 @@ scheduler.scheduleWithFixedDelay(() -> {
 | **Management** | You can cancel, check status, or shutdown the pool. | You only get a `timeoutID` to clear. |
 | **Concurrency** | Multiple instances of the task can run in parallel. | The same function cannot run "on top of itself." |
 
----
 
 ### Summary of Best Practices
 
@@ -10205,7 +9384,6 @@ A **Deadlock** is the ultimate traffic jam in multithreading. It happens when tw
 
 In your CMS, this might happen if one thread tries to update a **Post** and then its **Category**, while another thread tries to update the **Category** and then the **Post** at the same time.
 
----
 
 ### 1. How a Deadlock Happens (The "Deadly Embrace")
 
@@ -10244,7 +9422,6 @@ public class DeadlockDemo {
 
 ```
 
----
 
 ### 2. How to Avoid Deadlocks
 
@@ -10287,7 +9464,6 @@ if (lockA.tryLock(5, TimeUnit.SECONDS)) {
 
 Don't lock an entire method if you only need to protect one line of code. The less time a thread holds a lock, the lower the chance of a collision.
 
----
 
 ### 3. Summary of Strategies
 
@@ -10307,7 +9483,6 @@ In Java, the **`volatile`** keyword is a "lock-light" mechanism used to solve **
 
 To understand why we need it, you have to understand a secret about how modern CPUs work: to save time, each CPU core creates a local "cache" of variables. If **Thread A** updates a variable, **Thread B** might keep looking at its own old, cached version of that variable instead of the fresh one in main memory.
 
----
 
 ### 1. The Problem: Memory Visibility
 
@@ -10331,7 +9506,6 @@ public class VisibilityDemo {
 
 ```
 
----
 
 ### 2. The Solution: `volatile`
 
@@ -10346,7 +9520,6 @@ private volatile boolean keepRunning = true;
 
 Now, as soon as **Thread B** sets it to `false`, **Thread A** will see it immediately because it is forced to check the main memory on every loop iteration.
 
----
 
 ### 3. The Limitation: It is NOT "Thread-Safe"
 
@@ -10360,7 +9533,6 @@ If you have a `count++` operation, `volatile` will not save you from race condit
 | **Atomicity** | **No** (Doesn't stop race conditions) | Yes |
 | **Blocking** | No (Non-blocking/Fast) | Yes (Threads may wait) |
 
----
 
 ### 4. When to use `volatile`?
 
@@ -10383,7 +9555,6 @@ In Java, exception handling inside threads is a bit of a "silent killer." If a t
 
 Crucially, **the exception will not bubble up to the main thread.** Your application will keep running, but that specific background task will have vanished without a trace in your logs unless you've set up a handler.
 
----
 
 ### 1. The Problem: The "Silent Death"
 
@@ -10405,7 +9576,6 @@ try {
 
 ```
 
----
 
 ### 2. Solution A: The Internal Try-Catch (Standard)
 
@@ -10422,7 +9592,6 @@ Thread t = new Thread(() -> {
 
 ```
 
----
 
 ### 3. Solution B: UncaughtExceptionHandler (The "Global" Way)
 
@@ -10442,7 +9611,6 @@ t.start();
 
 ```
 
----
 
 ### 4. Solution C: Future.get() (For Callables)
 
@@ -10461,7 +9629,6 @@ try {
 
 ```
 
----
 
 ### Summary Table: Java vs. JavaScript
 
@@ -10481,7 +9648,6 @@ In Java, the **`Future`** keyword (specifically the `java.util.concurrent.Future
 
 Since threads run asynchronously, you can't get a return value immediately like a normal method call. The `Future` is the object that will eventually hold that return value once the background thread finishes its work.
 
----
 
 ### 1. The Core Workflow: "Order and Receipt"
 
@@ -10492,7 +9658,6 @@ Think of a `Future` like ordering food at a fast-casual restaurant:
 3. **Polling:** You can check the pager (`isDone()`) to see if the food is ready.
 4. **Retrieval:** When you want the food, you call `.get()`. If it's not ready, you have to stand at the counter and wait (**Blocking**).
 
----
 
 ### 2. Key Methods of a Future
 
@@ -10503,7 +9668,6 @@ Think of a `Future` like ordering food at a fast-casual restaurant:
 | **`.cancel(boolean)`** | Attempts to stop the thread execution. |
 | **`.isCancelled()`** | Checks if the task was stopped before completion. |
 
----
 
 ### 3. Code Example: Returning a Value from a Thread
 
@@ -10533,7 +9697,6 @@ executor.shutdown();
 
 ```
 
----
 
 ### 4. Java vs. JavaScript Comparison
 
@@ -10545,7 +9708,6 @@ For a Full-Stack developer, the `Future` is the closest thing to a **Promise**, 
 | **Consumption** | You pull the value via `.get()` (Blocking). | You receive the value via `.then()` or `await`. |
 | **Complexity** | Simple, but can freeze your main thread. | Designed to be non-blocking from the start. |
 
----
 
 ### 5. Why use it?
 
@@ -10562,14 +9724,12 @@ In Java, **`CompletableFuture`** is the direct answer to JavaScript’s `Promise
 
 It essentially brings the **callback-driven, non-blocking** style of Node.js to the high-powered multi-threading world of Java.
 
----
 
 ### 1. The Core Difference: Push vs. Pull
 
 * **`Future` (Pull):** You have to manually call `.get()` and wait. The thread is "pulled" into a blocked state.
 * **`CompletableFuture` (Push):** The background thread "pushes" the result into the next function in the chain as soon as it's ready.
 
----
 
 ### 2. Common Non-Blocking Methods
 
@@ -10583,7 +9743,6 @@ If you know JavaScript, these methods will look very familiar:
 | `.exceptionally(ex -> ...)` | `.catch((ex) => ...)` | Handle errors in the chain. |
 | `.thenCompose()` | Nested `.then()` or `await` | Chain two async tasks where the second depends on the first. |
 
----
 
 ### 3. Code Example: A Non-Blocking Pipeline
 
@@ -10619,7 +9778,6 @@ public class CmsAsyncService {
 
 ```
 
----
 
 ### 4. How the Threads Work
 
@@ -10629,7 +9787,6 @@ Behind the scenes, `CompletableFuture` uses a hidden **Thread Pool** (usually th
 * When Task 1 finishes, Task 2 might start on Thread A, or it might be picked up by Thread B if Thread A is busy.
 * This "work-stealing" makes it incredibly efficient for high-throughput applications.
 
----
 
 ### 5. Why use this in your CMS?
 
@@ -10647,7 +9804,6 @@ In Java 21, **Virtual Threads** (Project Loom) changed the fundamental rules of 
 
 **Virtual Threads** are "lightweight" threads that are not managed by the OS, but by the Java Virtual Machine (JVM).
 
----
 
 ### 1. The Concept: "Carrier" vs. "Virtual"
 
@@ -10656,7 +9812,6 @@ Think of a Virtual Thread like a **Passenger** and an OS Thread like a **Bus**.
 * **Platform Threads (Regular):** You are the driver of your own car. If you get stuck at a red light (I/O block), the car (OS Thread) sits there taking up space on the road and burning fuel, doing nothing.
 * **Virtual Threads:** You are a passenger on a bus. When the bus reaches a stop and you need to get off to wait for something (like a Database response), you hop off. The bus (the **Carrier Thread**) doesn't wait for you; it immediately drives away to pick up another passenger. When your data is ready, you hop on the *next available bus* to finish your trip.
 
----
 
 ### 2. When to use Virtual Threads over Regular Threads?
 
@@ -10679,7 +9834,6 @@ If your tasks are doing heavy math, video encoding, or complex image processing:
 
 * **Virtual Threads offer NO benefit.** * Because the CPU is actually working, it cannot "hop off the bus." One task will stay on that CPU core until it is done. Regular threads (Platform Threads) are still the best choice for raw computational power.
 
----
 
 ### 3. Java vs. JavaScript: The Breakthrough
 
@@ -10691,7 +9845,6 @@ As a Full-Stack engineer, here is the "Mind-Blowing" part: Virtual Threads give 
 | **Blocking** | Blocking the loop is a disaster. | Blocking a virtual thread is perfectly fine (it just unmounts). |
 | **Complexity** | "Coloring" functions (async vs sync). | No distinction; every function can be "async" for free. |
 
----
 
 ### 4. Code Example: Millions of Threads
 
@@ -10709,7 +9862,6 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 
 ```
 
----
 
 ### 5. Why not use them for everything?
 
@@ -10780,7 +9932,6 @@ public class CmsPostService {
 
 ```
 
----
 
 ### Why this is the "Minimum Viable Knowledge":
 
@@ -10789,7 +9940,6 @@ public class CmsPostService {
 * **`AtomicInteger`**: You are avoiding Race Conditions. If both posts finish at the exact same millisecond, the `totalProcessed` count will still be accurate.
 * **`supplyAsync`**: You are explicitly telling Java which thread pool to use for the work.
 
----
 
 ### Summary Table: Java Concurrency "Cheat Sheet"
 
@@ -10807,7 +9957,6 @@ In a multi-threaded Java environment, standard collections like `HashMap` or `Ar
 
 Here are the heavy hitters for concurrent data structures.
 
----
 
 ### 1. ConcurrentHashMap
 
@@ -10840,7 +9989,6 @@ Unlike a synchronized map that locks the *entire* table, this uses **Bucket Lock
 * **Performance:** Excellent. Reads are mostly lock-free.
 * **Best Practice:** Use `computeIfAbsent` or `merge` instead of `get-then-put` to avoid logic-level race conditions.
 
----
 
 ### 2. CopyOnWriteArrayList
 
@@ -10872,7 +10020,6 @@ Iterators still see the OLD array until the swap.
 * **Performance:** $O(1)$ for reads (fast), very slow for writes.
 * **Best Practice:** Only use for small lists or read-only heavy scenarios.
 
----
 
 ### 3. BlockingQueue (specifically LinkedBlockingQueue)
 
@@ -10905,7 +10052,6 @@ Producers -> [ Task ] [ Task ] [      ] -> Consumers
 * **Performance:** Highly optimized for throughput between threads.
 * **Best Practice:** Always specify a **capacity** (e.g., `new LinkedBlockingQueue(1000)`) to prevent `OutOfMemoryError` if the producers are faster than consumers.
 
----
 
 ### Summary Cheat Sheet
 
@@ -10931,7 +10077,6 @@ Instead of the web server thread doing the work, the request is turned into a "T
 
 ```
 
----
 
 ### 2. Strategic Thread Management
 
@@ -10941,7 +10086,6 @@ The "how" of invocation and management is critical for stability.
 * **The Worker Pool (ExecutorService):** A `FixedThreadPool` is used here. You calculate the pool size based on your CPU cores. For image processing (CPU-heavy), a good rule of thumb is: `Number of Cores + 1`.
 * **The Backpressure (Queue):** We use a **Bounded Queue**. If the queue fills up, we use a `RejectedExecutionHandler` to either return a `429 Too Many Requests` or spill over to a secondary storage (like SQS/RabbitMQ).
 
----
 
 ### 3. Execution & Data Handling
 
@@ -10968,7 +10112,6 @@ private void performTransformation(String imageId) {
 
 ```
 
----
 
 ### 4. Lock Management & Thread Safety
 
@@ -10978,7 +10121,6 @@ At a high level, you avoid manual `synchronized` blocks. Instead, you use **Conc
 * **Progress Counters:** Use `LongAdder` or `AtomicInteger` for metrics (e.g., total images processed). These are faster than synchronized integers because they use **CAS (Compare-And-Swap)** logic.
 * **Resource Access:** If two threads must never process the same image simultaneously, use a **Distributed Lock** (like Redis/Redlock) rather than a Java-level lock, so your service can scale horizontally across multiple servers.
 
----
 
 ### 5. Performance Concerns (The "Staff" Perspective)
 
@@ -10997,7 +10139,6 @@ While `npm` is primarily a package manager, Maven and Gradle manage the entire *
 * **Java:** Maven/Gradle = `npm` + `webpack` + `jest` + `tsc`.
 * **JS:** `npm` = Mostly just dependency management.
 
----
 
 ### 2. Maven vs. Gradle vs. NPM
 
@@ -11008,7 +10149,6 @@ While `npm` is primarily a package manager, Maven and Gradle manage the entire *
 | **Performance** | Slower (Re-checks everything). | **Fast** (Uses build cache and daemons). | Fast (with `node_modules` caching). |
 | **Dependency** | Downloaded from **Maven Central**. | Downloaded from Maven Central/Google. | Downloaded from **NPM Registry**. |
 
----
 
 ### 3. Code Comparison: Adding a Dependency
 
@@ -11046,7 +10186,6 @@ NPM is a simple JSON key-value pair.
 
 ```
 
----
 
 ### 4. Key Java Concepts for your CMS
 
@@ -11054,7 +10193,6 @@ NPM is a simple JSON key-value pair.
 * **Transitive Dependencies:** If you import Library A, and A needs Library B, Maven/Gradle handles this automatically (just like NPM).
 * **Plugins:** Both tools use plugins for everything. Want to build a Docker image? Add a plugin. Want to check for security vulnerabilities? Add a plugin.
 
----
 
 ### 5. Which one should you choose?
 
@@ -11072,7 +10210,6 @@ In the Java ecosystem, connecting to a database is split into two layers: **JDBC
 * **JDBC (Java Database Connectivity):** The "Raw SQL" layer. It’s like using the `pg` or `mysql2` driver in Node.js to write pure SQL strings.
 * **JPA (Jakarta Persistence API):** The "Object-Mapping" layer. It’s like using **TypeORM** or **Prisma**. You map Java classes to database tables.
 
----
 
 ### 2. Key Differences
 
@@ -11083,7 +10220,6 @@ In the Java ecosystem, connecting to a database is split into two layers: **JDBC
 | **Mapping** | Manual (`rs.getString`). | Automatic (via `@Entity`). | Row-to-Object manual mapping. |
 | **Portability** | Dialects can break SQL. | Swapping DBs is easy. | Hard-coded SQL vs Abstracted query. |
 
----
 
 ### 3. Code Comparison: Fetching a User
 
@@ -11121,7 +10257,6 @@ System.out.println(user.getName()); // No SQL written!
 
 ```
 
----
 
 ### 4. Which to use in your CMS?
 
@@ -11133,7 +10268,6 @@ As a Senior Engineer, you will almost always use **JPA** (specifically through *
 
 However, you keep **JDBC** in your back pocket for complex, high-performance reporting queries where the ORM's generated SQL might be too slow.
 
----
 
 ### 5. Summary Checklist
 
@@ -11150,7 +10284,6 @@ In the Java world, **Hibernate** is the most popular implementation of JPA (the 
 * **Hibernate (Java):** A robust, mature Object-Relational Mapper (ORM). It handles everything from table creation to complex caching.
 * **JavaScript Equivalent:** Think of it as **TypeORM** or **Sequelize**. If you've used **Prisma**, Hibernate is similar in purpose but much more "heavyweight" and configuration-driven.
 
----
 
 ### 2. Key Differences
 
@@ -11161,7 +10294,6 @@ In the Java world, **Hibernate** is the most popular implementation of JPA (the 
 | **Caching** | Built-in 1st and 2nd level caching to reduce DB hits. | Usually requires external libraries like Redis. |
 | **Schema** | Can automatically generate your entire DB schema from your Java classes. | Uses Migrations (though some support `sync`). |
 
----
 
 ### 3. Code Comparison: Defining a Relationship
 
@@ -11203,7 +10335,6 @@ export class Post {
 
 ```
 
----
 
 ### 4. The "Magic" of Dirty Checking
 
@@ -11222,7 +10353,6 @@ transaction.commit();
 
 ```
 
----
 
 ### 5. Why use Hibernate in your CMS?
 
@@ -11251,13 +10381,11 @@ Hibernate realizes it doesn't have the comments yet. So, for **every single post
 
 **Total Queries:** 1 (for posts) + 10 (for comments) = **11 queries** to show just 10 items.
 
----
 
 ### Why does this happen?
 
 It happens because of **Lazy Loading**. Hibernate is trying to be "efficient" by not loading comments until you actually call `post.getComments()`. But when you do that inside a loop, it triggers a "surprise" query for every iteration.
 
----
 
 ### How to Fix It (The Senior Way)
 
@@ -11293,7 +10421,6 @@ private List<Comment> comments;
 
 ```
 
----
 
 ### Summary Checklist
 
@@ -11309,7 +10436,6 @@ To understand Java’s history, you have to look at it as a journey from "Intera
 
 Here is the breakdown of its evolution, the core jargon (SDK/JDK), and the major shifts that shaped the language.
 
----
 
 ### 1. A Brief History: From Oak to Java
 
@@ -11319,7 +10445,6 @@ Java was started in **1991** by the "Green Team" at Sun Microsystems, led by **J
 * **The Name:** It was originally called **Oak** (after an oak tree outside Gosling's office). In 1995, it was renamed **Java** (inspired by the coffee from the island of Java).
 * **The Slogan:** "Write Once, Run Anywhere" (WORA). This was revolutionary because, unlike C++, you didn't have to recompile your code for Windows, Mac, or Linux.
 
----
 
 ### 2. Understanding the Jargon: SDK, JDK, JRE
 
@@ -11330,7 +10455,6 @@ As a software engineer, you’ll hear these terms used interchangeably, but they
 * **JDK (Java Development Kit):** This is the **full toolkit** for *building* Java apps. It includes the JRE + the Compiler (`javac`), Debugger, and Documentation tools.
 * **SDK (Software Development Kit):** This is a generic term. In the Java world, the **JDK is the SDK**.
 
----
 
 ### 3. Major Version Milestones
 
@@ -11346,13 +10470,11 @@ Java has a "Long Term Support" (LTS) model. While new versions come out every 6 
 | **Java 21 (LTS)** | 2023 | **Virtual Threads** (Project Loom). | Allows millions of threads without crashing the CPU. |
 | **Java 25 (LTS)** | 2025 | TBD / Advanced Features. | The current/upcoming stable standard. |
 
----
 
 ### 4. Why did the versions jump so fast?
 
 Before 2017, Java versions took 3 to 5 years to release (e.g., the long wait for Java 8). Oracle changed this to a **6-month release cycle**. This is why we went from Java 9 to Java 26 in just a few years. It allows Java to compete with the fast pace of languages like JavaScript and Go.
 
----
 
 ### 5. Summary: Why Java Still Rules the Backend
 
@@ -11364,7 +10486,6 @@ Before 2017, Java versions took 3 to 5 years to release (e.g., the long wait for
 
 To understand how the JVM works, think of it as a **universal translator**. It sits between your code and the computer hardware, ensuring that your Java application runs exactly the same way whether it's on a Mac, Windows, or a Linux server.
 
----
 
 ### 1. The Workflow: Code to Execution
 
@@ -11374,7 +10495,6 @@ The JVM doesn't run your `.java` files directly. It goes through a multi-step tr
 2. **Loading:** The **Class Loader** reads the `.class` files and brings them into the JVM’s memory.
 3. **Execution:** The **Execution Engine** converts that Bytecode into machine code (1s and 0s) that your specific CPU can execute.
 
----
 
 ### 2. Core Components of the JVM
 
@@ -11398,7 +10518,6 @@ This is the "Brain" of the JVM. It has two main ways to run code:
 * **The Interpreter:** Reads bytecode and executes it line-by-line. It starts fast but is slow for repetitive code.
 * **The JIT (Just-In-Time) Compiler:** This is the JVM's secret weapon. It watches for "hot" code (methods that run thousands of times) and compiles them directly into native machine code for extreme speed.
 
----
 
 ### 3. Key JVM Features for Developers
 
@@ -11406,7 +10525,6 @@ This is the "Brain" of the JVM. It has two main ways to run code:
 * **Automatic Memory Management:** You never have to manually "free" memory like in C or C++. The JVM’s Garbage Collector tracks which objects are no longer reachable and deletes them for you.
 * **Security:** The JVM runs your code in a "sandbox." It checks the bytecode before running it to ensure it doesn't try to access unauthorized memory or crash the system.
 
----
 
 ### 4. Summary: The JVM Lifecycle
 
@@ -11460,7 +10578,6 @@ To visualize the **JVM**, think of it as a three-layer factory that takes in blu
 
 ```
 
----
 
 ### Key Sections Explained
 
@@ -11470,7 +10587,6 @@ To visualize the **JVM**, think of it as a three-layer factory that takes in blu
 * **The JIT Compiler:** The "Speed Booster." It translates the most frequently used parts of your code directly into machine code so they run as fast as a C++ program.
 * **The Garbage Collector:** The "Maintenance Crew." It automatically frees up space in the **Heap** by deleting objects you are no longer using.
 
----
 
 ### Why this matters for your Senior/Staff Interview:
 
@@ -11485,7 +10601,6 @@ Java frameworks exist to solve the "boilerplate" problem. In the early days, set
 
 Frameworks provide a pre-built "skeleton" so you can focus on your CMS logic rather than the plumbing.
 
----
 
 ### 1. The "Big Three" Categories
 
@@ -11509,7 +10624,6 @@ This is the official set of specifications from Oracle/Eclipse Foundation. Many 
 
 * **Why it's there:** To provide a standard that different vendors (IBM, RedHat, Oracle) can all follow so your code isn't "locked in" to one company.
 
----
 
 ### 2. Specialized Frameworks for your CMS
 
@@ -11520,7 +10634,6 @@ This is the official set of specifications from Oracle/Eclipse Foundation. Many 
 | **Log4j2 / Logback** | Logging | Essential for observability and tracking "tail latencies." |
 | **Jackson** | JSON Parsing | The standard way to turn Java objects into JSON (and vice-versa). |
 
----
 
 ### 3. How they work: The "Inversion of Control" (IoC)
 
@@ -11538,7 +10651,6 @@ The biggest difference between a **Library** and a **Framework** is who is in ch
 
 ```
 
----
 
 ### 4. Code Example: Spring Boot (The "Staff" Standard)
 
@@ -11561,7 +10673,6 @@ public class PostController {
 
 ```
 
----
 
 ### Summary: Why so many?
 
