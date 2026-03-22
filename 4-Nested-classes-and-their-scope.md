@@ -1,3 +1,6 @@
+<!-- TOC --><a name="nested-classes-and-their-scope"></a>
+# Nested classes and their scope
+
 <!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
 
 - [Nested classes and their scope](#nested-classes-and-their-scope)
@@ -22,9 +25,6 @@
       + [4. Summary Table](#4-summary-table)
 
 <!-- TOC end -->
-
-<!-- TOC --><a name="nested-classes-and-their-scope"></a>
-# Nested classes and their scope
 
 Nested classes in Java are exactly what they sound like: a class written completely inside the curly braces of another class. 
 
