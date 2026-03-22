@@ -19,6 +19,19 @@
          - [JavaScript's Solution: `BigInt`](#javascripts-solution-bigint)
          - [The Missing Piece in JS: Decimals](#the-missing-piece-in-js-decimals)
          - [Common methods of BigInteger and BigDecimal](#common-methods-of-biginteger-and-bigdecimal)
+   * [Using a BigInteger as a loop counter](#using-a-biginteger-as-a-loop-counter)
+      + [ASCII Diagram: Translating the Loop](#ascii-diagram-translating-the-loop)
+         - [The 3 Rules of the BigInteger Loop:](#the-3-rules-of-the-biginteger-loop)
+         - [The Java Code Example (For Loop)](#the-java-code-example-for-loop)
+         - [The Java Code Example (While Loop - Often Cleaner)](#the-java-code-example-while-loop-often-cleaner)
+      + [Comparison: JavaScript & Node.js](#comparison-javascript-nodejs)
+         - [ASCII Diagram: JS BigInt Loop](#ascii-diagram-js-bigint-loop)
+         - [The JavaScript / Node.js Code](#the-javascript-nodejs-code)
+      + [Summary Table](#summary-table)
+   * [How `compareTo` Works: The 3 Magic Numbers](#how-compareto-works-the-3-magic-numbers)
+      + [ASCII Diagram: The Weighing Scale](#ascii-diagram-the-weighing-scale)
+      + [Translating the Loop Conditional](#translating-the-loop-conditional)
+      + [ASCII Diagram: The Translation](#ascii-diagram-the-translation)
    * [The `var` keyword](#the-var-keyword)
       + [1. The Non-Trivial Concept: `var` is NOT a Type!](#1-the-non-trivial-concept-var-is-not-a-type)
          - [ASCII Diagram: The Compiler at Work](#ascii-diagram-the-compiler-at-work)
@@ -191,6 +204,172 @@ JavaScript **does not have a built-in `BigDecimal`**. If you need exact financia
 |pow(int)      |Raises the number to a power (exponents). The power must be a normal int.|new BigInteger("2").pow(3)                         |8 (Which is 2 * 2 * 2)  |
 |abs()         |Absolute value. Turns negatives into positives.                          |new BigInteger("-50").abs()                        |50                      |
 
+
+<!-- TOC --><a name="using-a-biginteger-as-a-loop-counter"></a>
+## Using a BigInteger as a loop counter
+
+Looping over a `BigInteger` in Java is a classic "gotcha" moment for developers. It looks intimidating at first because you suddenly lose all your favorite programming symbols!
+
+When you write a normal `for` loop with an `int`, you rely heavily on operators like `<` (less than) and `++` (plus one). 
+
+Because `BigInteger` is an **Object** and not a primitive box, Java absolutely refuses to let you use those symbols. You have to translate those symbols into **Method Calls**.
+
+<!-- TOC --><a name="ascii-diagram-translating-the-loop"></a>
+### ASCII Diagram: Translating the Loop
+```text
+NORMAL INT LOOP:   for ( int i = 0;             i < max;                   i++ )
+                             |                     |                        |
+                          (Start)               (Stop)                   (Step)
+                             |                     |                        |
+BIGINTEGER LOOP:   for ( BigInteger i = ZERO;   i.compareTo(max) < 0;      i = i.add(ONE) )
+```
+
+Let's break down the three parts of the loop (Start, Stop, and Step) to see exactly how Java expects them to be written.
+
+<!-- TOC --><a name="the-3-rules-of-the-biginteger-loop"></a>
+#### The 3 Rules of the BigInteger Loop:
+1.  **Start:** Use `BigInteger.ZERO` or `BigInteger.ONE` instead of typing `new BigInteger("0")`. Java provides these as built-in shortcuts to save memory.
+2.  **Stop:** Use `.compareTo()`. Remember, `A.compareTo(B) < 0` means "A is less than B".
+3.  **Step:** Use `i = i.add(BigInteger.ONE)`. **CRITICAL:** `BigInteger` is immutable (unchangeable). Doing `i.add(ONE)` does nothing unless you save the result back into the `i` variable!
+
+<!-- TOC --><a name="the-java-code-example-for-loop"></a>
+#### The Java Code Example (For Loop)
+```java
+import java.math.BigInteger;
+
+public class BigLoop {
+    public static void main(String[] args) {
+        
+        // Let's loop 5 times, but using BigInteger
+        BigInteger limit = new BigInteger("5");
+        
+        // START                 // STOP                   // STEP
+        for (BigInteger i = BigInteger.ZERO; i.compareTo(limit) < 0; i = i.add(BigInteger.ONE)) {
+            
+            System.out.println("Current loop count: " + i);
+            
+        }
+    }
+}
+```
+
+<!-- TOC --><a name="the-java-code-example-while-loop-often-cleaner"></a>
+#### The Java Code Example (While Loop - Often Cleaner)
+Because the `for` loop gets very long and hard to read with all those words, many Java developers prefer a `while` loop for `BigInteger`.
+
+```java
+BigInteger limit = new BigInteger("5");
+BigInteger count = BigInteger.ZERO;
+
+while (count.compareTo(limit) < 0) {
+    System.out.println("While loop count: " + count);
+    count = count.add(BigInteger.ONE); // The step happens inside the loop
+}
+```
+
+
+<!-- TOC --><a name="comparison-javascript-nodejs"></a>
+### Comparison: JavaScript & Node.js
+
+This is where JavaScript developers get to laugh at Java developers. 
+
+Because modern JavaScript uses `BigInt` as a **primitive** data type (by adding an `n` to the end of the number), the JS engine perfectly understands standard math symbols! You can just write a normal loop.
+
+<!-- TOC --><a name="ascii-diagram-js-bigint-loop"></a>
+#### ASCII Diagram: JS BigInt Loop
+```text
+[ JS ENGINE ] ---> Sees '0n' ---> "Ah, a BigInt primitive!"
+      |
+      +---> Allows normal operators: < , <= , ++ , --
+```
+
+<!-- TOC --><a name="the-javascript-nodejs-code"></a>
+#### The JavaScript / Node.js Code
+```javascript
+// The limit is a BigInt (notice the 'n')
+let limit = 5n;
+
+// You can use standard < and ++ just like a normal number!
+for (let i = 0n; i < limit; i++) {
+    console.log("Current loop count: " + i);
+}
+```
+
+<!-- TOC --><a name="summary-table"></a>
+### Summary Table
+
+| Action | Java `int` | Java `BigInteger` | Node.js `BigInt` |
+| :--- | :--- | :--- | :--- |
+| **Start Variable** | `int i = 0;` | `BigInteger i = BigInteger.ZERO;` | `let i = 0n;` |
+| **Check Condition**| `i < limit;` | `i.compareTo(limit) < 0;` | `i < limit;` |
+| **Increment** | `i++` | `i = i.add(BigInteger.ONE)` | `i++` |
+
+<!-- TOC --><a name="how-compareto-works-the-3-magic-numbers"></a>
+## How `compareTo` Works: The 3 Magic Numbers
+
+In Java, `compareTo()` is a built-in method used to figure out which of two Objects is "bigger," "smaller," or if they are "equal." 
+
+When you call `A.compareTo(B)`, you are asking Object A to weigh itself against Object B. 
+It will always return one of three simple integer numbers: **-1**, **0**, or **1**.
+
+<!-- TOC --><a name="ascii-diagram-the-weighing-scale"></a>
+### ASCII Diagram: The Weighing Scale
+
+Let's say we do: `result = A.compareTo(B)`
+
+**Scenario 1: Returns `-1` (A is smaller)**
+```text
+    [ B ]
+      |
+      |          [ A ]
+      |            |
+------------------------  <-- A is lighter/smaller than B. Result is -1.
+```
+
+**Scenario 2: Returns `0` (A and B are equal)**
+```text
+    [ B ]        [ A ]
+      |            |
+------------------------  <-- Perfectly balanced! Result is 0.
+```
+
+**Scenario 3: Returns `1` (A is bigger)**
+```text
+                 [ A ]
+                   |
+    [ B ]          |
+      |            |
+------------------------  <-- A is heavier/bigger than B. Result is 1.
+```
+*(Note: Sometimes Java returns any negative or positive number, like -5 or +2, but the logic is exactly the same: negative means smaller, positive means bigger).*
+
+
+<!-- TOC --><a name="translating-the-loop-conditional"></a>
+### Translating the Loop Conditional
+
+Now, let's look at your loop question. In a normal loop, you write:
+`i < limit`
+
+Because `i` and `limit` are BigIntegers, we must use `compareTo`. We want the loop to keep running as long as `i` is smaller than `limit`. 
+
+If `i` is smaller than `limit`, what does `i.compareTo(limit)` return? **It returns a negative number (like -1).**
+
+So, to ask Java "Is 'i' smaller than 'limit'?", we literally ask: **"Does comparing 'i' to 'limit' result in a number less than 0?"**
+
+<!-- TOC --><a name="ascii-diagram-the-translation"></a>
+### ASCII Diagram: The Translation
+```text
+THE NORMAL WAY:       Is 'i' less than 'limit'?
+                      [ i < limit ]
+
+THE BIGINTEGER WAY:   Does weighing 'i' against 'limit' give us a negative number?
+                      [ i.compareTo(limit) < 0 ]
+```
+
+**Other translations to memorize:**
+* `i == limit`  translates to `i.compareTo(limit) == 0`
+* `i > limit`   translates to `i.compareTo(limit) > 0`
+* `i <= limit`  translates to `i.compareTo(limit) <= 0`
 
 <!-- TOC --><a name="the-var-keyword"></a>
 ## The `var` keyword
