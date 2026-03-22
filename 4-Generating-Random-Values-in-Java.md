@@ -1,3 +1,6 @@
+<!-- TOC --><a name="generating-random-values-in-java"></a>
+# Generating Random Values in Java
+
 <!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
 
 - [Generating Random Values in Java](#generating-random-values-in-java)
@@ -24,9 +27,6 @@
       + [4. Summary Table](#4-summary-table)
 
 <!-- TOC end -->
-
-<!-- TOC --><a name="generating-random-values-in-java"></a>
-# Generating Random Values in Java
 
 <!-- TOC --><a name="the-random-class"></a>
 ## The `Random` class
