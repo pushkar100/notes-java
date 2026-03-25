@@ -1,7 +1,100 @@
+<!-- TOC --><a name="java-concurrency-multithreading-course"></a>
 # Java Concurrency & Multithreading Course
+
+<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
+
+- [Java Concurrency & Multithreading Course](#java-concurrency-multithreading-course)
+   * [Motivation](#motivation)
+   * [OS fundamentals - Programs and Processes](#os-fundamentals-programs-and-processes)
+      + [Location and format](#location-and-format)
+         - [Program](#program)
+         - [Process](#process)
+         - [Process: key characteristics](#process-key-characteristics)
+   * [Threads](#threads)
+      + [Characrteristics of a thread](#characrteristics-of-a-thread)
+   * [Context switching](#context-switching)
+   * [Thread scheduling](#thread-scheduling)
+      + [1. First Come First Serve (FCFS)](#1-first-come-first-serve-fcfs)
+      + [2. Shortest Job First (SJF)](#2-shortest-job-first-sjf)
+      + [3. Epochs (The Modern OS Standard)](#3-epochs-the-modern-os-standard)
+   * [When to use a multi-threaded architecture?](#when-to-use-a-multi-threaded-architecture)
+   * [When to use a multi-process architecture?](#when-to-use-a-multi-process-architecture)
+   * [Threading fundamentals](#threading-fundamentals)
+      + [Creating a thread](#creating-a-thread)
+      + [Setting the name and priority of a thread](#setting-the-name-and-priority-of-a-thread)
+      + [Handling uncaught exceptions inside a thread](#handling-uncaught-exceptions-inside-a-thread)
+      + [Alternate way to define threads using the `Thread` class alone](#alternate-way-to-define-threads-using-the-thread-class-alone)
+         - [Pros and Cons of the approach of extending a `Thread` class](#pros-and-cons-of-the-approach-of-extending-a-thread-class)
+   * [Thread termination](#thread-termination)
+      + [Why do we want to stop threads?](#why-do-we-want-to-stop-threads)
+      + [Using `Thread.interrupt()`](#using-threadinterrupt)
+         - [When can we interrupt a thread?](#when-can-we-interrupt-a-thread)
+      + [Daemon threads](#daemon-threads)
+   * [Joining threads & coordination](#joining-threads-coordination)
+      + [Naive solution of Busy Waiting](#naive-solution-of-busy-waiting)
+      + [Desired solution using `join()`](#desired-solution-using-join)
+      + [Best practice while joining threads](#best-practice-while-joining-threads)
+   * [Performance in Multithreading](#performance-in-multithreading)
+      + [Ideal latency](#ideal-latency)
+      + [Practical latency ](#practical-latency)
+      + [Ideal throughput](#ideal-throughput)
+      + [Practical throughput](#practical-throughput)
+         - [Approaches to improve throughput ](#approaches-to-improve-throughput)
+   * [Data sharing between threads](#data-sharing-between-threads)
+      + [Why would threads want to share data?](#why-would-threads-want-to-share-data)
+      + [Problem with a simple resource sharing approach](#problem-with-a-simple-resource-sharing-approach)
+   * [Concurrency challenges](#concurrency-challenges)
+      + [Synchronization in Java ](#synchronization-in-java)
+         - [What happens to a thread unable to acquire a lock?](#what-happens-to-a-thread-unable-to-acquire-a-lock)
+         - [Reentrant locking](#reentrant-locking)
+      + [When to synchronize?](#when-to-synchronize)
+   * [The `volatile` keyword](#the-volatile-keyword)
+   * [Data race ](#data-race)
+      + [Avoiding a data race](#avoiding-a-data-race)
+   * [Locking strategies and deadlock](#locking-strategies-and-deadlock)
+      + [Deadlock](#deadlock)
+         - [Conditions for a deadlock:](#conditions-for-a-deadlock)
+         - [Solutions for removing a deadlock](#solutions-for-removing-a-deadlock)
+   * [Advanced locking](#advanced-locking)
+      + [ReentrantLock](#reentrantlock)
+      + [Query methods for testing ReentrantLock](#query-methods-for-testing-reentrantlock)
+      + [Lock fairness](#lock-fairness)
+      + [Locking interruptibly](#locking-interruptibly)
+      + [The try lock](#the-try-lock)
+      + [Reentrant Read Write lock](#reentrant-read-write-lock)
+   * [Semaphore](#semaphore)
+      + [Analogy to understand semaphore](#analogy-to-understand-semaphore)
+      + [Semaphore basic usage](#semaphore-basic-usage)
+      + [Binary semaphore](#binary-semaphore)
+      + [Semaphores make horrible locks!](#semaphores-make-horrible-locks)
+      + [Semaphores are used for the producer-consumer pattern](#semaphores-are-used-for-the-producer-consumer-pattern)
+      + [Multiple Producers & consumers](#multiple-producers-consumers)
+   * [Inter-Thread communication and conditional variables](#inter-thread-communication-and-conditional-variables)
+      + [Objects as conditional variables](#objects-as-conditional-variables)
+   * [Lock-free and non-blocking operations](#lock-free-and-non-blocking-operations)
+      + [Atomic operations revisit](#atomic-operations-revisit)
+         - [Atomic integer](#atomic-integer)
+         - [Atomic references](#atomic-references)
+   * [Threading models for high performance I/O](#threading-models-for-high-performance-io)
+      + [Negative impact of blocking on locks](#negative-impact-of-blocking-on-locks)
+      + [Another type of blocking - Blocking I/O](#another-type-of-blocking-blocking-io)
+      + [I/O bound use-cases](#io-bound-use-cases)
+      + [Even a few blocking I/O threads can signicantly impact throughput](#even-a-few-blocking-io-threads-can-signicantly-impact-throughput)
+      + [Thread per task/request model](#thread-per-taskrequest-model)
+         - [Ideal numebr of blocking calls per thread in the thread-per-task model](#ideal-numebr-of-blocking-calls-per-thread-in-the-thread-per-task-model)
+   * [Non-blocking I/O](#non-blocking-io)
+      + [Combination of multi-threading and non-blocking I/O](#combination-of-multi-threading-and-non-blocking-io)
+      + [Drawbacks of non-blocking I/O](#drawbacks-of-non-blocking-io)
+   * [Virtual threads and high performance I/O](#virtual-threads-and-high-performance-io)
+      + [Introduction to a virtual thread](#introduction-to-a-virtual-thread)
+      + [High-performance Non-blocking I/O with virtual threads](#high-performance-non-blocking-io-with-virtual-threads)
+      + [Virtual threads best practices](#virtual-threads-best-practices)
+
+<!-- TOC end -->
 
 [Udemy: Become an expert in Multithreading, Concurrency & Parallel programming in Java, with strong emphasis on high performance](https://pplearn.udemy.com/course/java-multithreading-concurrency-performance-optimization/learn/lecture/10187964#overview)
 
+<!-- TOC --><a name="motivation"></a>
 ## Motivation
 
 A single thread has two issues:
@@ -13,6 +106,7 @@ A single thread has two issues:
         - Fewer machines required at high scale -> Less money on hardware
         - Completes a complex task much faster!
 
+<!-- TOC --><a name="os-fundamentals-programs-and-processes"></a>
 ## OS fundamentals - Programs and Processes
 
 A **program** is the *recipe* (instructions stored on disk). 
@@ -22,8 +116,10 @@ A **process** is the *cooking* (those instructions actually running in memory an
 - Process: A program that is currently running, with its own memory, CPU state, and resources managed by the operating system
 - Examples: (1) `chrome.exe` on disk → program (2) When you open Chrome and it appears on screen → process (actually often many processes)
 
+<!-- TOC --><a name="location-and-format"></a>
 ### Location and format
 
+<!-- TOC --><a name="program"></a>
 #### Program
 
 - Lives: Mostly in *secondary storage* (disk/SSD), as a file.
@@ -56,6 +152,7 @@ Program file (on disk)
 +---------------------------+
 ```
 
+<!-- TOC --><a name="process"></a>
 #### Process
 
 - Lives: In main memory (*RAM*) while running; tracked by the OS.
@@ -100,6 +197,7 @@ A process includes the program plus runtime state:
 - CPU state: Registers, program counter.
 - PCB (Process Control Block): OS metadata (PID, state, priority, open files, etc.)
 
+<!-- TOC --><a name="process-key-characteristics"></a>
 #### Process: key characteristics
 
 - Active: Represents real execution of a program.
@@ -109,6 +207,7 @@ A process includes the program plus runtime state:
 - Has PCB: OS tracks it via a Process Control Block (ID, state, priority, etc.).
 - Many per program: One program file can spawn multiple processes at once.
 
+<!-- TOC --><a name="threads"></a>
 ## Threads
 
 A thread is a **lightweight path of execution** ***inside*** a process. 
@@ -161,6 +260,7 @@ Process address space (in RAM)
              with 3 threads
 ```
 
+<!-- TOC --><a name="characrteristics-of-a-thread"></a>
 ### Characrteristics of a thread
 
 1. It is a Subset of a process (Threads cannot exist standalone)
@@ -196,6 +296,7 @@ Browser process
 | Cost           | Heavyweight, expensive to create/switch | Lightweight, cheaper to create/switch |
 | Communication  | Slower, needs IPC                       | Fast, via shared memory               |
 
+<!-- TOC --><a name="context-switching"></a>
 ## Context switching
 
 A **context switch** is when the CPU *stops* running one process or thread, *saves* its state, and then *loads and continues* another process or thread.
@@ -225,6 +326,7 @@ Work done:
 ```
 Here the CPU is mostly doing context switch overhead (Save/Load) for processes/threads A, B, C, instead of actually executing their useful instructions.
 
+<!-- TOC --><a name="thread-scheduling"></a>
 ## Thread scheduling
 
 Thread scheduling is the *decision-making process* that chooses which thread runs on the CPU next and for how long.
@@ -255,6 +357,7 @@ Thread scheduling is the *decision-making process* that chooses which thread run
                +-------------+
 ```
 
+<!-- TOC --><a name="1-first-come-first-serve-fcfs"></a>
 ### 1. First Come First Serve (FCFS)
 
 First Come First Serve (FCFS) is a (non‑preemptive) scheduling algorithm where the process that arrives earliest gets the CPU first and runs until it finishes.
@@ -267,6 +370,7 @@ What is starvation?
 Why is starvation bad?
 - It is bad because some processes may never make progress or complete, which breaks fairness and can cause parts of a system to “freeze” or become unusable while others keep running
 
+<!-- TOC --><a name="2-shortest-job-first-sjf"></a>
 ### 2. Shortest Job First (SJF)
 
 A scheduling algorithm that always *picks the ready process with the smallest CPU burst time* to run next
@@ -276,6 +380,7 @@ A scheduling algorithm that always *picks the ready process with the smallest CP
 SJF also leads to starvation (of "long processes"):
 - If new short jobs keep arriving, SJF keeps selecting them, so long-running processes can wait indefinitely and suffer starvation.
 
+<!-- TOC --><a name="3-epochs-the-modern-os-standard"></a>
 ### 3. Epochs (The Modern OS Standard)
 
 In **epoch scheduling**, time is divided into *fixed rounds called epochs* (moderately sliced), and tasks are given *CPU time* and *priorities* for each epoch, then reconsidered at the start of the next epoch.
@@ -308,6 +413,7 @@ Advantages:
 3. Prevents hogging: CPU‑bound threads get negative bonus, lowering their dynamic priority so they cannot hog the CPU every epoch.
 4. Adapts over time: Because priority = static priority + bonus is recomputed each epoch, the system automatically adjusts to changing workloads.
 
+<!-- TOC --><a name="when-to-use-a-multi-threaded-architecture"></a>
 ## When to use a multi-threaded architecture?
 
 Reasons:
@@ -315,6 +421,7 @@ Reasons:
     - Threads are cheaper to create and destroy than Processes
     - Switching between threads (Context Switching) is much faster
 
+<!-- TOC --><a name="when-to-use-a-multi-process-architecture"></a>
 ## When to use a multi-process architecture?
 
 Reasons:
@@ -325,8 +432,10 @@ Reasons:
     - You do not need to share data between the tasks and threads are mostly used for that i.e makes sense for performing related tasks together as threads
     - Processes are also interleaved and scheduled by the OS so they fit well for this use-case
 
+<!-- TOC --><a name="threading-fundamentals"></a>
 ## Threading fundamentals
 
+<!-- TOC --><a name="creating-a-thread"></a>
 ### Creating a thread
 
 All the thread related properties and methods are encapsulated in the **`Thread`** class by the **JDK** (Available by default).
@@ -414,6 +523,7 @@ We are in the main main thread after starting the new thread.
 Hello from the Thread-0 thread!
 ```
 
+<!-- TOC --><a name="setting-the-name-and-priority-of-a-thread"></a>
 ### Setting the name and priority of a thread
 
 In the above example, the auto-generated value for a thread's name (`Thread-0`) is not very friendly. Imagine we have 1000s of threads then knowing which thread number is asssociated with which thread is not easy!
@@ -465,6 +575,7 @@ The priority of the thread is 10
 - All threads stop whenever a breakpoint is caught!
 - We might see multiple breakpoints highlighted in the IDE (Why?: Multiple threads executions were paused!)
 
+<!-- TOC --><a name="handling-uncaught-exceptions-inside-a-thread"></a>
 ### Handling uncaught exceptions inside a thread
 
 If any exceptions arise within a thread and they are uncaught, the whole program can get affected and crash.
@@ -523,6 +634,7 @@ Uncaught exception in thread: Thread-0
 Exception message: This is an uncaught exception from the misbehaving thread!
 ```
 
+<!-- TOC --><a name="alternate-way-to-define-threads-using-the-thread-class-alone"></a>
 ### Alternate way to define threads using the `Thread` class alone
 
 Current way to define a thread is to:
@@ -560,6 +672,7 @@ Output:
 Hello from MyThread
 ```
 
+<!-- TOC --><a name="pros-and-cons-of-the-approach-of-extending-a-thread-class"></a>
 #### Pros and Cons of the approach of extending a `Thread` class
 
 Advantage:
@@ -708,8 +821,10 @@ The police will arrive in 6 seconds...
 AscendingHackerThread guessed the password 3
 ```
 
+<!-- TOC --><a name="thread-termination"></a>
 ## Thread termination
 
+<!-- TOC --><a name="why-do-we-want-to-stop-threads"></a>
 ### Why do we want to stop threads?
 
 Threads **consume resources**
@@ -725,6 +840,7 @@ Threads **consume resources**
 *Scenario 3*:
 - By default, the application will NOT stop as long as at least one thread is running (Even if the main thread has completed!)
 
+<!-- TOC --><a name="using-threadinterrupt"></a>
 ### Using `Thread.interrupt()`
 
 We can use the *static* method, **`Thread.interrupt`**, to interrupt a thread from another one.
@@ -750,6 +866,7 @@ Thread A (caller)           Thread B (target)
 - Thread A calls threadB.interrupt() → the JVM sets Thread B’s interrupt flag.
 - When Thread B checks that flag or is in an interruptible wait/sleep/join, it wakes/throws `InterruptedException`.
 
+<!-- TOC --><a name="when-can-we-interrupt-a-thread"></a>
 #### When can we interrupt a thread?
 
 1. If the thread is executing a mrthod that throws an `InterruptedException`
@@ -833,6 +950,7 @@ Computation was interrupted
 20000^300000 = 0
 ```
 
+<!-- TOC --><a name="daemon-threads"></a>
 ### Daemon threads
 
 Deamon threads are **background threads** that *do not prevent* the applicaiton from exiting if the main thread terminates.
@@ -893,6 +1011,7 @@ public class App {
 ```
 Output: None. Since the main application exited without printing anything and the daemon continued executing in the background
 
+<!-- TOC --><a name="joining-threads-coordination"></a>
 ## Joining threads & coordination
 
 Points about threads:
@@ -907,6 +1026,7 @@ A might complete before B or B before A. Also, A's execution might be interleave
 - What if A depends on B? How does B know A has finished? How can we control the flow appropriately?
 
 
+<!-- TOC --><a name="naive-solution-of-busy-waiting"></a>
 ### Naive solution of Busy Waiting
 
 We simply add an `if` condition in one thread to check if another has finished (using the `isFinished()` method of that other thread)
@@ -922,6 +1042,7 @@ void waitForThreadA() {
 
 Whenever B is scheduled, it takes away time away from A and on top of it, all it does during the scheduled time is wait for A to finish (***blocking and wasteful***).
 
+<!-- TOC --><a name="desired-solution-using-join"></a>
 ### Desired solution using `join()`
 
 Sample flow:
@@ -1063,6 +1184,7 @@ Factorial of 23 is 2.5852017e+22
 Factorial of 5566 is: 48110966871420306777610245835196137...
 ```
 
+<!-- TOC --><a name="best-practice-while-joining-threads"></a>
 ### Best practice while joining threads
 
 What if a single thread takes a disproprtionately long time to finish?
@@ -1126,12 +1248,14 @@ However, the application will not exit unless all threads are complete. For this
 
 **Note**: Always use thread coodination, always prepare for the worst scenario and use ***defensive programming***.
 
+<!-- TOC --><a name="performance-in-multithreading"></a>
 ## Performance in Multithreading
 
 There are two ways to calculate performance:
 1. **Latency**: The time to completions of a task. Measured in time units
 2. **Throughput**: The amount of tasks completed in a given period. Measured in tasks/time unit
 
+<!-- TOC --><a name="ideal-latency"></a>
 ### Ideal latency
 
 What is the "ideal" latency time? How can we calculate and optimize for it?
@@ -1178,6 +1302,7 @@ Time →
 All finish around time T/N  → ideal latency = T/N
 ```
 
+<!-- TOC --><a name="practical-latency"></a>
 ### Practical latency 
 
 There are questions we need to answer before trying to achieve `T/N` latency.
@@ -1238,6 +1363,7 @@ Answer 3:
 - There are 3 types of tasks: Fully breakable into smaller tasks, non-breakable, and partially breakable
 - We need to check the characteristics of a specific tasks and answer this question and take the appropriate action
 
+<!-- TOC --><a name="ideal-throughput"></a>
 ### Ideal throughput
 
 Definition: The number of tasks completed in a given period. (tasks/time unit)
@@ -1257,6 +1383,7 @@ Theoretical Throughput = N / T
 
 **NOTE**: We are trying ***maximize*** throughput. Hence, the bigger the `N/T` value, the better!
 
+<!-- TOC --><a name="practical-throughput"></a>
 ### Practical throughput
 
 In practice, throughput will be **less than** `N/T` because (less performant)
@@ -1274,6 +1401,7 @@ Practical Throughput < N / T
 - We only care about tasks in isolation for this metric (how many tasks ran in a given time - we do not care about aggregating results and producing one output etc for this metric)
 - Hence, does not matter if all the sub-tasks results were not aggregated. It is not a per-task metric
 
+<!-- TOC --><a name="approaches-to-improve-throughput"></a>
 #### Approaches to improve throughput 
 
 **Thread pooling**
@@ -1381,6 +1509,7 @@ Throughput
      cores      vthreads
 ```
 
+<!-- TOC --><a name="data-sharing-between-threads"></a>
 ## Data sharing between threads
 
 **What is a stack?**
@@ -1444,6 +1573,7 @@ void create() {
 - `p` (the reference variable) is in the **stack** frame of create.
 - The actual Person object that `p` points to is on the **heap**.
 
+<!-- TOC --><a name="why-would-threads-want-to-share-data"></a>
 ### Why would threads want to share data?
 
 Threads can share objects, class members, and static variables but not local primitives and local references.
@@ -1453,6 +1583,7 @@ There are many use cases to share data:
 2. A work dispatcher thread placing a task in a queue for multiple worker threads to pick up for procssing - the queue is the shared resource
 3. Multiple request threads handle writing data to a database. The DB is the shared resource
 
+<!-- TOC --><a name="problem-with-a-simple-resource-sharing-approach"></a>
 ### Problem with a simple resource sharing approach
 
 An example of problems caused by respource sharing 
@@ -1586,6 +1717,7 @@ In the end, count is 1 in this sample run instead of 0 (expected)
 
 **Non-atomic operations** like the one above form the challenges of **multi-threaded programming**!
 
+<!-- TOC --><a name="concurrency-challenges"></a>
 ## Concurrency challenges
 
 When does a concurrency problem occur? It occurs when:
@@ -1622,6 +1754,7 @@ Points to note:
 
 This mechanism is known as a **synchronized monitor** / **lock**. Different languages implement the same concept in different ways (syntax/constructs)
 
+<!-- TOC --><a name="synchronization-in-java"></a>
 ### Synchronization in Java 
 
 There are two ways to make this happen:
@@ -1848,6 +1981,7 @@ Output:
 Final count: 0
 ```
 
+<!-- TOC --><a name="what-happens-to-a-thread-unable-to-acquire-a-lock"></a>
 #### What happens to a thread unable to acquire a lock?
 
 All the threads waiting to acquire a lock not freed up by a particular thread:
@@ -1856,6 +1990,7 @@ All the threads waiting to acquire a lock not freed up by a particular thread:
 
 (**Note**: Calling the interrupt method on a thread (`blockingThread.interrupt()`) from another thread to free up a lock held by it ***does not work*** in the case of a `synchronized` lock)
 
+<!-- TOC --><a name="reentrant-locking"></a>
 #### Reentrant locking
 
 The **`synchronized`** tool is known as a "reentrant lock". 
@@ -1884,6 +2019,7 @@ class Demo {
 ```
 Here, a() calls b(), both are synchronized on the same object (`this`), and the same thread can enter both — that’s exactly what “reentrant” means.
 
+<!-- TOC --><a name="when-to-synchronize"></a>
 ### When to synchronize?
 
 - Using a lot of Synchronized method or blocks will be worse than running a single thread
@@ -1892,6 +2028,7 @@ Here, a() calls b(), both are synchronized on the same object (`this`), and the 
 - **Lock only the most critical resources**
     - Smaller concurrent section, the better
 
+<!-- TOC --><a name="the-volatile-keyword"></a>
 ## The `volatile` keyword
 
 **What are the atomic operations in Java (and the OS)?**
@@ -2007,6 +2144,7 @@ public class App {
 }
 ```
 
+<!-- TOC --><a name="data-race"></a>
 ## Data race 
 
 There are two types of issues with managing shared resources
@@ -2072,6 +2210,7 @@ int x = a + 1; // CPU can never execute this before `int a = 0;`
 int y = x + 2; // CPU can never execute this before `int x = a + 1;`
 ```
 
+<!-- TOC --><a name="avoiding-a-data-race"></a>
 ### Avoiding a data race
 
 - Option 1: `synchronized` method or block that modifies a shared variable
@@ -2139,6 +2278,7 @@ Output: None.
 
 Notice that even though the data type is an `int` which can be assigned (set/update) and read atomically in Java, the "Data race" problem makes us still mark it as "volatile".
  
+<!-- TOC --><a name="locking-strategies-and-deadlock"></a>
 ## Locking strategies and deadlock
 
 When you have multiple shared resources , you can choose a strategy for locking them:
@@ -2152,6 +2292,7 @@ When you have multiple shared resources , you can choose a strategy for locking 
 
 There is no one good / one bad approach. It depends on the specifics. You need to make a choice for your app / code.
 
+<!-- TOC --><a name="deadlock"></a>
 ### Deadlock
 
 Deadlock is a situation where two or more threads/processes are stuck forever because each is waiting for a resource or lock held by another, so none of them can continue!
@@ -2287,12 +2428,14 @@ public class App {
 ```
 Output: At some point both the threads must be locked on each other!
 
+<!-- TOC --><a name="conditions-for-a-deadlock"></a>
 #### Conditions for a deadlock:
 1. *Mutual exclusion*: Only one thread can have exclusive access to a resource
 2. *Hold and wait*: At least one thread is holding a resource and is waiting for another resource
 3. *Non-preemptive allocation*: A resource is released only after the thread is done using it
 4. *Circular wait*: A chain of at least two threads with each one holding one resource and waiting for another resource
 
+<!-- TOC --><a name="solutions-for-removing-a-deadlock"></a>
 #### Solutions for removing a deadlock
 1. **Avoid circular wait**: Enforce a strict order in lock acquisition (All the locks must be acquired in the same order by every thread)
 
@@ -2324,6 +2467,7 @@ public void takeRoadB() {
 3. Thread interruption - Not possible with `synchronized` in Java
 4. "tryLock" operations - Not possible with `synchronized` in Java
 
+<!-- TOC --><a name="advanced-locking"></a>
 ## Advanced locking
 
 Let us refresh our memory on what happens to a thread unable to acquire a lock because of another thread holding it:
@@ -2333,6 +2477,7 @@ Let us refresh our memory on what happens to a thread unable to acquire a lock b
 
 (**Note**: Calling the interrupt method on a thread (`blockingThread.interrupt()`) from another thread to free up a lock held by it ***does not work*** in the case of a `synchronized` lock)
 
+<!-- TOC --><a name="reentrantlock"></a>
 ### ReentrantLock
 
 **ReentrantLock**: A reentrant lock from `java.util.concurrent.locks` that you manage manually with lock()/unlock() and that offers extra features like tryLock, fairness, and interruptible/timed locking.
@@ -2408,6 +2553,7 @@ public void method() {
 }
 ```
 
+<!-- TOC --><a name="query-methods-for-testing-reentrantlock"></a>
 ### Query methods for testing ReentrantLock
 
 1.`getQueuedThreads()`: Returns a list of threads waiting to acquire a lock
@@ -2415,6 +2561,7 @@ public void method() {
 3. `isHeldByCurrentThread()`: Queries if the lock is held by the current thread
 4. `isLocked()`: Queries if the lock is held by any thread
 
+<!-- TOC --><a name="lock-fairness"></a>
 ### Lock fairness
 
 A ReentrantLock takes in an optional argument which, if `true`, ensures fairness in providing locks to threads. Typically the OS schedules threads and some threads may unfairly suffer i.e too much delay. This lock option tries to change the priorities to ensure fairness.
@@ -2427,6 +2574,7 @@ It tries to avoid deadlocks and starvations but could, in fact, lead to longer w
 
 Use it sparingly! Only if absolutely necessary.
 
+<!-- TOC --><a name="locking-interruptibly"></a>
 ### Locking interruptibly
 
 Synchronized locks (the default) go into a suspended state if the lock it is trying to acquire is not free. We cannot even interrupt the thread with the lock to free it
@@ -2448,6 +2596,7 @@ public void run() {
 }
 ```
 
+<!-- TOC --><a name="the-try-lock"></a>
 ### The try lock
 
 A synchronized lock always makes the thread wait (suspended) on fetching the lock - either immediately or wake up when freed 
@@ -2481,6 +2630,7 @@ if (lockObject.tryLock()) {
 // ...
 ```
 
+<!-- TOC --><a name="reentrant-read-write-lock"></a>
 ### Reentrant Read Write lock
 
 Until now, we have seen only one type of lock: A lock of "total mutual exclusion"
@@ -2549,6 +2699,7 @@ try {
 
 **Note**: `ReentrantReadWriteLock` is not always better than a conventional lock. Use the right tool for the job.
 
+<!-- TOC --><a name="semaphore"></a>
 ## Semaphore
 
 Semaphore is a **thread synchronization tool**.
@@ -2559,6 +2710,7 @@ It can be used for:
 
 The semaphore can restrict any given number of users to a resource!
 
+<!-- TOC --><a name="analogy-to-understand-semaphore"></a>
 ### Analogy to understand semaphore
 
 Think of a semaphore as the gate system for a ***parking lot with limited spots***.
@@ -2605,6 +2757,7 @@ In words:
 - Each arriving car takes 1 permit (decrements the semaphore) if a spot is free; otherwise it waits.
 - Each leaving car returns 1 permit (increments the semaphore), letting a waiting car proceed.
 
+<!-- TOC --><a name="semaphore-basic-usage"></a>
 ### Semaphore basic usage
 
 Example:
@@ -2626,6 +2779,7 @@ semaphore.acquire(NUMBER_OF_PERMITS); // 0 now available
 semaphore.acquire(); // 0 permits available -> THREAD BLOCKED! -> GOES TO SLEEP!
 ```
 
+<!-- TOC --><a name="binary-semaphore"></a>
 ### Binary semaphore
 
 It is a semaphore initialized with `1` (which is the default if an argument is not passed).
@@ -2649,6 +2803,7 @@ void function1() {
 }
 ```
 
+<!-- TOC --><a name="semaphores-make-horrible-locks"></a>
 ### Semaphores make horrible locks!
 
 Reasons:
@@ -2674,6 +2829,7 @@ Then what is a semaphore used for?
 1. Inter-thread communication
 2. Maintaining a healthy Producer-Consumer flow 
 
+<!-- TOC --><a name="semaphores-are-used-for-the-producer-consumer-pattern"></a>
 ### Semaphores are used for the producer-consumer pattern
 
 ```java
@@ -2715,6 +2871,7 @@ Semaphores are good for producer/consumer because they give you exactly the two 
 
 Bottom-line: **Producers cannot produce faster than a consumer can consume** (Slow consumer? Producer waits. Fast consumer? Producer produces faster)
 
+<!-- TOC --><a name="multiple-producers-consumers"></a>
 ### Multiple Producers & consumers
 
 We can also use semaphores for multiple Producers & consumers. Place a "queue" instead of a single item. We also add a **lock** on the queue access so that only a single thread can produce to or consume from it at a time
@@ -2752,6 +2909,7 @@ while (true) {
 }
 ```
 
+<!-- TOC --><a name="inter-thread-communication-and-conditional-variables"></a>
 ## Inter-Thread communication and conditional variables
 
 The following are the ways of Inter-thread communication:
@@ -2860,6 +3018,7 @@ class SimpleQueue {
 **Note**: `condition.signalAll()`
 - `condition.signalAll()` wakes up **all threads** that are currently waiting on that condition, which is good when the state change you just made can now allow multiple waiting threads to make progress (or when you don’t know which specific one should be woken). `condition.signal()` only wakes up one waiting thread (if any) and if there are more waiting threads, all but one continue to wait. 
 
+<!-- TOC --><a name="objects-as-conditional-variables"></a>
 ### Objects as conditional variables
 
 All objects in Java extend from the base **`Object` class** which has the following methods by default:
@@ -2934,6 +3093,7 @@ public class MySharedClass {
 }
 ```
 
+<!-- TOC --><a name="lock-free-and-non-blocking-operations"></a>
 ## Lock-free and non-blocking operations
 
 Why do we need it? **For the most part, we probably don't!**
@@ -2955,6 +3115,7 @@ Why do we need "lock-free" solutions then?
 
 For some applications, these drawbacks and performance issues (such as overhead with acquiring and releasing locks) become a bottleneck (ex: Trading platforms)
 
+<!-- TOC --><a name="atomic-operations-revisit"></a>
 ### Atomic operations revisit
 
 Most of the concurrency problems, at least race conditions, are because our operations are non-atomic.
@@ -2970,6 +3131,7 @@ New package: **`java.util.concurrent.atomic`**
 
 Note, if you are working on more than one atomic data type at a time or operating more than once on it within a critical section, you still need locking and synchronization!
 
+<!-- TOC --><a name="atomic-integer"></a>
 #### Atomic integer
 
 ```java
@@ -3078,6 +3240,7 @@ Final count: 0
 
 Note: `AtomicLong`, `AtomicDouble`, and `AtomicBoolean` behave in a similar way and with similar methods.
 
+<!-- TOC --><a name="atomic-references"></a>
 #### Atomic references
 
 This data type is for setting and getting objects atomically.
@@ -3122,8 +3285,10 @@ If multiple threads were trying to update the name variable simultaneously, usin
 
 If the current value of `atomicName` is equal to oldName, it will be updated to newName atomically, otherwise, the update will fail, and the current name will be printed without any risk of inconsistent state due to concurrent modifications.
 
+<!-- TOC --><a name="threading-models-for-high-performance-io"></a>
 ## Threading models for high performance I/O
 
+<!-- TOC --><a name="negative-impact-of-blocking-on-locks"></a>
 ### Negative impact of blocking on locks
 
 What happens to other threads when one thread has a lock on a critical section?
@@ -3140,6 +3305,7 @@ method {
 
 In order to get around the negative / blocking impacts of locking, **"lock-free"** algorithms/data structures/atomic operations were introduced.
 
+<!-- TOC --><a name="another-type-of-blocking-blocking-io"></a>
 ### Another type of blocking - Blocking I/O
 
 There are two types of operations in general:
@@ -3221,6 +3387,7 @@ public void handleRequest (HttpExchange exchange) {
 }
 ```
 
+<!-- TOC --><a name="io-bound-use-cases"></a>
 ### I/O bound use-cases
 
 1. Online web store application (News website) (The thread mostly waits for DB/API responses, so this is I/O-bound.)
@@ -3252,6 +3419,7 @@ User → [ Web Server Thread ]
 
 **Important**: Throughput is often limited by how fast you can read/write data, not how fast you can compute.
 
+<!-- TOC --><a name="even-a-few-blocking-io-threads-can-signicantly-impact-throughput"></a>
 ### Even a few blocking I/O threads can signicantly impact throughput
 
 **Note**: All it takes is even just one or a few long blocking I/O bound tasks to affect the throughput!
@@ -3312,6 +3480,7 @@ Takeaways:
 
 **Therefore: `1 thread = 1 core` oiptimization does NOT give us the best throughput when dealing with blocking I/O calls**
 
+<!-- TOC --><a name="thread-per-taskrequest-model"></a>
 ### Thread per task/request model
 
 What we have seen so far: 1 thread per CPU core
@@ -3387,6 +3556,7 @@ ExecutorService ex = Executors.newFixedThreadPool(8);
 => More threads than cores, but bounded.
 ```
 
+<!-- TOC --><a name="ideal-numebr-of-blocking-calls-per-thread-in-the-thread-per-task-model"></a>
 #### Ideal numebr of blocking calls per thread in the thread-per-task model
 
 Thread per task where task only does 1 blocking I/O:
@@ -3404,6 +3574,7 @@ Thread per task where task only does 1 blocking I/O:
 **Final note**: Thread per task/request has been industry standard for many years. However, due to the above issues, we know that it:
 - It will **not** give us optimal performance or CPU utilization
 
+<!-- TOC --><a name="non-blocking-io"></a>
 ## Non-blocking I/O
 
 Threads per task work fine for standard applications even though it is sub-optimal. It has been in use for a while.
@@ -3485,12 +3656,14 @@ Since the "call" returns immediately, multiple requests can be serviced conccure
 - New request -> make another non-blocking I/O call -> returns immediately, the thread is free again ... so on
 - Data comes back from 1st request -> the same single thread picks it up again and processes it (CPU work) -> done processing? -> Free again
 
+<!-- TOC --><a name="combination-of-multi-threading-and-non-blocking-io"></a>
 ### Combination of multi-threading and non-blocking I/O
 
 If non-blocking works on single-threaded program running on a single core, when would we need multi-threading?
 
 Answer: If the number of cores is more than one, we can have the original **`#threads = #cores`**. Why? Since one thread can do non-blocking I/O, only if there are more CPU core available, we want to have many threads to take advantage of true parallelism!
 
+<!-- TOC --><a name="drawbacks-of-non-blocking-io"></a>
 ### Drawbacks of non-blocking I/O
 
 1. **Security and stability**: The APIs available to perform non-blocking I/O in Java are complex. Libraries make the job easier (`netty`, `vert.x`, `webflux`)
@@ -3520,6 +3693,7 @@ We get:
    - Concurrency within each thread (many I/Os per thread)
 ```
 
+<!-- TOC --><a name="virtual-threads-and-high-performance-io"></a>
 ## Virtual threads and high performance I/O
 
 The threads we have used so far are called "Platform threads" (provided by the JVM)
@@ -3567,6 +3741,7 @@ Multiple platform threads:
           [ CPU core ]                  [ CPU core ]
 ```
 
+<!-- TOC --><a name="introduction-to-a-virtual-thread"></a>
 ### Introduction to a virtual thread
 
 A **virtual thread** is an ordinary Java object in its heap!
@@ -3666,6 +3841,7 @@ public class VirtualThreadsDemo {
 }
 ```
 
+<!-- TOC --><a name="high-performance-non-blocking-io-with-virtual-threads"></a>
 ### High-performance Non-blocking I/O with virtual threads
 
 For Non-blocking I/O with virtual threads, the key benefit is that we can perform the operational just like a simple, blocking call:
@@ -3745,6 +3921,7 @@ public class IoBoundApplicationV2 {
 }
 ```
 
+<!-- TOC --><a name="virtual-threads-best-practices"></a>
 ### Virtual threads best practices
 
 1. **CPU only operations**: **Virtual threads provide NO benefit** over regular threads in terms of performance
