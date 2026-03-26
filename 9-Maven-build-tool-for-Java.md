@@ -219,6 +219,17 @@ Let's generate a simple project, build it, and run it.
 mvn archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.4 -DinteractiveMode=false
 ```
 
+**Note**: What to do if the java compilation version is very old and youir project fails to compile? Still, run the above command to create your project and then in the `pom.xml`, change the following lines to the Java version of your choice (i.e one that will be supported):
+
+Example for using Java 17
+```xml
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+  </properties>
+```
+
 **Step 2: Understand the Standard Directory Structure**
 Maven forces a standard layout. If you navigate into the `my-app` folder, you will see this:
 
