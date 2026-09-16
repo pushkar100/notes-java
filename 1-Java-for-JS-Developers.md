@@ -1,5 +1,7 @@
 # Java for JavaScript Developers
 
+
+TOC
 - [Java for JavaScript Developers](#java-for-javascript-developers)
   * [Code structure, file, and comments](#code-structure--file--and-comments)
   * [Scope of classes](#scope-of-classes)
