@@ -4,18 +4,19 @@ Navigate directly to any module, architectural concept, code reference, or pract
 
 ## Master Table of Contents
 
-Navigate directly to any module, architectural concept, code reference, or practice exercise across the master curriculum:
-
 - [**Part 0: Spring Core Foundations & Architectural Primer**](#part-0-spring-core-foundations-architectural-primer)
   - [0.0 Fundamental Concepts: Annotations, Records, Entities, and DTOs](#00-fundamental-concepts-annotations-records-entities-and-dtos)
   - [0.1 The Architectural Crisis of Plain Java & Enterprise J2EE](#01-the-architectural-crisis-of-plain-java-enterprise-j2ee)
   - [0.2 Inversion of Control (IoC) & Dependency Injection (DI)](#02-inversion-of-control-ioc-dependency-injection-di)
   - [0.3 The Spring IoC Container & Bean Lifecycle](#03-the-spring-ioc-container-bean-lifecycle)
   - [0.4 Stereotype Annotations & Layered Architecture](#04-stereotype-annotations-layered-architecture)
+    - [0.4.1 Spring AOP & Proxies: The "Secret Service" Mental Model](#041-spring-aop--proxies-the-secret-service-mental-model)
   - [0.5 From Spring Framework to Spring Boot: The Magic Unveiled](#05-from-spring-framework-to-spring-boot-the-magic-unveiled)
+    - [0.5.1 How Auto-Configuration Actually Works Under the Hood](#051-how-auto-configuration-actually-works-under-the-hood)
 - [**Part 1: Web Applications and Microservices**](#part-1-web-applications-and-microservices)
   - [Chapter 1: Building RESTful APIs](#chapter-1-building-restful-apis)
     - [1.0 Foundations of Web Communication & The Simplest Spring Web App](#10-foundations-of-web-communication-the-simplest-spring-web-app)
+      - [1.0.1 The Web Request Lifecycle: DispatcherServlet Under the Hood](#101-the-web-request-lifecycle-dispatcherservlet-under-the-hood)
     - [1.1 Accepting Inputs: Path Variables, Query Parameters, and Headers](#11-accepting-inputs-path-variables-query-parameters-and-headers)
     - [1.2 Data Serialization, Deserialization, DTOs & Jackson Deep Dive](#12-data-serialization-deserialization-dtos-jackson-deep-dive)
     - [1.3 Complete CRUD Operations in Practice](#13-complete-crud-operations-in-practice)
@@ -25,11 +26,14 @@ Navigate directly to any module, architectural concept, code reference, or pract
     - [1.7 Living API Documentation with OpenAPI & Swagger UI](#17-living-api-documentation-with-openapi-swagger-ui)
     - [1.8 Testing the Web Layer with `@WebMvcTest` and `MockMvc`](#18-testing-the-web-layer-with-webmvctest-and-mockmvc)
     - [1.9 Consuming Downstream APIs with `RestClient` and WireMock](#19-consuming-downstream-apis-with-restclient-and-wiremock)
+      - [1.9.1 Modern Declarative HTTP Interfaces with `@HttpExchange`](#191-modern-declarative-http-interfaces-with-httpexchange)
     - [1.10 Real-Time Server Push: Server-Sent Events (SSE) with SseEmitter](#110-real-time-server-push-server-sent-events-sse-with-sseemitter)
     - [Chapter 1 Exercises & Solutions](#chapter-1-exercises-solutions)
   - [Chapter 2: Securing Spring Boot Applications with OAuth2](#chapter-2-securing-spring-boot-applications-with-oauth2)
     - [2.0 The Spring Security Mental Model](#20-the-spring-security-mental-model)
     - [2.1 Configuring the Modern `SecurityFilterChain`](#21-configuring-the-modern-securityfilterchain)
+      - [2.1.1 CORS & CSRF Demystified for Modern REST APIs](#211-cors--csrf-demystified-for-modern-rest-apis)
+      - [2.1.2 Handling Security Failures with RFC 7807 ProblemDetail Responses](#212-handling-security-failures-with-rfc-7807-problemdetail-responses)
     - [2.2 Password Encoding & User Authentication](#22-password-encoding-user-authentication)
     - [2.3 Role-Based Access Control (RBAC) & Method Security](#23-role-based-access-control-rbac-method-security)
     - [2.4 OAuth2 & OpenID Connect (OIDC) Protocol Architecture](#24-oauth2-openid-connect-oidc-protocol-architecture)
@@ -40,22 +44,30 @@ Navigate directly to any module, architectural concept, code reference, or pract
   - [Chapter 3: Observability, Monitoring, and Application Management](#chapter-3-observability-monitoring-and-application-management)
     - [3.0 The Four Pillars of Observability](#30-the-four-pillars-of-observability)
     - [3.1 Production Health & Metrics with Spring Boot Actuator](#31-production-health-metrics-with-spring-boot-actuator)
+      - [3.1.1 Kubernetes Liveness, Readiness & Graceful Shutdown](#311-kubernetes-liveness-readiness--graceful-shutdown)
     - [3.2 Authoring Custom Health Indicators](#32-authoring-custom-health-indicators)
     - [3.3 Publishing Metrics to Prometheus with Micrometer](#33-publishing-metrics-to-prometheus-with-micrometer)
+      - [3.3.1 Unified Telemetry with the Micrometer Observation API (`@Observed`)](#331-unified-telemetry-with-the-micrometer-observation-api-observed)
+      - [3.3.2 Authoring Custom Actuator Endpoints (`@Endpoint`)](#332-authoring-custom-actuator-endpoints-endpoint)
     - [3.4 Distributed Tracing with Micrometer Tracing & Zipkin](#34-distributed-tracing-with-micrometer-tracing-zipkin)
     - [3.5 Enterprise Logging: SLF4J, Logback, and Log4j2](#35-enterprise-logging-slf4j-logback-and-log4j2)
     - [Chapter 3 Exercises & Solutions](#chapter-3-exercises-solutions)
   - [Chapter 4: Spring Cloud and Microservices Architecture](#chapter-4-spring-cloud-and-microservices-architecture)
     - [4.0 Microservices Design Principles & Challenges](#40-microservices-design-principles-challenges)
     - [4.1 Service Registration & Discovery with Netflix Eureka](#41-service-registration-discovery-with-netflix-eureka)
+      - [4.1.1 Client-Side Load Balancing with Spring Cloud LoadBalancer](#411-client-side-load-balancing-with-spring-cloud-loadbalancer)
     - [4.2 API Routing & Filtering with Spring Cloud Gateway](#42-api-routing-filtering-with-spring-cloud-gateway)
+      - [4.2.1 Edge Security: Validating JWTs in Gateway Filters](#421-edge-security-validating-jwts-in-gateway-filters)
+      - [4.2.2 Distributed Edge Rate Limiting with Redis](#422-distributed-edge-rate-limiting-with-redis)
     - [4.3 Fault Tolerance & Circuit Breaking with Resilience4j](#43-fault-tolerance-circuit-breaking-with-resilience4j)
     - [4.4 Centralized Configuration Management with Spring Cloud Config](#44-centralized-configuration-management-with-spring-cloud-config)
+    - [4.5 Distributed Tracing & W3C Trace Context Propagation Across Services](#45-distributed-tracing--w3c-trace-context-propagation-across-services)
     - [Chapter 4 Exercises & Solutions](#chapter-4-exercises-solutions)
 - [**Part 2: Database Technologies**](#part-2-database-technologies)
   - [Chapter 5: Data Persistence and Relational Database Integration with Spring Data](#chapter-5-data-persistence-and-relational-database-integration-with-spring-data)
     - [5.0 The Database Abstraction Ladder & Core Architecture](#50-the-database-abstraction-ladder-core-architecture)
     - [5.1 Docker Setup & Database Connectivity](#51-docker-setup-database-connectivity)
+      - [5.1.1 Zero-Config Local Containers with `spring-boot-docker-compose`](#511-zero-config-local-containers-with-spring-boot-docker-compose)
     - [5.2 Lightweight High-Speed SQL with `JdbcClient`](#52-lightweight-high-speed-sql-with-jdbcclient)
     - [5.3 Entity Modeling & Jakarta Persistence (JPA)](#53-entity-modeling-jakarta-persistence-jpa)
     - [5.4 Mastering Entity Relationships](#54-mastering-entity-relationships)
@@ -63,8 +75,9 @@ Navigate directly to any module, architectural concept, code reference, or pract
     - [5.6 The N+1 Query Problem: Complete Deep Dive](#56-the-n1-query-problem-complete-deep-dive)
     - [5.7 Database Schema Version Control with Flyway](#57-database-schema-version-control-with-flyway)
     - [5.8 Transaction Management with `@Transactional`](#58-transaction-management-with-transactional)
-    - [5.8.1 Concurrency Control: Optimistic vs Pessimistic Locking](#581-concurrency-control-optimistic-vs-pessimistic-locking)
+    - [5.8.1 Concurrency Control: Optimistic vs. Pessimistic Locking](#581-concurrency-control-optimistic-vs-pessimistic-locking)
     - [5.9 Automated Integration Testing with Testcontainers](#59-automated-integration-testing-with-testcontainers)
+      - [5.9.1 Modern Integration Testing with Spring Boot 3.1 `@ServiceConnection`](#591-modern-integration-testing-with-spring-boot-31-serviceconnection)
     - [Chapter 5 Exercises & Comprehensive Scenarios with Solutions](#chapter-5-exercises-comprehensive-scenarios-with-solutions)
   - [Chapter 6: Data Persistence and NoSQL Database Integration with Spring Data](#chapter-6-data-persistence-and-nosql-database-integration-with-spring-data)
     - [6.0 The NoSQL Mental Model & Architecture](#60-the-nosql-mental-model-architecture)
@@ -93,10 +106,12 @@ Navigate directly to any module, architectural concept, code reference, or pract
   - [Chapter 9: Upgrading from Spring Boot 2.x to Spring Boot 3.0](#chapter-9-upgrading-from-spring-boot-2x-to-spring-boot-30)
     - [9.0 The Major Milestones of Spring Boot 3](#90-the-major-milestones-of-spring-boot-3)
     - [9.1 The Java 17 Baseline & Java EE to Jakarta EE Namespace Migration](#91-the-java-17-baseline-java-ee-to-jakarta-ee-namespace-migration)
-    - [9.2 Modern Security Configuration Updates](#92-modern-security-configuration-updates)
-    - [9.3 Configuration Property Removals & Renames](#93-configuration-property-removals-renames)
-    - [9.4 Spring Data 3 and Actuator 3 Breaking Changes](#94-spring-data-3-and-actuator-3-breaking-changes)
-    - [9.5 Automated Codebase Migration with OpenRewrite](#95-automated-codebase-migration-with-openrewrite)
+    - [9.2 Modern Security Configuration Updates (Spring Security 6)](#92-modern-security-configuration-updates-spring-security-6)
+    - [9.3 Hibernate 6 & Spring Data 3 Breaking Changes](#93-hibernate-6--spring-data-3-breaking-changes)
+    - [9.4 Migrating Distributed Tracing: The Sleuth to Micrometer Transition](#94-migrating-distributed-tracing-the-sleuth-to-micrometer-transition)
+    - [9.5 The Spring Boot 3.x Feature Roadmap (3.1, 3.2, 3.3, 3.4)](#95-the-spring-boot-3x-feature-roadmap-31-32-33-34)
+    - [9.6 Automated Migration with OpenRewrite](#96-automated-migration-with-openrewrite)
+    - [9.7 The 10-Step Production Upgrade Playbook (Checklist)](#97-the-10-step-production-upgrade-playbook-checklist)
     - [Chapter 9 Exercises & Solutions](#chapter-9-exercises-solutions)
 - [**Chapter 10: Massive Exercises Section (Concept Checks, Debugging & Capstones)**](#chapter-10-massive-exercises-section-concept-checks-debugging-capstones)
   - [10.1 Conceptual & Architectural Review Questions](#101-conceptual-architectural-review-questions)
@@ -1166,6 +1181,139 @@ public class UserController {
 
 ---
 
+### 0.4.1 Spring AOP & Proxies: The "Secret Service" Mental Model
+
+One of the greatest sources of confusion for developers new to Spring is how annotations like `@Transactional`, `@Async`, `@Cacheable`, `@CircuitBreaker`, and `@PreAuthorize` actually execute. 
+
+Do these annotations magically alter your compiled Java bytecode? **No.**
+Spring achieves this declarative magic through **Aspect-Oriented Programming (AOP)** using **Dynamic Proxies**.
+
+#### The Real-World Secret Service Analogy
+
+Think of your Spring Bean as a high-profile Head of State (the Target Object). 
+When foreign dignitaries (the Client) want to speak with the Head of State, they never speak to the person directly. Instead, they interact with the **Secret Service Bodyguard (the Spring Proxy)** standing in front of them:
+
+1. **Before the meeting**: The Secret Service verifies the visitor's credentials (Security check / `@PreAuthorize`), opens the security gate, and starts an audio recording (Beginning transaction / `@Transactional`).
+2. **During the meeting**: The Secret Service steps aside and delegates the actual conversation to the Head of State (invoking your actual Java method).
+3. **After the meeting**: The Secret Service seals the room, archives the recording (Committing transaction), and logs the exit timestamp (Metrics / Logging).
+4. **If an incident occurs**: If an intruder attacks during the meeting (Unchecked exception thrown), the Secret Service locks down the building and rolls back all open vaults (Rollback transaction).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Caller (e.g., Controller)
+    participant Proxy as Spring AOP Proxy (Bodyguard)
+    participant Target as Real Service Bean (Target Object)
+    participant DB as Transaction / Cache / Security Aspect
+
+    Client->>Proxy: Calls orderService.placeOrder(dto)
+    Note over Proxy,DB: [Before Advice]: Start DB Transaction, Check Security
+    Proxy->>DB: Begin Transaction (conn.setAutoCommit(false))
+    Proxy->>Target: Delegates: real target.placeOrder(dto)
+    
+    alt Method executes successfully
+        Target-->>Proxy: Returns OrderConfirmationDto
+        Note over Proxy,DB: [After Returning Advice]: Commit Transaction
+        Proxy->>DB: Commit Transaction (conn.commit())
+        Proxy-->>Client: Returns OrderConfirmationDto to Caller
+    else Method throws RuntimeException
+        Target-->>Proxy: Throws RuntimeException("Payment failed")
+        Note over Proxy,DB: [After Throwing Advice]: Rollback Transaction
+        Proxy->>DB: Rollback Transaction (conn.rollback())
+        Proxy-->>Client: Propagates Exception
+    end
+```
+
+#### How Spring Creates Proxies: JDK Dynamic Proxies vs. CGLIB
+
+Spring uses two distinct mechanisms to generate dynamic proxy objects at runtime:
+
+| Proxy Technology | How It Works | Requirement | Spring Boot 3 Default |
+| :--- | :--- | :--- | :--- |
+| **JDK Dynamic Proxies** | Generates an in-memory proxy class implementing the exact same Java `interface` as your bean. | Bean **must** implement one or more Java interfaces. | Used only if explicitly configured (`spring.aop.proxy-target-class=false`). |
+| **CGLIB (Code Generation Library)** | Generates a dynamic subclass of your actual bean class at runtime, overriding public methods to inject interceptor logic. | Bean class and methods **must NOT be `final`**. | **Default in Spring Boot 2 & 3** (`proxyTargetClass=true`). |
+
+```mermaid
+flowchart TD
+    subgraph JDKProxy ["1. JDK Dynamic Proxy (Interface-Based)"]
+        Interface["UserService (Interface)"]
+        Interface --> RealService["UserServiceImpl (Real Bean)"]
+        Interface --> JdkP["$Proxy123 (Generated Proxy)"]
+        JdkP -->|"Delegates to"| RealService
+    end
+
+    subgraph CglibProxy ["2. CGLIB Dynamic Proxy (Class-Based Subclass)"]
+        RealClass["UserService (Concrete Class)"]
+        CglibP["UserService$$SpringCGLIB$$0 (Generated Subclass)"]
+        CglibP --|>|"Extends & Overrides methods"| RealClass
+    end
+```
+
+#### The #1 Spring Beginner Trap: The Self-Invocation Pitfall
+
+Consider this seemingly innocent code:
+
+```java
+@Service
+public class OrderService {
+
+    // Non-transactional public method called by the Controller
+    public void processOrder(Long orderId) {
+        System.out.println("Validating order parameters...");
+        // Calling another method in the SAME class!
+        this.saveOrderToDatabase(orderId);
+    }
+
+    @Transactional // Expecting a database transaction here!
+    public void saveOrderToDatabase(Long orderId) {
+        // SQL statements executed here
+    }
+}
+```
+
+> [!CAUTION]
+> **The Catastrophic Bug**:
+> When a client calls `orderService.processOrder(1L)`, the transaction on `saveOrderToDatabase()` **WILL NEVER START**! The `@Transactional` annotation is completely ignored!
+> 
+> **Why?**
+> The client invokes `processOrder()` through the Spring Proxy. The Proxy has no advice for `processOrder()`, so it delegates directly to the real target `OrderService`.
+> Once execution is inside `OrderService`, `this.saveOrderToDatabase()` is an internal Java `this` reference. **It bypasses the proxy bodyguard entirely!** Because the proxy is never touched, the transaction advice never intercepts the call!
+
+```text
+External Client ───> [ Spring Proxy ] ───> OrderService.processOrder()
+                                                    │
+                                            (calls this.saveOrderToDatabase())
+                                                    │
+                                                    ▼
+                                           OrderService.saveOrderToDatabase()
+                                           [ BYPASSES PROXY! NO TRANSACTION! ]
+```
+
+##### How to Fix the Self-Invocation Bug:
+
+1. **Extract to a Separate Collaborator Bean (Recommended)**: Move the transactional method to a dedicated `OrderPersistenceService` and inject it. This ensures every call flows through the Spring Proxy.
+2. **Self-Injection with `ObjectProvider` or Lazy Dependency**:
+   ```java
+   @Service
+   public class OrderService {
+       private final ObjectProvider<OrderService> selfProvider;
+
+       public OrderService(ObjectProvider<OrderService> selfProvider) {
+           this.selfProvider = selfProvider;
+       }
+
+       public void processOrder(Long orderId) {
+           // Invokes through the proxy bean obtained from the Spring container!
+           selfProvider.getObject().saveOrderToDatabase(orderId);
+       }
+
+       @Transactional
+       public void saveOrderToDatabase(Long orderId) { ... }
+   }
+   ```
+
+---
+
 ### 0.5 From Spring Framework to Spring Boot: The Magic Unveiled
 
 While the classic Spring Framework solved object coupling and resource management, setting up a new project remained notoriously painful.
@@ -1271,6 +1419,94 @@ my-ecommerce-project/
 
 ---
 
+### 0.5.1 How Auto-Configuration Actually Works Under the Hood
+
+The greatest breakthrough of Spring Boot is **Opinionated Auto-Configuration**. But to junior developers, it often feels like an unpredictable "black box". Let us open the engine and examine every gear.
+
+#### The Core Mechanism: The Imports Registry
+
+When `@SpringBootApplication` executes, it triggers `@EnableAutoConfiguration`. 
+
+In Spring Boot 1.x and 2.x, auto-configuration classes were registered in `META-INF/spring.factories`. 
+In **Spring Boot 3.0+**, this mechanism was modernized to use a dedicated imports file:
+```text
+META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+```
+
+Inside `spring-boot-autoconfigure.jar`, this file contains a plain-text list of over 140 pre-packaged `@Configuration` classes, such as:
+- `org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration`
+- `org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration`
+- `org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration`
+- `org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration`
+
+#### The Gatekeepers: Conditional Annotations
+
+Spring Boot does not blindly instantiate all 140 configurations! That would bloat startup time and consume gigabytes of RAM.
+Instead, every auto-configuration class is guarded by a battery of **Conditional Annotations**:
+
+```mermaid
+flowchart TD
+    Boot["Spring Boot Starts Up"] --> Read["Reads AutoConfiguration.imports"]
+    Read --> Loop["Inspects each Candidate AutoConfiguration Class"]
+    
+    Loop --> Cond1{"@ConditionalOnClass?\nIs the library JAR on classpath?"}
+    Cond1 -- NO --> Skip["SKIP: Do not create beans"]
+    Cond1 -- YES --> Cond2{"@ConditionalOnMissingBean?\nHas user already declared custom bean?"}
+    
+    Cond2 -- NO (User provided bean) --> Backoff["BACK OFF: Respect user's custom bean!"]
+    Cond2 -- YES (No user bean exists) --> Cond3{"@ConditionalOnProperty?\nIs feature enabled in application.yml?"}
+    
+    Cond3 -- NO --> Skip
+    Cond3 -- YES --> Create["INSTANTIATE: Register default Spring Boot Bean!"]
+```
+
+#### The Master Conditionals Cheatsheet
+
+| Annotation | What It Checks | Real-World Example |
+| :--- | :--- | :--- |
+| **`@ConditionalOnClass`** | Passes only if specified `.class` files exist on the JVM classpath. | If `DataSource.class` and `HikariDataSource.class` exist in JARs, prepare database pool! |
+| **`@ConditionalOnMissingClass`** | Passes only if a class is **not** on the classpath. | Useful for fallback implementations when an optional library is omitted. |
+| **`@ConditionalOnBean`** | Passes only if a specific Spring Bean is already in the `ApplicationContext`. | Create `FlywayMigrationInitializer` only if a `Flyway` bean exists. |
+| **`@ConditionalOnMissingBean`** | Passes only if the user has **not** defined their own bean. **This is why Spring Boot never gets in your way!** | Spring provides a default `ObjectMapper` or `SecurityFilterChain` *only* if you didn't write your own `@Bean`. |
+| **`@ConditionalOnProperty`** | Passes only if a configuration property matches in `application.yml`. | Enable caching only if `spring.cache.type != none`. |
+| **`@ConditionalOnWebApplication`** | Passes only if running inside a Servlet or Reactive web environment. | Only spin up Tomcat if this is a web application. |
+
+#### Real Code Anatomy: How `DataSourceAutoConfiguration` Works
+
+Here is a simplified look at how Spring Boot automatically configures your database:
+
+```java
+@AutoConfiguration
+@ConditionalOnClass({ DataSource.class, EmbeddedDatabaseType.class }) // 1. Only if JDBC classes are on classpath
+@EnableConfigurationProperties(DataSourceProperties.class)           // 2. Bind spring.datasource.* properties
+public class DataSourceAutoConfiguration {
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnMissingBean(DataSource.class)                      // 3. User has NOT defined their own DataSource
+    static class PooledDataSourceConfiguration {
+
+        @Bean
+        @ConditionalOnClass(HikariDataSource.class)                  // 4. HikariCP is on classpath!
+        @ConditionalOnProperty(name = "spring.datasource.type", 
+                               havingValue = "com.zaxxer.hikari.HikariDataSource", 
+                               matchIfMissing = true)                // 5. Default choice if unspecified
+        public HikariDataSource dataSource(DataSourceProperties properties) {
+            return properties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
+        }
+    }
+}
+```
+
+> [!TIP]
+> **How to Peek Behind the Curtain in Any Project**:
+> Add `--debug` when running your application:
+> ```bash
+> ./mvnw spring-boot:run -Dspring-boot.run.arguments="--debug"
+> ```
+> Spring Boot will print the **CONDITIONS EVALUATION REPORT**, displaying every single bean that was created, every condition that passed, and every condition that backed off!
+
+---
+
 # Part 1: Web Applications and Microservices
 
 Distributed web systems exchange state across networks using standardized protocols. Understanding how to build resilient, secure, observable services requires mastering the client-server request pipeline, authentication filters, metrics instrumentation, and distributed cloud routing patterns.
@@ -1371,6 +1607,64 @@ HTTP defines specific semantic rules for each request method:
 - **Safe Methods (`GET`, `HEAD`)**: Calling a safe method does not modify the state of the resource on the server. Because `GET` requests never mutate state, web browsers and Content Delivery Networks (CDNs) can safely cache them indefinitely to save bandwidth.
 - **Idempotent Methods (`GET`, `PUT`, `DELETE`)**: Making $N$ identical requests produces the exact same server-side outcome as making a single request. If a network timeout occurs after sending a `PUT` or `DELETE` request, the client can safely retry the request without creating duplicate records or corrupting database state.
 - **Non-Idempotent Methods (`POST`)**: If a client sends `POST /api/v1/orders` twice due to a network blip, the server will create two separate orders and charge the customer twice unless an idempotency key is implemented.
+
+---
+
+### 1.0.1 The Web Request Lifecycle: DispatcherServlet Under the Hood
+
+To truly master Spring Boot web development, you must understand the **Front Controller Design Pattern** implemented by Spring MVC's **`DispatcherServlet`**.
+
+Every single HTTP request sent to a Spring Boot web application passes through a carefully orchestrated pipeline:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as HTTP Client (Browser / App)
+    participant Tomcat as Embedded Tomcat & Servlet Filters
+    participant DS as DispatcherServlet (Front Controller)
+    participant HM as HandlerMapping
+    participant HA as HandlerAdapter
+    participant AR as HandlerMethodArgumentResolver
+    participant Controller as Your @RestController
+    participant MC as HttpMessageConverter (Jackson)
+
+    Client->>Tomcat: TCP HTTP Request (e.g., POST /api/v1/orders)
+    Tomcat->>Tomcat: Passes through FilterChain (Security, CORS, Logging)
+    Tomcat->>DS: Delegates to DispatcherServlet.doDispatch()
+    
+    DS->>HM: getHandler(request): Who can handle "/api/v1/orders"?
+    HM-->>DS: Returns HandlerExecutionChain (Controller method + Interceptors)
+    
+    DS->>HA: getHandlerAdapter(handler)
+    Note over DS,HA: Pre-Handle Interceptors Execute
+    
+    HA->>AR: Resolve method parameters (@PathVariable, @RequestBody, @Valid)
+    AR->>MC: Read HTTP body JSON -> Deserialize to Java Record / DTO
+    MC-->>AR: Java Object Instantiated
+    
+    HA->>Controller: Invokes yourControllerMethod(orderDto)
+    Controller-->>HA: Returns ResponseEntity<OrderResponseDto>
+    
+    HA->>MC: Write Object -> Serialize Java Record to JSON bytes
+    MC-->>DS: Response Body Formatted (Content-Type: application/json)
+    
+    Note over DS: Post-Handle & After-Completion Interceptors Execute
+    DS-->>Tomcat: HttpServletResponse populated
+    Tomcat-->>Client: Returns HTTP 201 Created + JSON payload
+```
+
+#### The 5 Pillars of the Spring MVC Request Pipeline:
+
+1. **`DispatcherServlet` (The Air Traffic Controller)**:
+   The central front controller. It doesn't perform business logic itself; instead, it coordinates the entire request processing lifecycle, querying specialized components to map, adapt, execute, and render responses.
+2. **`HandlerMapping` (The Directory Lookup)**:
+   Maintains a lookup table of URL patterns, HTTP verbs, and headers mapped to controller methods. Spring's default `RequestMappingHandlerMapping` scans all `@RestController` and `@RequestMapping` classes at application boot time to build this routing table.
+3. **`HandlerAdapter` & `HandlerMethodArgumentResolver` (The Translator)**:
+   Java methods have custom signatures: parameters annotated with `@PathVariable`, `@RequestParam`, `@RequestBody`, or `@RequestHeader`. The `HandlerAdapter` iterates over registered `HandlerMethodArgumentResolver` implementations to extract and convert raw HTTP data into strongly typed Java arguments.
+4. **`HttpMessageConverter` (The Serializer / Deserializer)**:
+   The workhorse responsible for converting between HTTP body byte streams and Java objects. For JSON APIs, `MappingJackson2HttpMessageConverter` reads incoming JSON text and parses it into Java records or entities, and formats outgoing Java return values back into JSON strings.
+5. **`HandlerInterceptor` (The Cross-Cutting Guardrail)**:
+   Provides hooks to intercept requests **before** (`preHandle`), **after** (`postHandle`), and **upon completion** (`afterCompletion`). Unlike Servlet Filters (which operate at the low-level Tomcat container level), Interceptors have full access to Spring's `ApplicationContext` and the specific controller `HandlerMethod`.
 
 ---
 
@@ -2174,6 +2468,150 @@ class CurrencyClientServiceTest {
 
 ---
 
+### 1.9.1 Modern Declarative HTTP Interfaces with `@HttpExchange`
+
+While `RestClient` is great for programmatic HTTP calls, writing repetitive boilerplate methods for every downstream endpoint creates unnecessary code bloat. 
+
+In older Spring Boot versions, teams had to pull in Netflix Feign or OpenFeign via Spring Cloud to get declarative HTTP clients.
+In **Spring Framework 6 and Spring Boot 3.0+**, the Spring team introduced **native Declarative HTTP Interfaces** directly into the core framework!
+
+#### The Mental Model: Spring Data for Remote HTTP APIs
+
+Just as Spring Data JPA generates repository implementations automatically from a simple interface (`interface UserRepository extends JpaRepository`), Spring's HTTP Interface generates an entire REST client implementation at runtime from an annotated Java interface!
+
+```mermaid
+flowchart TD
+    subgraph DeclarativeClient ["Modern Declarative HTTP Client Pipeline"]
+        Interface["Java Interface\n(@HttpExchange, @GetExchange, @PostExchange)"]
+        Factory["HttpServiceProxyFactory\n(backed by RestClient or WebClient)"]
+        Proxy["Dynamic Spring Proxy Bean\n(Auto-generates HTTP calls, serializes JSON)"]
+        Remote["Downstream Remote Microservice / Third-Party API"]
+        
+        Interface --> Factory
+        Factory --> Proxy
+        Proxy --> Remote
+    end
+```
+
+#### The Client Evolution in Spring:
+
+| Client Type | Introduced In | Programming Style | Status in Spring Boot 3.x |
+| :--- | :--- | :--- | :--- |
+| **`RestTemplate`** | Spring 3.0 (2009) | Template method pattern, heavy parameter overloading | **Maintenance Mode** (Deprecated for new code) |
+| **`WebClient`** | Spring 5.0 (2017) | Reactive, non-blocking builder (requires WebFlux) | Active (Best for reactive / high concurrency) |
+| **`RestClient`** | Spring Boot 3.2 | Fluent, synchronous, builder-based | **Recommended Standard** for imperative code |
+| **`@HttpExchange`** | Spring Boot 3.0+ | **Declarative interface proxy** (zero implementation code) | **State-of-the-art** for clean microservice contracts |
+
+#### Step 1: Define the Declarative Client Interface
+
+Declare the HTTP contract as a clean Java interface using Spring's exchange annotations:
+
+```java
+package com.example.demo.client;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.*;
+
+import java.util.List;
+
+public record UserDto(Long id, String name, String email) {}
+public record CreateUserRequest(String name, String email) {}
+
+@HttpExchange("/api/v1/users") // Base path for all endpoints in this contract
+public interface UserApiClient {
+
+    @GetExchange
+    List<UserDto> getAllUsers(@RequestParam(defaultValue = "1") int page);
+
+    @GetExchange("/{id}")
+    UserDto getUserById(@PathVariable("id") Long id);
+
+    @PostExchange
+    UserDto createUser(@RequestBody CreateUserRequest request);
+
+    @DeleteExchange("/{id}")
+    void deleteUser(@PathVariable("id") Long id);
+}
+```
+
+#### Step 2: Register the Client Bean with `HttpServiceProxyFactory`
+
+Configure a factory bean that wires `RestClient` into the dynamic proxy adapter:
+
+```java
+package com.example.demo.config;
+
+import com.example.demo.client.UserApiClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+
+@Configuration
+public class ClientInterfaceConfig {
+
+    @Bean
+    public UserApiClient userApiClient(
+            RestClient.Builder restClientBuilder,
+            @Value("${downstream.user-service.url:https://api.internal-users.com}") String baseUrl) {
+        
+        // 1. Build the underlying RestClient with base URL and default timeout headers
+        RestClient restClient = restClientBuilder
+                .baseUrl(baseUrl)
+                .defaultHeader("Accept", "application/json")
+                .defaultHeader("User-Agent", "SpringBoot3-Core-Client")
+                .build();
+
+        // 2. Wrap the RestClient in an HTTP Adapter
+        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+
+        // 3. Build the HttpServiceProxyFactory using the adapter
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+
+        // 4. Generate the dynamic proxy implementing our UserApiClient interface!
+        return factory.createClient(UserApiClient.class);
+    }
+}
+```
+
+#### Step 3: Inject and Use Like Any Standard Spring Bean
+
+In your service layer, inject `UserApiClient` just like any regular Spring `@Service` or `@Repository`:
+
+```java
+package com.example.demo.service;
+
+import com.example.demo.client.UserApiClient;
+import com.example.demo.client.UserDto;
+import org.springframework.stereotype.Service;
+
+@Service
+public class OrderProcessingService {
+
+    private final UserApiClient userApiClient;
+
+    public OrderProcessingService(UserApiClient userApiClient) {
+        this.userApiClient = userApiClient;
+    }
+
+    public void verifyCustomerEligibility(Long customerId) {
+        // Zero HTTP boilerplate! Invokes GET /api/v1/users/{id} and maps JSON to UserDto!
+        UserDto user = userApiClient.getUserById(customerId);
+        System.out.println("Verified customer: " + user.name() + " (" + user.email() + ")");
+    }
+}
+```
+
+> [!TIP]
+> **Why `@HttpExchange` Wins in Microservices**:
+> You can package the `UserApiClient` interface and its DTO records into a lightweight shared Maven JAR (e.g., `user-api-contract.jar`). Other microservices simply include the contract JAR and configure the proxy bean in 5 lines of code, ensuring type-safe, contract-driven inter-service communication!
+
+---
+
 ### 1.10 Real-Time Server Push: Server-Sent Events (SSE) with SseEmitter
 
 Modern web applications require instantaneous updates: order status notifications, live stock quotes, sports tickers, or streaming token-by-token responses from generative AI models. 
@@ -2683,6 +3121,228 @@ public class ModernSecurityConfig {
 
                 .build();
     }
+}
+```
+
+---
+
+### 2.1.1 CORS & CSRF Demystified for Modern REST APIs
+
+Two of the most frequent points of failure when deploying modern single-page apps (React, Angular, Vue) against a Spring Boot backend are **CORS (Cross-Origin Resource Sharing)** errors and **CSRF (Cross-Site Request Forgery)** rejections.
+
+#### 1. Why Do We Disable CSRF in Stateless REST APIs?
+
+##### What is CSRF?
+In traditional server-rendered web applications (e.g., Thymeleaf, JSP), user authentication relies on a session cookie stored in the user's browser (`JSESSIONID`).
+When a user visits a malicious website while logged into their bank, the malicious site can submit a hidden form:
+```html
+<form action="https://mybank.com/transfer" method="POST">
+  <input type="hidden" name="recipient" value="attacker" />
+  <input type="hidden" name="amount" value="5000" />
+</form>
+<script>document.forms[0].submit();</script>
+```
+The browser **automatically attaches the bank's session cookie** with the request! The bank server sees a valid session and transfers the money.
+
+##### Why Stateless REST APIs Are Immune to CSRF:
+In modern REST APIs using JWTs, tokens are stored in memory or local storage and sent in the HTTP `Authorization` header:
+```text
+Authorization: Bearer eyJhbGciOi...
+```
+**Browsers NEVER automatically attach Authorization headers to cross-origin requests!**
+Only JavaScript code running in the original application origin can attach custom headers. Because an attacker's website cannot read or inject the client's `Authorization: Bearer` token, **CSRF attacks are technically impossible against token-based stateless REST APIs**.
+
+Therefore, calling `.csrf(AbstractHttpConfigurer::disable)` in Spring Security is safe and standard practice for stateless APIs.
+
+---
+
+#### 2. The CORS Disaster: Why `@CrossOrigin` Fails on Secured Endpoints
+
+**CORS** is a browser security mechanism that blocks web applications running at one origin (e.g., `http://localhost:3000`) from reading responses from a server at a different origin (e.g., `https://api.mycompany.com`).
+
+##### The Preflight `OPTIONS` Request:
+Before a browser makes a cross-origin mutation (like `POST` or `PUT`) or sends custom headers (like `Authorization`), it sends an HTTP **`OPTIONS` preflight request** to ask the backend server:
+*"Do you allow POST requests with Authorization headers from origin `http://localhost:3000`?"*
+
+##### The Deadly `@CrossOrigin` Trap:
+Beginners often put `@CrossOrigin(origins = "http://localhost:3000")` on their `@RestController`.
+Then they test with React, and the browser throws a CORS error:
+```text
+Access to XMLHttpRequest at 'http://localhost:8080/api/v1/orders' from origin 'http://localhost:3000' 
+has been blocked by CORS policy: Response to preflight request doesn't pass access control check!
+```
+**Why did it fail?**
+The browser's preflight `OPTIONS` request does not include credentials. When it hits Spring Security's `FilterChainProxy`, Spring Security intercepts it **BEFORE** it reaches the controller! Spring Security says: *"This request has no credentials, 401 Unauthorized!"* and terminates the request. The `@CrossOrigin` annotation on the controller was never even reached!
+
+##### The Production Fix: The `CorsConfigurationSource` Bean:
+Configure CORS directly inside Spring Security's filter chain so preflight requests are processed and approved before authentication checks:
+
+```java
+package com.example.demo.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
+@Configuration
+public class ProductionSecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+                // 1. Tell Spring Security to use the corsConfigurationSource Bean defined below!
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/public/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        
+        // Explicitly allow your frontend origins (Never use '*' in production with credentials!)
+        config.setAllowedOrigins(List.of("http://localhost:3000", "https://app.mycompany.com"));
+        
+        // Allow all standard REST HTTP methods
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        
+        // Allow Authorization, Content-Type, and custom tracing headers
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "traceparent"));
+        
+        // Allow browser to read custom response headers (e.g. pagination or rate limit headers)
+        config.setExposedHeaders(List.of("X-Total-Count", "X-RateLimit-Remaining"));
+        
+        // Allow credentials (cookies / authorization headers)
+        config.setAllowCredentials(true);
+        
+        // Cache preflight OPTIONS response for 1 hour (3600 seconds) so browser doesn't send OPTIONS on every click!
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config); // Apply to all API routes
+        return source;
+    }
+}
+```
+
+---
+
+### 2.1.2 Handling Security Failures with RFC 7807 ProblemDetail Responses
+
+By default, when an unauthenticated user or unauthorized role hits a protected endpoint, Spring Security either redirects to a HTML login page or returns an empty HTTP 401/403 status without a JSON body.
+
+In modern REST APIs, security errors must return standardized **RFC 7807 `ProblemDetail`** payloads.
+
+Spring Security delegates errors to two distinct components:
+1. **`AuthenticationEntryPoint`**: Invoked when an unauthenticated user tries to access a protected resource (**HTTP 401 Unauthorized** - "Who are you?").
+2. **`AccessDeniedHandler`**: Invoked when an authenticated user attempts to access a resource for which they lack the required permissions (**HTTP 403 Forbidden** - "You don't have permission").
+
+```mermaid
+flowchart TD
+    Req["Incoming HTTP Request"] --> SecFilter["AuthorizationFilter"]
+    
+    SecFilter --> CheckAuth{"Is user authenticated?"}
+    CheckAuth -- NO --> EntryPoint["AuthenticationEntryPoint\n(Returns HTTP 401 ProblemDetail JSON)"]
+    
+    CheckAuth -- YES --> CheckRole{"Does user have required role?"}
+    CheckRole -- NO --> DeniedHandler["AccessDeniedHandler\n(Returns HTTP 403 ProblemDetail JSON)"]
+    CheckRole -- YES --> Controller["Proceed to @RestController"]
+```
+
+#### Custom JSON Security Handlers Implementation:
+
+```java
+package com.example.demo.security;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.net.URI;
+import java.time.Instant;
+
+@Component
+public class CustomSecurityProblemHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
+
+    private final ObjectMapper objectMapper;
+
+    public CustomSecurityProblemHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    // Handles 401 Unauthorized (Missing or invalid token)
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+                         AuthenticationException authException) throws IOException {
+        
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, 
+                "Authentication is required to access this resource: " + authException.getMessage()
+        );
+        problem.setTitle("Unauthorized Access");
+        problem.setType(URI.create("https://api.mycompany.com/errors/unauthorized"));
+        problem.setProperty("timestamp", Instant.now());
+        problem.setProperty("path", request.getRequestURI());
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
+        objectMapper.writeValue(response.getOutputStream(), problem);
+    }
+
+    // Handles 403 Forbidden (User logged in, but lacks required role)
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException {
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN, 
+                "You do not possess the required permissions or roles to perform this operation."
+        );
+        problem.setTitle("Forbidden Resource");
+        problem.setType(URI.create("https://api.mycompany.com/errors/forbidden"));
+        problem.setProperty("timestamp", Instant.now());
+        problem.setProperty("path", request.getRequestURI());
+
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
+        objectMapper.writeValue(response.getOutputStream(), problem);
+    }
+}
+```
+
+#### Registering Handlers in `SecurityFilterChain`:
+
+```java
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomSecurityProblemHandler problemHandler) throws Exception {
+    return http
+            // Register custom RFC 7807 error handlers
+            .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint(problemHandler) // 401 handler
+                    .accessDeniedHandler(problemHandler)       // 403 handler
+            )
+            // other configurations...
+            .build();
 }
 ```
 
@@ -3399,6 +4059,87 @@ Navigate to `http://localhost:8080/actuator/health` to inspect the composite sys
 
 ---
 
+### 3.1.1 Kubernetes Liveness, Readiness & Graceful Shutdown
+
+In modern containerized deployments (Kubernetes, Amazon ECS, Google Cloud Run), the container orchestrator relies on Actuator probes to determine whether your container is healthy or should be restarted.
+
+#### Liveness vs. Readiness Probes Explained Simply:
+
+```mermaid
+flowchart TD
+    subgraph K8sProbes ["Kubernetes Health Probe Mental Model"]
+        Liveness["1. Liveness Probe (/actuator/health/liveness)\nQuestion: Is the application stuck in a deadlock or OOM?\nAction if FAILS: RESTART THE CONTAINER (Kill & Reboot Pod)"]
+        Readiness["2. Readiness Probe (/actuator/health/readiness)\nQuestion: Is the application ready to handle incoming web traffic?\nAction if FAILS: STOP SENDING TRAFFIC (Remove from Load Balancer, do NOT kill)"]
+    end
+```
+
+- **Liveness Failure**: The JVM has entered an unrecoverable state (e.g., permanent deadlock or fatal memory leak). Kubernetes detects this, executes `SIGKILL`, and restarts the pod fresh.
+- **Readiness Failure**: The application is busy warming up caches, executing Flyway database migrations, or the database connection pool is temporarily saturated. Kubernetes **does not kill** the application; it simply detaches the pod from the Kubernetes Service load balancer so users don't receive HTTP 500 errors. Once the application catches up and readiness turns `UP`, traffic resumes automatically!
+
+#### Production Configuration for Kubernetes:
+
+Configure probes and **Graceful Shutdown** in `application.yml`:
+
+```yaml
+server:
+  # Enable Graceful Shutdown: Stop accepting new requests and finish in-flight requests cleanly!
+  shutdown: graceful
+
+spring:
+  lifecycle:
+    # Max time (30 seconds) allowed for in-flight requests to complete before hard termination
+    timeout-per-shutdown-phase: 30s
+
+management:
+  endpoint:
+    health:
+      probes:
+        # Enables /actuator/health/liveness and /actuator/health/readiness
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+```
+
+#### Programmatically Mutating Readiness State:
+
+If your service experiences an event where it needs to temporarily stop receiving traffic (e.g., preparing for heavy local cache re-indexing), publish an `AvailabilityChangeEvent`:
+
+```java
+package com.example.demo.service;
+
+import org.springframework.boot.availability.AvailabilityChangeEvent;
+import org.springframework.boot.availability.ReadinessState;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MaintenanceService {
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    public MaintenanceService(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
+    public void pauseTrafficForHeavyBatchJob() {
+        // Marks /actuator/health/readiness as OUT_OF_SERVICE
+        // Kubernetes immediately removes this pod from load balancer!
+        AvailabilityChangeEvent.publish(eventPublisher, this, ReadinessState.REFUSING_TRAFFIC);
+    }
+
+    public void resumeTraffic() {
+        // Marks /actuator/health/readiness as UP
+        // Kubernetes puts this pod back into rotation!
+        AvailabilityChangeEvent.publish(eventPublisher, this, ReadinessState.ACCEPTING_TRAFFIC);
+    }
+}
+```
+
+---
+
 ### 3.2 Authoring Custom Health Indicators
 
 When your service depends on an external dependency (such as an external payment provider or custom socket service), write a custom `HealthIndicator` so Actuator reports its status accurately:
@@ -3514,6 +4255,163 @@ public class OrderMetricsService {
 ```
 
 Metrics are exposed at `http://localhost:8080/actuator/prometheus` in Prometheus scrape format.
+
+---
+
+### 3.3.1 Unified Telemetry with the Micrometer Observation API (`@Observed`)
+
+Before Spring Boot 3, developers had to manage two completely separate instrumentation pipelines:
+1. Writing `Timer` and `Counter` code for **Micrometer metrics**.
+2. Writing manual spans and Baggage code for **Spring Cloud Sleuth / OpenTelemetry tracing**.
+
+**Spring Boot 3 introduced the Micrometer Observation API**, unifying metrics, distributed tracing, and structured logging into a single programmatic and declarative abstraction!
+
+```mermaid
+flowchart TD
+    Obs["Single Call: Observation.createNotStarted(...) or @Observed"]
+    Obs --> Metric["1. Micrometer Timer / Counter (Sent to Prometheus)"]
+    Obs --> Trace["2. Distributed Tracing Span (Sent to Zipkin / Jaeger)"]
+    Obs --> Log["3. MDC Diagnostic Context (Injected into Logback JSON)"]
+```
+
+#### Step 1: Enable AOP for `@Observed`
+
+Add the AOP starter and declare an `ObservedAspect` bean:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+```
+
+```java
+package com.example.demo.config;
+
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.aop.ObservedAspect;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ObservationConfig {
+
+    @Bean
+    public ObservedAspect observedAspect(ObservationRegistry observationRegistry) {
+        return new ObservedAspect(observationRegistry);
+    }
+}
+```
+
+#### Step 2: Instrument Methods Declaratively with `@Observed`
+
+Annotate any service method with `@Observed`:
+
+```java
+package com.example.demo.service;
+
+import io.micrometer.observation.annotation.Observed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PaymentProcessingService {
+
+    private static final Logger log = LoggerFactory.getLogger(PaymentProcessingService.class);
+
+    @Observed(
+            name = "payment.processing",          // Metric name in Prometheus
+            contextualName = "process-payment-tx" // Span name in Zipkin / distributed trace
+    )
+    public String executeTransaction(String customerId, double amount) {
+        log.info("Processing credit card payment for customer: {}", customerId);
+        
+        // Simulating processing logic
+        try {
+            Thread.sleep(120);
+        } catch (InterruptedException ignored) {}
+
+        return "TX-SUCCESS-" + System.currentTimeMillis();
+    }
+}
+```
+
+##### What Happens Automatically Behind the Scenes:
+1. **Prometheus Metric Generated**: Creates a timer `payment_processing_seconds_count` and `payment_processing_seconds_sum` recording exact execution duration and success/failure counts.
+2. **Distributed Tracing Span Created**: Automatically starts a child span named `process-payment-tx` attached to the current active Trace ID!
+3. **MDC Injected**: Injects tracing IDs into the SLF4J MDC context so every log statement inside the method includes the current trace and span ID.
+
+---
+
+### 3.3.2 Authoring Custom Actuator Endpoints (`@Endpoint`)
+
+Beyond the standard `/actuator/health` and `/actuator/metrics`, enterprise architectures often require exposing proprietary internal runtime state (e.g., active WebSocket sessions, cache hit ratios, feature toggle states).
+
+Spring Boot allows authoring custom Actuator endpoints using the `@Endpoint` annotation:
+
+```java
+package com.example.demo.actuator;
+
+import org.springframework.boot.actuate.endpoint.annotation.*;
+import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Component
+@Endpoint(id = "features") // Exposes endpoint at /actuator/features
+public class CustomFeatureFlagEndpoint {
+
+    private final Map<String, Boolean> featureFlags = new ConcurrentHashMap<>();
+
+    public CustomFeatureFlagEndpoint() {
+        featureFlags.put("dark_mode_v2", true);
+        featureFlags.put("instant_checkout", false);
+        featureFlags.put("ai_recommendations", true);
+    }
+
+    // 1. @ReadOperation handles HTTP GET /actuator/features
+    @ReadOperation
+    public Map<String, Object> getAllFeatures() {
+        return Map.of(
+                "timestamp", Instant.now(),
+                "activeFlagsCount", featureFlags.size(),
+                "flags", featureFlags
+        );
+    }
+
+    // 2. @ReadOperation with path parameter: GET /actuator/features/{name}
+    @ReadOperation
+    public Boolean getFeatureStatus(@Selector String name) {
+        return featureFlags.getOrDefault(name, false);
+    }
+
+    // 3. @WriteOperation handles HTTP POST /actuator/features to toggle runtime flags
+    @WriteOperation
+    public Map<String, Object> updateFeatureFlag(String name, boolean enabled) {
+        featureFlags.put(name, enabled);
+        return Map.of("updated", name, "enabled", enabled);
+    }
+
+    // 4. @DeleteOperation handles HTTP DELETE /actuator/features/{name}
+    @DeleteOperation
+    public void deleteFeatureFlag(@Selector String name) {
+        featureFlags.remove(name);
+    }
+}
+```
+
+#### Exposing and Securing the Custom Endpoint in `application.yml`:
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus, features # Add custom endpoint id
+```
 
 ---
 
@@ -3953,6 +4851,87 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 ```
 
+#### Eureka High Availability & Self-Preservation Mode
+
+In production, two Eureka mechanics are critical to understand:
+
+1. **Client-Side Registry Caching**:
+   When `order-service` calls `product-service`, it does **not** query Eureka on every single HTTP request! That would turn Eureka into a massive performance bottleneck.
+   Instead, Eureka clients cache the entire service registry locally in memory, refreshing it in the background every 30 seconds (`eureka.client.registry-fetch-interval-seconds`). If Eureka crashes completely, microservices can still communicate with each other using their local cache!
+
+2. **Self-Preservation Mode**:
+   Every microservice instance sends a heartbeat to Eureka every 30 seconds. If Eureka stops receiving heartbeats from an instance, it normally evicts it after 90 seconds.
+   However, if a network glitch occurs between Eureka and an entire AWS availability zone, Eureka might suddenly lose heartbeats from 40% of all microservices. 
+   Instead of foolishly deleting all 40% from the registry, Eureka enters **Self-Preservation Mode**: it pauses all evictions, assuming the services are still running and the network between them is just temporarily impaired!
+
+---
+
+### 4.1.1 Client-Side Load Balancing with Spring Cloud LoadBalancer
+
+In early Spring Cloud versions, Netflix **Ribbon** was used for client-side load balancing. Ribbon was deprecated and completely removed.
+The modern standard is **Spring Cloud LoadBalancer**, a lightweight, non-blocking load balancer fully integrated with Spring MVC and WebFlux.
+
+#### How Client-Side Load Balancing Works Under the Hood:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Order as Order Service (Client)
+    participant LB as Spring Cloud LoadBalancer
+    participant Cache as Local Eureka Registry Cache
+    participant Prod1 as Product Service Instance 1 (10.0.1.5:8081)
+    participant Prod2 as Product Service Instance 2 (10.0.1.8:8081)
+
+    Order->>LB: Calls http://PRODUCT-SERVICE/api/v1/products/42
+    LB->>Cache: Look up live instances of "PRODUCT-SERVICE"
+    Cache-->>LB: Returns [10.0.1.5:8081, 10.0.1.8:8081]
+    Note over LB: Round-Robin Algorithm picks 10.0.1.8:8081
+    LB->>Order: Rewrites URL to http://10.0.1.8:8081/api/v1/products/42
+    Order->>Prod2: Direct TCP HTTP Request executed!
+```
+
+#### Configuring `@LoadBalanced` with Modern `RestClient` in Spring Boot 3:
+
+Add the load balancer starter to `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+</dependency>
+```
+
+Annotate the `RestClient.Builder` bean with `@LoadBalanced`:
+
+```java
+package com.example.demo.config;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
+
+@Configuration
+public class LoadBalancedClientConfig {
+
+    // @LoadBalanced intercepts RestClient calls and replaces virtual service IDs with physical IPs!
+    @Bean
+    @LoadBalanced
+    public RestClient.Builder loadBalancedRestClientBuilder() {
+        return RestClient.builder();
+    }
+
+    @Bean
+    public RestClient productRestClient(RestClient.Builder loadBalancedBuilder) {
+        return loadBalancedBuilder
+                .baseUrl("http://PRODUCT-SERVICE") // Virtual Eureka service ID!
+                .build();
+    }
+}
+```
+
+Now, calling `productRestClient.get().uri("/api/v1/products/{id}", id).retrieve()` automatically distributes requests across all healthy instances using Round-Robin!
+
 ---
 
 ### 4.2 API Routing & Filtering with Spring Cloud Gateway
@@ -3984,6 +4963,171 @@ spring:
             - Path=/api/v1/orders/**
           filters:
             - AddRequestHeader=X-Gateway-Origin, EdgeGateway
+```
+
+#### 4.2.1 Edge Security: Validating JWTs in Gateway Filters
+
+In production microservices, internal services (like `order-service` or `inventory-service`) should never be exposed directly to the public internet. 
+The **API Gateway acts as the security perimeter**: it inspects and cryptographically verifies the incoming `Authorization: Bearer <JWT>` token. If valid, the gateway extracts user metadata and forwards clean HTTP headers (`X-User-Id`, `X-User-Roles`) to downstream services!
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Public Client / Mobile App
+    participant GW as Spring Cloud Gateway (Edge Perimeter)
+    participant Auth as Identity Provider (Keycloak / Auth0)
+    participant Order as Order Microservice (Internal Network)
+
+    User->>GW: POST /api/v1/orders (Authorization: Bearer JWT)
+    GW->>GW: JwtValidationFilter executes!
+    GW->>GW: Cryptographically verifies JWT signature against public key
+    
+    alt Token is Missing or Expired
+        GW-->>User: Returns HTTP 401 Unauthorized (Rejected at Edge!)
+    else Token is Valid
+        GW->>GW: Extracts userId="usr_987", role="ROLE_CUSTOMER"
+        GW->>GW: Mutates request: Injects X-User-Id and X-User-Roles headers
+        GW->>Order: Forwards request with clean headers!
+        Order-->>GW: Order created (201 Created)
+        GW-->>User: 201 Created
+    end
+```
+
+##### Implementing a Custom Reactive Gateway Filter:
+
+Because Spring Cloud Gateway is built on non-blocking Spring WebFlux, gateway filters implement `GatewayFilter` and manipulate `ServerWebExchange`:
+
+```java
+package com.example.gateway.filter;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+
+@Component
+public class AuthenticationGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthenticationGatewayFilterFactory.Config> {
+
+    private final SecretKey signingKey;
+
+    public AuthenticationGatewayFilterFactory() {
+        super(Config.class);
+        // In production, inject via @Value("${jwt.secret}")
+        this.signingKey = Keys.hmacShaKeyFor("YourSuperSecret256BitKeyForJwtSigningHere!".getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static class Config {}
+
+    @Override
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            ServerHttpRequest request = exchange.getRequest();
+
+            // 1. Verify Authorization Header exists
+            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete(); // Short-circuit and return 401
+            }
+
+            String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+
+            String token = authHeader.substring(7);
+
+            try {
+                // 2. Validate cryptographic signature and parse claims
+                Claims claims = Jwts.parser()
+                        .verifyWith(signingKey)
+                        .build()
+                        .parseSignedClaims(token)
+                        .getPayload();
+
+                // 3. Mutate the request: Inject user identity headers for downstream microservices
+                ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                        .header("X-User-Id", claims.getSubject())
+                        .header("X-User-Email", claims.get("email", String.class))
+                        .header("X-User-Roles", claims.get("roles", String.class))
+                        .build();
+
+                // 4. Forward mutated request downstream
+                return chain.filter(exchange.mutate().request(mutatedRequest).build());
+
+            } catch (Exception ex) {
+                // Invalid or expired token
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+        };
+    }
+}
+```
+
+#### 4.2.2 Distributed Edge Rate Limiting with Redis
+
+To protect your system against Distributed Denial of Service (DDoS) attacks and brute-force abuse, Spring Cloud Gateway includes a built-in **Token Bucket Rate Limiter** powered by Redis (`RequestRateLimiter`).
+
+Configure rate limiting per IP or per API key in `application.yml`:
+
+```yaml
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cloud:
+    gateway:
+      routes:
+        - id: rate-limited-order-route
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/v1/orders/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                # Number of tokens added to bucket per second (sustained rate)
+                redis-rate-limiter.replenishRate: 10
+                # Maximum capacity of bucket (allows short bursts up to 20 requests)
+                redis-rate-limiter.burstCapacity: 20
+                # Cost per request in tokens
+                redis-rate-limiter.requestedTokens: 1
+                # Bean name of KeyResolver to determine identity of caller
+                key-resolver: "#{@ipKeyResolver}"
+```
+
+Declare the `KeyResolver` bean in Java to rate-limit by client IP address:
+
+```java
+package com.example.gateway.config;
+
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import reactor.core.publisher.Mono;
+
+@Configuration
+public class RateLimiterConfig {
+
+    @Bean
+    public KeyResolver ipKeyResolver() {
+        // Resolve client remote IP address as rate limit key
+        return exchange -> Mono.just(
+                exchange.getRequest().getRemoteAddress() != null
+                        ? exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
+                        : "anonymous"
+        );
+    }
+}
 ```
 
 ---
@@ -4245,6 +5389,74 @@ Microservices fetch their properties on startup and can refresh dynamic properti
 
 ---
 
+### 4.5 Distributed Tracing & W3C Trace Context Propagation Across Services
+
+In a monolith, tracking a request is straightforward because execution occurs within a single JVM process and log file. In a microservices architecture, a single user click ("Place Order") triggers a complex sequence of remote network calls across multiple independently deployed services.
+
+Without **Distributed Context Propagation**, debugging an intermittent timeout across 6 microservices is nearly impossible.
+
+#### The W3C TraceContext Standard
+
+Modern Spring Boot 3 applications adhere to the **W3C TraceContext specification**. When an incoming request reaches your API Gateway, Spring generates a standard HTTP header named **`traceparent`**:
+
+```text
+traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
+              │  └───────────────┬───────────────┘ └───────┬──────┘ └─┬┘
+           Version          Trace ID                    Parent/Span  Flags (01 = Sampled)
+           (Always 00)  (Globally Unique 128-bit)      ID (64-bit)
+```
+
+- **Trace ID (`4bf92f3577b34da6a3ce929d0e0e4736`)**: Stays identical across every single service in the distributed transaction.
+- **Span ID (`00f067aa0ba902b7`)**: Identifies the specific operation being executed within the current service.
+
+#### The Distributed Propagation Flow:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Client
+    participant GW as API Gateway
+    participant Order as Order Service
+    participant Pay as Payment Service
+    participant Kafka as Apache Kafka
+    participant Notif as Notification Service
+
+    User->>GW: POST /api/v1/orders
+    Note over GW: Generates TraceId: T1, SpanId: S1
+    GW->>Order: POST /orders (Header: traceparent: 00-T1-S1-01)
+    
+    Note over Order: Inherits TraceId: T1<br/>Creates Child SpanId: S2
+    Order->>Pay: POST /charge (Header: traceparent: 00-T1-S2-01)
+    
+    Note over Pay: Inherits TraceId: T1<br/>Creates Child SpanId: S3
+    Pay-->>Order: 200 OK (Payment Verified)
+    
+    Order->>Kafka: Publish "OrderPlacedEvent" (Kafka Header: traceparent: 00-T1-S2-01)
+    Order-->>GW: 201 Created
+    GW-->>User: Order Completed!
+    
+    Kafka->>Notif: Consumes Event (Extracts traceparent from Kafka Record Headers!)
+    Note over Notif: Inherits TraceId: T1<br/>Creates Child SpanId: S4 (Sends Email)
+```
+
+#### Automatic Propagation with `RestClient`:
+
+When you use Spring Boot 3's auto-configured `RestClient.Builder` or `@LoadBalanced RestClient.Builder`, Micrometer Tracing registers an HTTP client interceptor (`ObservationClientHttpRequestInterceptor`).
+This interceptor **automatically injects the current active `traceparent` header into every outgoing HTTP call** without writing a single line of custom header code!
+
+```java
+// Micrometer Tracing automatically attaches 'traceparent' under the hood!
+PaymentResponse response = restClient.post()
+        .uri("http://PAYMENT-SERVICE/v1/charge")
+        .body(paymentRequest)
+        .retrieve()
+        .body(PaymentResponse.class);
+```
+
+When all services report their spans to Zipkin or Jaeger, you obtain a complete, unified **Waterfall Latency Graph** displaying the exact millisecond cost of every network hop and database query across your entire fleet of microservices.
+
+---
+
 ### Chapter 4 Exercises & Solutions
 
 Test your knowledge of service discovery, routing gateways, and circuit breaking.
@@ -4427,6 +5639,58 @@ The `hibernate.ddl-auto` setting tells Hibernate how to synchronize Java `@Entit
 - **`update`**: Compares your Java classes to the database tables and automatically adds missing columns or tables. While convenient for local development, **`update` is dangerous in production** because it never drops unused columns, cannot handle column renames safely, and can lock high-traffic tables unexpectedly.
 - **`validate`**: Compares your Java entities to the existing database tables. If any column, table, or data type does not match, **it refuses to start the application and throws an error**. This is the **recommended production setting**.
 - **`none`**: Disables all schema inspection and generation completely.
+
+---
+
+### 5.1.1 Zero-Config Local Containers with `spring-boot-docker-compose`
+
+In older Spring Boot versions, developers had to manually run `docker run` or `docker compose up -d` before starting their application, and had to copy database ports and passwords into `application.yml`. If they forgot to boot Docker, the app crashed immediately.
+
+**Spring Boot 3.1 introduced automatic Docker Compose support!**
+
+#### How It Works:
+When you add `spring-boot-docker-compose` to your build, Spring Boot automatically discovers your `compose.yaml` file on startup:
+1. It executes `docker compose up` in the background.
+2. It waits for PostgreSQL to pass its healthcheck.
+3. It **automatically extracts the dynamically assigned database port, username, and password** and binds them to Spring's `DataSource`!
+4. You do not need **ANY database URL, username, or password in `application.yml`**!
+5. When you stop the Spring Boot application (e.g. clicking Stop in IntelliJ), Spring Boot automatically stops the container.
+
+#### Step 1: Add Dependency to `pom.xml`
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-docker-compose</artifactId>
+    <scope>runtime</scope>
+    <optional>true</optional>
+</dependency>
+```
+
+#### Step 2: Create `compose.yaml` in the Project Root Directory
+
+```yaml
+services:
+  postgres:
+    image: 'postgres:16-alpine'
+    environment:
+      - 'POSTGRES_DB=ecommercedb'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=secret'
+    ports:
+      - '5432' # Leaving host port blank allows Docker to assign an available ephemeral port!
+```
+
+#### Step 3: Run the Application!
+
+Execute `./mvnw spring-boot:run`. Spring Boot's console logs:
+```text
+Using Docker Compose file: /Users/pushkar/Desktop/my-project/compose.yaml
+Created container: my-project-postgres-1
+Started container: my-project-postgres-1
+Connected to PostgreSQL at 127.0.0.1:5432
+```
+Zero configuration, zero port collisions across developer laptops!
 
 ---
 
@@ -5685,6 +6949,58 @@ class CategoryRepositoryIntegrationTest {
     }
 }
 ```
+
+#### 5.9.1 Modern Integration Testing with Spring Boot 3.1 `@ServiceConnection`
+
+While `@DynamicPropertySource` works, it requires 8 lines of repetitive boilerplate code for every container (Postgres, Redis, Kafka, RabbitMQ) across every test class.
+
+**Spring Boot 3.1 introduced `@ServiceConnection`**, which completely eliminates `@DynamicPropertySource`!
+
+##### The Revolution in 3 Lines of Code:
+When you annotate a container with `@ServiceConnection`, Spring Boot automatically queries the Testcontainer, determines its service type, and dynamically registers the corresponding `ConnectionDetails` bean:
+
+```java
+package com.example.demo.repository;
+
+import com.example.demo.domain.Category;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@DataJpaTest
+@Testcontainers
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class ModernCategoryRepositoryTest {
+
+    // @ServiceConnection automatically extracts port, username, password and configures DataSource!
+    // NO @DynamicPropertySource METHOD NEEDED!
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Test
+    @DisplayName("Persist and retrieve entity using modern @ServiceConnection")
+    void testCategoryPersistence() {
+        Category saved = categoryRepository.save(new Category("Electronics"));
+        assertNotNull(saved.getId());
+        assertEquals("Electronics", saved.getName());
+    }
+}
+```
+
+> [!TIP]
+> `@ServiceConnection` works out of the box with over 15 Testcontainers modules, including PostgreSQL, MySQL, MariaDB, Oracle, MongoDB, Redis, Kafka, RabbitMQ, and Neo4j!
 
 ---
 
@@ -8473,174 +9789,325 @@ Migrating existing applications across major framework versions requires a struc
 
 ## Chapter 9: Upgrading from Spring Boot 2.x to Spring Boot 3.0
 
-Upgrading a codebase across major architectural milestones requires understanding the foundational changes introduced in Spring Boot 3.0 and how to refactor legacy code patterns deterministically.
+Upgrading an enterprise codebase across major architectural milestones is one of the most critical engineering responsibilities. Spring Boot 3.0 (and its minor releases 3.1, 3.2, 3.3, and 3.4) represents the most significant paradigm shift in the Java ecosystem in a decade.
+
+This chapter provides an exhaustive, battle-tested roadmap for migrating legacy Spring Boot 2.x applications to modern Spring Boot 3.x cleanly, safely, and without production regressions.
+
+---
 
 ### 9.0 The Major Milestones of Spring Boot 3
 
-Spring Boot 3.0 represents a generational shift in the Java ecosystem, establishing modern runtime baselines:
+Spring Boot 3.0 is not merely an incremental release; it establishes a brand-new technical foundation for the next decade of enterprise Java:
 
 ```mermaid
 graph TD
     Boot3["Spring Boot 3.0 Core Foundations"]
-    Boot3 --> J17["Java 17 LTS Baseline (Records, Pattern Matching, Sealed Types)"]
-    Boot3 --> Jak["Jakarta EE 10 (Namespace shift: javax.* -> jakarta.*)"]
-    Boot3 --> Native["GraalVM Native Image Support (Ahead-of-Time compilation)"]
-    Boot3 --> Sec6["Spring Security 6.0 (Component-based SecurityFilterChain)"]
+    Boot3 --> J17["Java 17 LTS / Java 21 Baseline\n(Records, Sealed Types, Pattern Matching, Virtual Threads)"]
+    Boot3 --> Jak["Jakarta EE 10 Baseline\n(Namespace shift: javax.* -> jakarta.*)"]
+    Boot3 --> Native["GraalVM Native Image Support\n(Ahead-of-Time compilation, instant startup, low memory)"]
+    Boot3 --> Sec6["Spring Security 6.0\n(Component-based SecurityFilterChain, purely functional Lambda DSL)"]
+    Boot3 --> Obs["Micrometer Observation API\n(Unified metrics, distributed tracing, and logging)"]
+    Boot3 --> Hib6["Hibernate 6 ORM\n(New SQM Query Engine, strict type checking, higher SQL efficiency)"]
 ```
 
 #### Prerequisite Concepts & Terminologies
 
-Before upgrading existing microservices, master these core migration concepts:
+Before touching legacy codebases, master these core concepts:
 
-- **Jakarta EE Migration**: Following Oracle's donation of Java EE to the Eclipse Foundation, the `javax.*` trademark remained with Oracle. Consequently, all enterprise packages (`javax.servlet`, `javax.persistence`, `javax.validation`, `javax.annotation`) were legally required to migrate to the `jakarta.*` package namespace.
-- **Java 17 Baseline**: Spring Boot 3 requires Java 17 as its absolute minimum compiler and runtime version. Applications running on Java 8 or Java 11 cannot run on Spring Boot 3.
-- **GraalVM AOT Compilation**: Native image generation that compiles bytecode into an OS-specific standalone native executable at build time, yielding instant (&lt; 5ms) startup and minimal memory footprint.
-- **OpenRewrite**: An automated refactoring tool that parses abstract syntax trees (ASTs) and executes migration recipes to update thousands of source files, imports, and POM dependencies deterministically.
+- **Jakarta EE 10 Migration**: In 2017, Oracle transferred Java EE to the Eclipse Foundation. Because Oracle retained ownership of the `javax.*` trademark, all enterprise specifications (`javax.servlet`, `javax.persistence`, `javax.validation`, `javax.annotation`) were legally renamed to `jakarta.*`. Spring Boot 3.0 marks the final break: **`javax.*` enterprise packages do not exist in Spring Boot 3**.
+- **Java 17 LTS Baseline**: Spring Boot 3 requires Java 17 as its absolute minimum version. It also seamlessly leverages Java 21 LTS features (including Virtual Threads and Record Patterns). Any application running on Java 8 or Java 11 **must first be upgraded to Java 17** before upgrading to Spring Boot 3.
+- **GraalVM Native Image (AOT Compilation)**: Spring Boot 3 features first-class Ahead-of-Time (AOT) compilation. Using GraalVM, bytecode is analyzed at build time, dead code is pruned, and a standalone machine executable is produced that starts in 10 to 50 milliseconds and uses one-fifth the RAM of a JVM.
+- **Micrometer Tracing**: Spring Cloud Sleuth was completely retired in Spring Boot 3. All distributed tracing is now handled natively by Micrometer Tracing.
+- **OpenRewrite**: An automated source-code refactoring engine that parses Java Abstract Syntax Trees (ASTs) and executes recipes to update imports, dependencies, and deprecated methods automatically.
 
 ---
 
 ### 9.1 The Java 17 Baseline & Java EE to Jakarta EE Namespace Migration
 
-The most pervasive change in Spring Boot 3 is the migration from `javax.*` to `jakarta.*` for all enterprise APIs.
+The most pervasive change in Spring Boot 3 is the migration from `javax.*` to `jakarta.*`. Every Java file utilizing servlets, JPA, or validation must be updated.
 
-#### Namespace Conversion Table
+#### Comprehensive Namespace Conversion Table
 
-The following mapping table details the mandatory package namespace replacements required across common enterprise specifications:
-
-| Specification | Spring Boot 2.x (Legacy Java EE) | Spring Boot 3.0 (Modern Jakarta EE 10) |
+| Specification | Spring Boot 2.x (Legacy Java EE) | Spring Boot 3.x (Modern Jakarta EE 10) |
 | :--- | :--- | :--- |
-| **Servlet API** | `javax.servlet.http.HttpServletRequest` | `jakarta.servlet.http.HttpServletRequest` |
-| **JPA / ORM** | `javax.persistence.Entity`, `@Table`, `@Id` | `jakarta.persistence.Entity`, `@Table`, `@Id` |
-| **Bean Validation** | `javax.validation.constraints.NotNull` | `jakarta.validation.constraints.NotNull` |
-| **Lifecycle Annotations** | `javax.annotation.PostConstruct`, `@PreDestroy` | `jakarta.annotation.PostConstruct`, `@PreDestroy` |
+| **Servlet API** | `javax.servlet.http.HttpServletRequest`<br>`javax.servlet.Filter` | `jakarta.servlet.http.HttpServletRequest`<br>`jakarta.servlet.Filter` |
+| **JPA / ORM** | `javax.persistence.Entity`<br>`javax.persistence.Table`<br>`javax.persistence.Id`<br>`javax.persistence.OneToMany` | `jakarta.persistence.Entity`<br>`jakarta.persistence.Table`<br>`jakarta.persistence.Id`<br>`jakarta.persistence.OneToMany` |
+| **Bean Validation** | `javax.validation.constraints.NotNull`<br>`javax.validation.constraints.NotBlank`<br>`javax.validation.Valid` | `jakarta.validation.constraints.NotNull`<br>`jakarta.validation.constraints.NotBlank`<br>`jakarta.validation.Valid` |
+| **Common Annotations** | `javax.annotation.PostConstruct`<br>`javax.annotation.PreDestroy` | `jakarta.annotation.PostConstruct`<br>`jakarta.annotation.PreDestroy` |
 | **Transactions** | `javax.transaction.Transactional` | `jakarta.transaction.Transactional` |
+| **JavaMail** | `javax.mail.internet.MimeMessage` | `jakarta.mail.internet.MimeMessage` |
+| **WebSockets** | `javax.websocket.OnMessage` | `jakarta.websocket.OnMessage` |
 
-#### Code Transformation Example
+> [!WARNING]
+> **Do NOT Replace JDK Core `javax.*` Packages!**
+> Only enterprise packages were migrated to `jakarta.*`. Standard JDK packages such as `javax.crypto.*`, `javax.net.ssl.*`, and `javax.sql.DataSource` remain part of the Java standard library and must **NOT** be changed to `jakarta.*`!
 
-Review the direct import statement diff between legacy Java EE and modern Jakarta EE 10:
+#### The Third-Party Library Graveyard
 
-The following code contrasts legacy Java EE imports with modern Jakarta EE imports:
+One of the most common causes of migration failure is outdated third-party libraries that still depend on `javax.*`:
 
-```java
-// BEFORE (Spring Boot 2.x - Fails compilation in Boot 3):
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.annotation.PostConstruct;
-
-// AFTER (Spring Boot 3.x - Required Jakarta EE 10 baseline):
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.annotation.PostConstruct;
-```
+1. **Springfox Swagger 2 (`springfox-boot-starter`)**:
+   - **Status**: Completely abandoned and incompatible with Spring Boot 3.
+   - **Fix**: Replace immediately with **SpringDoc OpenAPI v2**:
+     ```xml
+     <dependency>
+         <groupId>org.springdoc</groupId>
+         <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+         <version>2.5.0</version>
+     </dependency>
+     ```
+2. **Legacy Jackson JAXB Modules**:
+   - Replace `jackson-module-jaxb-annotations` with `jakarta.xml.bind-api` compatible versions.
+3. **Embedded Databases**:
+   - Upgrade H2 to version 2.1+ (H2 v1.x databases will fail to parse modern SQL).
 
 ---
 
-### 9.2 Modern Security Configuration Updates
+### 9.2 Modern Security Configuration Updates (Spring Security 6)
 
-In Spring Boot 2.x, security was configured by extending `WebSecurityConfigurerAdapter` and overriding `configure(HttpSecurity http)`. In Spring Boot 3.0, this class has been completely deleted.
+In Spring Boot 2.x, security was declared by extending `WebSecurityConfigurerAdapter` and overriding `configure(HttpSecurity http)`. In Spring Boot 3.0 / Spring Security 6, this class was **completely deleted**.
 
-#### Complete Refactoring Example
+Furthermore, Spring Security 6 made the **Lambda DSL mandatory**, deprecating the old chained `.and()` syntax.
 
-Compare the legacy adapter pattern with the modern standalone `SecurityFilterChain` bean approach:
-
-The following code illustrates the complete refactoring from legacy adapter to modern bean:
+#### The Complete Security Refactoring Comparison:
 
 ```java
-// BEFORE (Spring Boot 2.x - DELETED in Boot 3):
+// ==============================================================================
+// BEFORE: Spring Boot 2.x (Legacy WebSecurityConfigurerAdapter - DELETED IN BOOT 3)
+// ==============================================================================
 @Configuration
 public class LegacySecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-            .antMatchers("/public/**").permitAll()
-            .anyRequest().authenticated()
+        http
+            .csrf().disable() // Chained syntax with .and()
+            .authorizeRequests()
+                .antMatchers("/public/**").permitAll() // antMatchers() DELETED
+                .antMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
             .and()
-            .httpBasic();
+            .httpBasic()
+            .and()
+            .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }
 
-// AFTER (Spring Boot 3.x - Modern Component-Based Lambda DSL):
+// ==============================================================================
+// AFTER: Spring Boot 3.x (Modern Component-Based Lambda DSL)
+// ==============================================================================
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity // Replaces @EnableGlobalMethodSecurity
 public class ModernSecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+            // 1. Functional lambda DSL (No .and() chains!)
+            .csrf(AbstractHttpConfigurer::disable)
+            
+            // 2. Stateless session policy via lambda
+            .sessionManagement(session -> 
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // 3. authorizeHttpRequests replaces authorizeRequests
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/public/**").permitAll() // antMatchers() is replaced by requestMatchers()
+                // requestMatchers() replaces antMatchers() and mvcMatchers()
+                .requestMatchers("/public/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
+            
+            // 4. httpBasic using Customizer
             .httpBasic(Customizer.withDefaults())
+            
             .build();
     }
 }
 ```
 
+#### Summary of Security Breaking Changes:
+
+| Spring Boot 2.x / Security 5.x | Spring Boot 3.x / Security 6.x | Reason for Change |
+| :--- | :--- | :--- |
+| `extends WebSecurityConfigurerAdapter` | `@Bean SecurityFilterChain` | Favors composition over inheritance. |
+| `.authorizeRequests()` | `.authorizeHttpRequests()` | Enhanced performance and simplified authorization rules. |
+| `.antMatchers()`, `.mvcMatchers()` | `.requestMatchers()` | Unified matching eliminates security bypasses from URL pattern differences. |
+| Chained `.and()` methods | Lambda DSL `auth -> auth...` | Prevents ambiguous chaining and improves IDE code completion. |
+| `@EnableGlobalMethodSecurity` | `@EnableMethodSecurity` | Modernized method-level security with faster SpEL evaluation. |
+
 ---
 
-### 9.3 Configuration Property Removals & Renames
+### 9.3 Hibernate 6 & Spring Data 3 Breaking Changes
 
-Spring Boot 3 renamed or relocated several common `application.yml` properties:
+Spring Boot 3 upgrades Hibernate from 5.6 to **Hibernate 6.x**, which introduces an entirely rewritten **Semantic Query Model (SQM)**:
 
-| Spring Boot 2.x Property | Spring Boot 3.x Replacement |
-| :--- | :--- |
-| `spring.redis.host` | `spring.data.redis.host` |
-| `spring.redis.port` | `spring.data.redis.port` |
-| `server.max-http-header-size` | `server.max-http-request-header-size` |
-| `management.metrics.export.prometheus.enabled` | `management.prometheus.metrics.export.enabled` |
+1. **Strict JPQL Type Checking**:
+   In Hibernate 5, arithmetic operations and functions were loosely typed. In Hibernate 6, types are strictly validated. For example:
+   ```java
+   // In Hibernate 5: This might return an Integer or BigInteger
+   // In Hibernate 6: COUNT() strictly returns a java.lang.Long!
+   Long userCount = entityManager.createQuery("SELECT COUNT(u) FROM User u", Long.class).getSingleResult();
+   ```
+2. **Automatic Batch Fetching**:
+   Hibernate 6 includes a brand-new query execution plan cache that reduces SQL generation overhead by over 40%.
+3. **Sequence Generators**:
+   The default table and sequence naming convention changed. If you relied on Hibernate 5's automatic sequence names (`hibernate_sequence`), add this property to maintain backward compatibility:
+   ```yaml
+   spring:
+     jpa:
+       properties:
+         hibernate:
+           id:
+             db_structure_naming_strategy: legacy
+   ```
+4. **Spring Data `findById` Semantics**:
+   `CrudRepository.findById()` returns `Optional<T>`. Calling `.get()` directly without checking `.isPresent()` will throw `NoSuchElementException`. Always use `.orElseThrow(() -> new ResourceNotFoundException(...))`.
 
-#### Using the Properties Migrator
+---
 
-To assist during migration, Spring Boot provides a temporary migrator module that diagnoses legacy properties on startup:
+### 9.4 Migrating Distributed Tracing: The Sleuth to Micrometer Transition
 
-Add the migrator dependency to `pom.xml`:
+One of the biggest architectural removals in Spring Boot 3 is **Spring Cloud Sleuth**. 
+
+> [!CAUTION]
+> **Spring Cloud Sleuth is Deprecated and Dead**:
+> `spring-cloud-starter-sleuth` does **NOT** exist in Spring Boot 3 and will fail to resolve in Maven!
+
+#### How to Migrate to Micrometer Tracing:
+
+1. **Remove Old Dependency**:
+   Remove `spring-cloud-starter-sleuth` from `pom.xml`.
+2. **Add Modern Micrometer Tracing Starters**:
+   ```xml
+   <!-- Micrometer Tracing Facade -->
+   <dependency>
+       <groupId>io.micrometer</groupId>
+       <artifactId>micrometer-tracing-bridge-brave</artifactId> <!-- Or micrometer-tracing-bridge-otel -->
+   </dependency>
+   
+   <!-- Reporter for Zipkin -->
+   <dependency>
+       <groupId>io.zipkin.reporter2</groupId>
+       <artifactId>zipkin-reporter-brave</artifactId>
+   </dependency>
+   ```
+3. **Update Application Properties**:
+   Replace legacy Sleuth property keys:
+   ```yaml
+   # OLD (Spring Boot 2.x Sleuth):
+   # spring.sleuth.sampler.probability: 1.0
+   # spring.zipkin.base-url: http://localhost:9411
+
+   # NEW (Spring Boot 3.x Micrometer):
+   management:
+     tracing:
+       sampling:
+         probability: 1.0 # 100% of requests sampled
+     zipkin:
+       tracing:
+         endpoint: http://localhost:9411/api/v2/spans
+   ```
+
+---
+
+### 9.5 The Spring Boot 3.x Feature Roadmap (3.1, 3.2, 3.3, 3.4)
+
+When upgrading to Spring Boot 3, do not stop at 3.0! Take advantage of the game-changing features introduced across minor releases:
+
+```mermaid
+timeline
+    title Spring Boot 3 Innovation Timeline
+    Spring Boot 3.0 (Nov 2022) : Java 17 Baseline : Jakarta EE 10 : GraalVM AOT Compilation : ProblemDetail RFC 7807
+    Spring Boot 3.1 (May 2023) : Docker Compose Auto-Lifecycle : Testcontainers @ServiceConnection : ConnectionDetails Abstraction
+    Spring Boot 3.2 (Nov 2023) : RestClient Fluent HTTP Client : Java 21 Virtual Threads Support : Declarative @HttpExchange Improvements
+    Spring Boot 3.3 & 3.4 (2024+) : Class Data Sharing (CDS) Support : Structured JSON Logging : Extended GraalVM Native Hints
+```
+
+#### Highlights of the 3.x Line:
+
+- **Spring Boot 3.1: `@ServiceConnection`**: Eliminates `@DynamicPropertySource` in Testcontainers integration tests.
+- **Spring Boot 3.1: `spring-boot-docker-compose`**: Automatically detects `compose.yaml` and starts local databases on application boot.
+- **Spring Boot 3.2: `RestClient`**: Modern synchronous HTTP client replacing verbose `RestTemplate`.
+- **Spring Boot 3.2: Virtual Threads**: Enabling `spring.threads.virtual.enabled=true` automatically switches embedded Tomcat and `@Async` executors to lightweight Java 21 Virtual Threads, boosting I/O throughput by 300%.
+
+---
+
+### 9.6 Automated Migration with OpenRewrite
+
+Manually editing hundreds of imports, changing POM dependencies, and rewriting security configs across thousands of files is error-prone. **OpenRewrite** automates this entire process using deterministic Abstract Syntax Tree (AST) recipes.
+
+#### Step 1: Add OpenRewrite to Your Legacy `pom.xml`
 
 ```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-properties-migrator</artifactId>
-    <scope>runtime</scope>
-</dependency>
+<plugin>
+    <groupId>org.openrewrite.maven</groupId>
+    <artifactId>rewrite-maven-plugin</artifactId>
+    <version>5.38.0</version>
+    <configuration>
+        <activeRecipes>
+            <recipe>org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0</recipe>
+        </activeRecipes>
+    </configuration>
+    <dependencies>
+        <dependency>
+            <groupId>org.openrewrite.recipe</groupId>
+            <artifactId>rewrite-spring</artifactId>
+            <version>5.10.0</version>
+        </dependency>
+    </dependencies>
+</plugin>
 ```
 
-On application boot, this module inspects your properties, logs warning messages for deprecated keys, and temporarily maps them to their Boot 3 equivalents in memory. Remove this dependency once all properties have been updated.
+#### Step 2: Preview the Changes with `dryRun`
 
----
-
-### 9.4 Spring Data 3 and Actuator 3 Breaking Changes
-
-Spring Data 3 made major breaking changes to reactive and derived query methods:
-- **`CrudRepository.findById()`**: Returns an `Optional<T>`. Calling `.get()` on an empty optional throws `NoSuchElementException`.
-- **Actuator Health Grouping**: Health groups are now declared strictly under `management.endpoint.health.group.<name>.include`.
-
----
-
-### 9.5 Automated Codebase Migration with OpenRewrite
-
-Instead of manually editing imports and properties across thousands of files, **OpenRewrite** automates 90% of the Spring Boot 3 migration work.
-
-#### Running the Spring Boot 3 Migration Recipe
-
-Add the OpenRewrite Maven plugin to your project `pom.xml` and run the migration recipe:
-
-The following Maven command executes the automated Spring Boot 3 migration recipe:
+Run the dry-run goal to generate a Git-style patch without modifying your files:
 
 ```bash
-mvn org.openrewrite.maven:rewrite-maven-plugin:run   -Drewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:RELEASE   -Drewrite.activeRecipes=org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0
+mvn rewrite:dryRun
 ```
 
-#### What OpenRewrite Performs Automatically
+Inspect the generated `target/rewrite/patch.diff` to review all proposed transformations.
 
-The OpenRewrite recipe scans your source tree and performs deterministic transformations:
-1. Replaces all `javax.*` imports with `jakarta.*` across all `.java` files.
-2. Updates Maven `pom.xml` dependencies and properties to Java 17 and Spring Boot 3.x.
-3. Migrates `WebSecurityConfigurerAdapter` to `@Bean SecurityFilterChain`.
-4. Replaces deprecated `.antMatchers()` with `.requestMatchers()`.
+#### Step 3: Execute the Automated Upgrade
+
+Apply the transformations directly to your source files:
+
+```bash
+mvn rewrite:run
+```
+
+##### What OpenRewrite Performs Automatically in Seconds:
+1. Rewrites all `javax.servlet.*`, `javax.persistence.*`, `javax.validation.*`, and `javax.annotation.*` imports to `jakarta.*`.
+2. Updates Maven POM parent version to `3.0.x` and sets `java.version` to `17`.
+3. Replaces `WebSecurityConfigurerAdapter` with `@Bean SecurityFilterChain`.
+4. Replaces `.antMatchers()` with `.requestMatchers()`.
+5. Renames removed configuration properties in `application.yml`.
+
+---
+
+### 9.7 The 10-Step Production Upgrade Playbook (Checklist)
+
+Follow this battle-tested checklist when migrating production microservices:
+
+```text
+[ ] Step 1: Upgrade to the latest Spring Boot 2.7.x release first!
+            (Ensure zero deprecation warnings on Boot 2.7 before leaping to 3.0).
+[ ] Step 2: Upgrade JDK to Java 17 LTS (or Java 21 LTS) and ensure tests pass on Boot 2.7.
+[ ] Step 3: Run the temporary Properties Migrator to flag deprecated keys:
+            (Add spring-boot-properties-migrator to pom.xml).
+[ ] Step 4: Audit third-party libraries for Jakarta EE 10 compatibility
+            (Replace Springfox Swagger with SpringDoc OpenAPI v2).
+[ ] Step 5: Execute OpenRewrite to automate namespace and security migrations:
+            (mvn rewrite:run).
+[ ] Step 6: Migrate Spring Cloud Sleuth to Micrometer Tracing.
+[ ] Step 7: Refactor Spring Security to use the Lambda DSL and requestMatchers.
+[ ] Step 8: Update Hibernate 6 JPQL queries to verify strict type handling.
+[ ] Step 9: Remove the spring-boot-properties-migrator dependency.
+[ ] Step 10: Run the full integration test suite with Testcontainers to verify runtime behavior!
+```
 
 ---
 
@@ -8650,20 +10117,38 @@ Test your comprehension of Spring Boot 3 upgrade requirements.
 
 #### Exercise 9.1: Identifying Namespace Equivalents
 
-**Task**: What is the Jakarta EE replacement for `javax.servlet.Filter`?
+**Task**: What is the Jakarta EE replacement for `javax.servlet.Filter` and `javax.validation.constraints.NotNull`?
 
 **Explanation**:
-The replacement is `jakarta.servlet.Filter`, packaged inside `jakarta.servlet-api`.
+- `javax.servlet.Filter` $\rightarrow$ `jakarta.servlet.Filter` (packaged in `jakarta.servlet:jakarta.servlet-api`).
+- `javax.validation.constraints.NotNull` $\rightarrow$ `jakarta.validation.constraints.NotNull` (packaged in `jakarta.validation:jakarta.validation-api`).
 
-#### Exercise 9.2: Refactoring antMatchers
+#### Exercise 9.2: Refactoring antMatchers & Lambda DSL
 
-**Task**: Refactor the legacy security rule `.antMatchers(HttpMethod.GET, "/api/**").hasRole("USER")` to Spring Boot 3 syntax.
-
-The following snippet demonstrates modern request matcher syntax:
-
+**Task**: Refactor the following legacy security snippet to valid Spring Boot 3 syntax:
 ```java
-.requestMatchers(HttpMethod.GET, "/api/**").hasRole("USER")
+http.csrf().disable()
+    .authorizeRequests()
+    .antMatchers(HttpMethod.GET, "/api/**").hasRole("USER")
+    .anyRequest().authenticated();
 ```
+
+**Solution**:
+```java
+http
+    .csrf(AbstractHttpConfigurer::disable)
+    .authorizeHttpRequests(auth -> auth
+        .requestMatchers(HttpMethod.GET, "/api/**").hasRole("USER")
+        .anyRequest().authenticated()
+    );
+```
+
+#### Exercise 9.3: Sleuth Replacement
+
+**Task**: A developer complains that their microservice fails to compile after upgrading to Spring Boot 3 because Maven cannot find `spring-cloud-starter-sleuth`. What is the resolution?
+
+**Explanation**:
+Spring Cloud Sleuth was retired in Spring Boot 3. The developer must remove `spring-cloud-starter-sleuth` and replace it with `io.micrometer:micrometer-tracing-bridge-brave` (or `micrometer-tracing-bridge-otel`) and configure `management.tracing.sampling.probability` in `application.yml`.
 
 ---
 
