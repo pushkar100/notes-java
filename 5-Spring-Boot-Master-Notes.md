@@ -25,6 +25,7 @@ Navigate directly to any module, architectural concept, code reference, or pract
     - [1.7 Living API Documentation with OpenAPI & Swagger UI](#17-living-api-documentation-with-openapi-swagger-ui)
     - [1.8 Testing the Web Layer with `@WebMvcTest` and `MockMvc`](#18-testing-the-web-layer-with-webmvctest-and-mockmvc)
     - [1.9 Consuming Downstream APIs with `RestClient` and WireMock](#19-consuming-downstream-apis-with-restclient-and-wiremock)
+    - [1.10 Real-Time Server Push: Server-Sent Events (SSE) with SseEmitter](#110-real-time-server-push-server-sent-events-sse-with-sseemitter)
     - [Chapter 1 Exercises & Solutions](#chapter-1-exercises-solutions)
   - [Chapter 2: Securing Spring Boot Applications with OAuth2](#chapter-2-securing-spring-boot-applications-with-oauth2)
     - [2.0 The Spring Security Mental Model](#20-the-spring-security-mental-model)
@@ -34,6 +35,7 @@ Navigate directly to any module, architectural concept, code reference, or pract
     - [2.4 OAuth2 & OpenID Connect (OIDC) Protocol Architecture](#24-oauth2-openid-connect-oidc-protocol-architecture)
     - [2.5 Configuring an OAuth2 Resource Server with JWTs](#25-configuring-an-oauth2-resource-server-with-jwts)
     - [2.6 Single Sign-On (SSO) with OAuth2 Client Login](#26-single-sign-on-sso-with-oauth2-client-login)
+    - [2.7 Working with JWTs: Generation, Custom Filter, and Refresh Tokens](#27-working-with-jwts-generation-custom-filter-and-refresh-tokens)
     - [Chapter 2 Exercises & Solutions](#chapter-2-exercises-solutions)
   - [Chapter 3: Observability, Monitoring, and Application Management](#chapter-3-observability-monitoring-and-application-management)
     - [3.0 The Four Pillars of Observability](#30-the-four-pillars-of-observability)
@@ -41,6 +43,7 @@ Navigate directly to any module, architectural concept, code reference, or pract
     - [3.2 Authoring Custom Health Indicators](#32-authoring-custom-health-indicators)
     - [3.3 Publishing Metrics to Prometheus with Micrometer](#33-publishing-metrics-to-prometheus-with-micrometer)
     - [3.4 Distributed Tracing with Micrometer Tracing & Zipkin](#34-distributed-tracing-with-micrometer-tracing-zipkin)
+    - [3.5 Enterprise Logging: SLF4J, Logback, and Log4j2](#35-enterprise-logging-slf4j-logback-and-log4j2)
     - [Chapter 3 Exercises & Solutions](#chapter-3-exercises-solutions)
   - [Chapter 4: Spring Cloud and Microservices Architecture](#chapter-4-spring-cloud-and-microservices-architecture)
     - [4.0 Microservices Design Principles & Challenges](#40-microservices-design-principles-challenges)
@@ -60,6 +63,7 @@ Navigate directly to any module, architectural concept, code reference, or pract
     - [5.6 The N+1 Query Problem: Complete Deep Dive](#56-the-n1-query-problem-complete-deep-dive)
     - [5.7 Database Schema Version Control with Flyway](#57-database-schema-version-control-with-flyway)
     - [5.8 Transaction Management with `@Transactional`](#58-transaction-management-with-transactional)
+    - [5.8.1 Concurrency Control: Optimistic vs Pessimistic Locking](#581-concurrency-control-optimistic-vs-pessimistic-locking)
     - [5.9 Automated Integration Testing with Testcontainers](#59-automated-integration-testing-with-testcontainers)
     - [Chapter 5 Exercises & Comprehensive Scenarios with Solutions](#chapter-5-exercises-comprehensive-scenarios-with-solutions)
   - [Chapter 6: Data Persistence and NoSQL Database Integration with Spring Data](#chapter-6-data-persistence-and-nosql-database-integration-with-spring-data)
@@ -76,12 +80,14 @@ Navigate directly to any module, architectural concept, code reference, or pract
     - [7.3 Concurrency Evolution: Java 21 Virtual Threads (Project Loom)](#73-concurrency-evolution-java-21-virtual-threads-project-loom)
     - [7.4 JVM Profiling, Memory Leaks, and Garbage Collection Tuning](#74-jvm-profiling-memory-leaks-and-garbage-collection-tuning)
     - [7.5 Production Observability: Prometheus & Grafana Performance Dashboards](#75-production-observability-prometheus-grafana-performance-dashboards)
+    - [7.6 Task Scheduling and Distributed Locking with ShedLock and Redis](#76-task-scheduling-and-distributed-locking-with-shedlock-and-redis)
     - [Chapter 7 Exercises & Solutions](#chapter-7-exercises-solutions)
   - [Chapter 8: Spring Reactive and Spring Cloud Stream](#chapter-8-spring-reactive-and-spring-cloud-stream)
     - [8.0 Reactive Streams Mental Model: Mono and Flux](#80-reactive-streams-mental-model-mono-and-flux)
     - [8.1 Building Reactive REST APIs with Spring WebFlux](#81-building-reactive-rest-apis-with-spring-webflux)
     - [8.2 Non-Blocking Relational Persistence with Spring Data R2DBC](#82-non-blocking-relational-persistence-with-spring-data-r2dbc)
     - [8.3 Event-Driven Messaging with Spring Cloud Stream and RabbitMQ](#83-event-driven-messaging-with-spring-cloud-stream-and-rabbitmq)
+    - [8.4 Pub/Sub and Event Streaming with Apache Kafka & Reactive Spring](#84-pubsub-and-event-streaming-with-apache-kafka--reactive-spring)
     - [Chapter 8 Exercises & Solutions](#chapter-8-exercises-solutions)
 - [**Part 4: Upgrading to Spring Boot 3 from Previous Versions**](#part-4-upgrading-to-spring-boot-3-from-previous-versions)
   - [Chapter 9: Upgrading from Spring Boot 2.x to Spring Boot 3.0](#chapter-9-upgrading-from-spring-boot-2x-to-spring-boot-30)
@@ -2168,6 +2174,324 @@ class CurrencyClientServiceTest {
 
 ---
 
+### 1.10 Real-Time Server Push: Server-Sent Events (SSE) with SseEmitter
+
+Modern web applications require instantaneous updates: order status notifications, live stock quotes, sports tickers, or streaming token-by-token responses from generative AI models. 
+
+#### What is Server-Sent Events (SSE)?
+
+**Server-Sent Events (SSE)** is an open W3C standard that allows a server to push real-time event notifications to a web client over a standard persistent HTTP connection (`text/event-stream`).
+
+Unlike standard REST requests where the server returns a response and terminates the socket, an SSE endpoint leaves the HTTP response socket open indefinitely, streaming discrete text payloads whenever an event occurs on the server.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Browser as Client Browser (JavaScript EventSource)
+    participant Spring as Spring MVC (SseEmitter)
+    participant Worker as Background Event / Service Layer
+
+    Browser->>Spring: GET /api/v1/notifications/subscribe (Accept: text/event-stream)
+    Note over Spring: Spring keeps HTTP socket open (HTTP 200 OK)
+    Spring-->>Browser: Connection Established (Content-Type: text/event-stream)
+
+    loop Event Broadcasts
+        Worker->>Spring: send(NotificationEvent)
+        Spring-->>Browser: data: {"id": 101, "message": "Order #482 Shipped!"}\n\n
+    end
+
+    loop Keep-Alive Heartbeat (Every 15s)
+        Spring-->>Browser: :ping (comment line prevents proxy timeout)\n\n
+    end
+
+    alt Client Network Disconnects
+        Browser->>Spring: Reconnects automatically with Header: Last-Event-ID: 101
+    end
+```
+
+#### SSE vs WebSockets vs Polling: Architectural Comparison
+
+Choosing the correct real-time protocol is critical to system scalability:
+
+| Feature | Short Polling | Long Polling | Server-Sent Events (SSE) | WebSockets |
+| :--- | :--- | :--- | :--- | :--- |
+| **Communication Direction** | Client $\rightarrow$ Server | Client $\rightarrow$ Server | **Server $\rightarrow$ Client (Unidirectional)** | **Full Duplex (Bidirectional)** |
+| **Underlying Protocol** | Standard HTTP/1.1 | Standard HTTP/1.1 | **Standard HTTP/1.1 or HTTP/2** | TCP Upgrade (`ws://` or `wss://`) |
+| **Automatic Reconnection** | Manual (`setInterval`) | Manual loop | **Built into browser standard (`EventSource`)** | Manual JavaScript implementation |
+| **Firewall / Proxy Friendly** | Yes | Yes | **Yes (Pure standard HTTP)** | Often blocked or requires special proxy config |
+| **Server Overhead** | Very High (repeated handshakes) | Moderate | **Low (Single persistent HTTP socket)** | Low (Binary frame streaming) |
+| **Best Use Cases** | Low-frequency checks | Legacy fallbacks | **Live notifications, stock updates, AI token streaming** | **Multiplayer gaming, collaborative editing, chat apps** |
+
+> [!TIP]
+> **Rule of Thumb**: If your clients only need to **receive** real-time updates from the server (e.g., "Your payment was processed", "Flight status updated"), **use SSE**. It runs over standard HTTP, avoids custom WebSocket handshake complexity, and comes with built-in browser reconnection logic!
+
+---
+
+#### How SseEmitter Works in Spring MVC
+
+In standard Spring MVC, request threads are drawn from Tomcat's thread pool. If an endpoint left a thread blocked waiting for events, Tomcat's default 200 threads would be exhausted in seconds!
+
+To solve this, Spring MVC uses **`SseEmitter`** (an implementation of asynchronous request processing). When a controller returns an `SseEmitter`:
+1. Spring detaches the Tomcat worker thread and returns it to the pool immediately.
+2. The underlying HTTP connection remains open in Tomcat's NIO non-blocking connector.
+3. When your application calls `emitter.send()`, a lightweight thread writes the data frame to the client.
+4. When the emitter completes or times out, the socket is cleanly closed.
+
+---
+
+#### Complete Production Implementation: Live Notification System
+
+Here is a production-grade, thread-safe notification system supporting individual user subscriptions, topic broadcasting, and heartbeat keep-alives.
+
+##### Step 1: The Notification Event DTO
+
+```java
+package com.example.demo.notification.dto;
+
+import java.time.Instant;
+
+public record NotificationDto(
+        String id,
+        String userId,
+        String title,
+        String message,
+        Instant timestamp
+) {}
+```
+
+##### Step 2: Thread-Safe `SseNotificationService`
+
+This service manages active subscriber connections in a `ConcurrentHashMap`, handles lifecycle callbacks (`onCompletion`, `onTimeout`, `onError`), and sends periodic heartbeats to prevent intermediate proxies (Nginx, AWS ALB) from closing idle connections.
+
+```java
+package com.example.demo.notification.service;
+
+import com.example.demo.notification.dto.NotificationDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+@Service
+public class SseNotificationService {
+
+    private static final Logger log = LoggerFactory.getLogger(SseNotificationService.class);
+
+    // Timeout: 30 minutes in milliseconds (0L = indefinite, but not recommended in production)
+    private static final Long EMITTER_TIMEOUT = 30 * 60 * 1000L;
+
+    // Thread-safe map tracking multiple client tabs/connections per userId
+    private final Map<String, CopyOnWriteArrayList<SseEmitter>> userEmitters = new ConcurrentHashMap<>();
+
+    /**
+     * Creates a new persistent SSE connection for a specific user.
+     */
+    public SseEmitter subscribe(String userId) {
+        SseEmitter emitter = new SseEmitter(EMITTER_TIMEOUT);
+
+        userEmitters.computeIfAbsent(userId, k -> new CopyOnWriteArrayList<>()).add(emitter);
+
+        // Lifecycle cleanup callbacks
+        emitter.onCompletion(() -> {
+            log.info("SSE connection completed for user: {}", userId);
+            removeEmitter(userId, emitter);
+        });
+
+        emitter.onTimeout(() -> {
+            log.warn("SSE connection timed out for user: {}", userId);
+            emitter.complete();
+            removeEmitter(userId, emitter);
+        });
+
+        emitter.onError((ex) -> {
+            log.error("SSE connection error for user: {}: {}", userId, ex.getMessage());
+            removeEmitter(userId, emitter);
+        });
+
+        // Send an initial handshake event so client knows connection succeeded
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("INIT")
+                    .id("init-" + System.currentTimeMillis())
+                    .data("Connected to live notification stream"));
+        } catch (IOException e) {
+            log.error("Failed to send INIT handshake to user {}", userId, e);
+            removeEmitter(userId, emitter);
+        }
+
+        return emitter;
+    }
+
+    /**
+     * Pushes a real-time notification to all active devices of a specific user.
+     */
+    public void sendToUser(String userId, NotificationDto notification) {
+        CopyOnWriteArrayList<SseEmitter> emitters = userEmitters.get(userId);
+        if (emitters == null || emitters.isEmpty()) {
+            log.debug("No active SSE connections for user: {}", userId);
+            return;
+        }
+
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("NOTIFICATION")
+                        .id(notification.id())
+                        .data(notification));
+            } catch (IOException e) {
+                log.warn("Dead emitter detected while sending to user {}. Cleaning up.", userId);
+                removeEmitter(userId, emitter);
+            }
+        }
+    }
+
+    /**
+     * Broadcasts a notification to every connected client across the system.
+     */
+    public void broadcast(NotificationDto notification) {
+        userEmitters.forEach((userId, emitters) -> {
+            sendToUser(userId, notification);
+        });
+    }
+
+    /**
+     * Keep-alive ping sent every 20 seconds.
+     * Intermediate firewalls and cloud proxies terminate idle TCP sockets if no bytes are sent!
+     */
+    @Scheduled(fixedRate = 20000)
+    public void sendHeartbeat() {
+        userEmitters.forEach((userId, emitters) -> {
+            for (SseEmitter emitter : emitters) {
+                try {
+                    // SSE comments start with a colon ':' and are ignored by client event handlers
+                    emitter.send(SseEmitter.event().comment("ping"));
+                } catch (IOException e) {
+                    removeEmitter(userId, emitter);
+                }
+            }
+        });
+    }
+
+    private void removeEmitter(String userId, SseEmitter emitter) {
+        CopyOnWriteArrayList<SseEmitter> emitters = userEmitters.get(userId);
+        if (emitters != null) {
+            emitters.remove(emitter);
+            if (emitters.isEmpty()) {
+                userEmitters.remove(userId);
+            }
+        }
+    }
+}
+```
+
+##### Step 3: The Notification REST Controller
+
+```java
+package com.example.demo.notification.controller;
+
+import com.example.demo.notification.dto.NotificationDto;
+import com.example.demo.notification.service.SseNotificationService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/notifications")
+public class NotificationController {
+
+    private final SseNotificationService notificationService;
+
+    public NotificationController(SseNotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
+    /**
+     * Client subscribes to live updates.
+     * NOTE: produces = MediaType.TEXT_EVENT_STREAM_VALUE is MANDATORY for SSE!
+     */
+    @GetMapping(value = "/subscribe/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribe(@PathVariable String userId) {
+        return notificationService.subscribe(userId);
+    }
+
+    /**
+     * Endpoint to simulate an event trigger (e.g. called by payment service or admin).
+     */
+    @PostMapping("/send/{userId}")
+    public ResponseEntity<Void> sendNotification(
+            @PathVariable String userId,
+            @RequestParam String title,
+            @RequestParam String message) {
+
+        NotificationDto dto = new NotificationDto(
+                UUID.randomUUID().toString(),
+                userId,
+                title,
+                message,
+                Instant.now()
+        );
+
+        notificationService.sendToUser(userId, dto);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+}
+```
+
+##### Step 4: Client-Side Consumption (HTML5 / JavaScript)
+
+Connecting to an SSE stream in the browser requires just a few lines of native JavaScript:
+
+```javascript
+// Native browser API — no external npm packages or libraries required!
+const userId = "user-123";
+const eventSource = new EventSource(`/api/v1/notifications/subscribe/${userId}`);
+
+// 1. Listen for connection opening
+eventSource.onopen = () => {
+    console.log("Connected to live notification stream!");
+};
+
+// 2. Listen for custom named event: "NOTIFICATION"
+eventSource.addEventListener("NOTIFICATION", (event) => {
+    const notification = JSON.parse(event.data);
+    console.log("Received notification:", notification);
+    alert(`[${notification.title}] ${notification.message}`);
+});
+
+// 3. Listen for errors & auto-reconnect
+eventSource.onerror = (error) => {
+    console.error("SSE stream error. Browser will automatically retry connection...", error);
+};
+```
+
+---
+
+#### 4 Critical Production Gotchas for SSE
+
+1. **Proxy Buffering (Nginx / Cloudflare)**:
+   - By default, reverse proxies like Nginx buffer HTTP responses until a full block is received. This ruins real-time streaming!
+   - **Fix**: In Nginx, add the header: `proxy_set_header X-Accel-Buffering no;`.
+2. **HTTP/1.1 Connection Limits**:
+   - Browsers allow a maximum of **6 concurrent open HTTP/1.1 connections** per domain. If a user opens 6 tabs with SSE, a 7th tab will freeze!
+   - **Fix**: Use **HTTP/2**. Under HTTP/2, all streams are multiplexed over a single TCP connection, allowing hundreds of active streams per domain.
+3. **Always Clean Up on Disconnect**:
+   - Forgetting to register `emitter.onCompletion()` or `emitter.onTimeout()` leads to memory leaks as dead sockets accumulate in your map.
+4. **Periodic Heartbeats Are Mandatory**:
+   - AWS Application Load Balancers (ALB) terminate idle connections after 60 seconds. A scheduled `:ping` event every 15–20 seconds keeps the socket active.
+
+---
+
 ### Chapter 1 Exercises & Solutions
 
 Test your comprehension of Spring Web MVC, parameter binding, validation, and testing.
@@ -2596,6 +2920,387 @@ When users navigate to a protected page, Spring Boot automatically redirects the
 
 ---
 
+### 2.7 Working with JWTs: Generation, Custom Filter, and Refresh Tokens
+
+While Section 2.5 demonstrated using Spring Boot as an OAuth2 Resource Server relying on an external identity provider (like Keycloak), many production systems require Spring Boot to **issue, sign, and validate its own JSON Web Tokens (JWTs)** internally.
+
+#### What is a JSON Web Token (JWT)?
+
+A **JWT** is a compact, URL-safe standard (RFC 7519) for transmitting claims securely between two parties. It is cryptographically signed, meaning the recipient can verify that the token was created by a trusted authority and has not been altered in transit.
+
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJleHAiOjE3NjE1Nzc2MDB9.7s9Dk3...
+[------------------ HEADER ------------------] . [------------------ PAYLOAD ------------------] . [---- SIGNATURE ----]
+```
+
+```mermaid
+flowchart TD
+    subgraph JWT ["Anatomy of a Signed JWT"]
+        direction TB
+        H["1. Header (Base64Url)\nAlgorithm: HMAC-SHA256\nType: JWT"]
+        P["2. Payload / Claims (Base64Url)\nsub: user-102\nroles: ['ROLE_USER', 'ROLE_ADMIN']\niat: 1761570000 (Issued At)\nexp: 1761570900 (Expires)"]
+        S["3. Cryptographic Signature\nHMACSHA256(Base64(Header) + '.' + Base64(Payload), SecretKey)"]
+        H --- P
+        P --- S
+    end
+
+    style H fill:#e1f5fe,stroke:#0288d1,color:#000
+    style P fill:#fff9c4,stroke:#fbc02d,color:#000
+    style S fill:#ffcdd2,stroke:#d32f2f,color:#000
+```
+
+> [!IMPORTANT]
+> **JWT Myth: "JWTs Are Encrypted"**:
+> Standard JWTs are **signed, NOT encrypted**. Anyone who intercepts a JWT can decode the Header and Payload using standard Base64 decoding (`atob()` in browser). **Never store sensitive data like passwords or credit card numbers inside JWT claims!**
+
+---
+
+#### Stateful Sessions vs Stateless JWT Architecture
+
+```mermaid
+flowchart LR
+    subgraph Stateful ["Stateful Session Architecture"]
+        Client1["Client"] -->|"1. Session Cookie"| Server1["App Instance 1"]
+        Server1 -->|"2. Look up session in RAM/DB"| SessionDB[("Central Session Store (Redis)")]
+    end
+
+    subgraph Stateless ["Stateless JWT Architecture"]
+        Client2["Client"] -->|"1. Authorization: Bearer <token>"| Server2["Any App Instance"]
+        Server2 -->|"2. Validates signature locally using Secret Key\n(Zero DB/Network calls!)"| Done["Request Authorized"]
+    end
+
+    style Stateful fill:#fff3e0,stroke:#ef6c00
+    style Stateless fill:#e8f5e9,stroke:#388e3c
+```
+
+- **Stateful (Cookies + Sessions)**: The server stores session state in memory or Redis. Every HTTP request requires a database or cache lookup to identify the user. Hard to scale across distributed multi-region data centers.
+- **Stateless (JWTs)**: The token itself contains the user identity and permissions. Any backend microservice possessing the signing key can validate the token locally in $< 1\text{ ms}$ with zero network or database queries!
+
+---
+
+#### The Full Authentication & Token Refresh Flow
+
+In production, never issue an access token that lives for hours. If an access token is stolen, an attacker has access until it expires! Instead, pair a **short-lived Access Token (15 mins)** with a **long-lived Refresh Token (7 days)**:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Frontend Client (React/Vue/Mobile)
+    participant Auth as Auth Controller
+    participant Filter as JwtAuthenticationFilter
+    participant API as Protected /api/v1/orders
+    participant DB as User Database
+
+    Note over Client,Auth: 1. Initial Login
+    Client->>Auth: POST /api/auth/login { "email": "alice@ex.com", "password": "secretPassword" }
+    Auth->>DB: Verify credentials with BCrypt
+    DB-->>Auth: User Valid (Roles: USER)
+    Auth-->>Client: Returns: { "accessToken": "xyz... (15m)", "refreshToken": "abc... (7d)" }
+
+    Note over Client,API: 2. Accessing Protected Resource
+    Client->>Filter: GET /api/v1/orders (Header: Authorization: Bearer xyz...)
+    Filter->>Filter: Verify signature & expiration
+    Filter->>API: Valid! Set SecurityContextHolder -> Dispatch to Controller
+    API-->>Client: HTTP 200 OK [Orders JSON]
+
+    Note over Client,Auth: 3. Token Expiration & Refresh (15 minutes later)
+    Client->>Filter: GET /api/v1/orders (Header: Authorization: Bearer xyz...)
+    Filter-->>Client: HTTP 401 Unauthorized (Token Expired)
+    Client->>Auth: POST /api/auth/refresh { "refreshToken": "abc..." }
+    Auth->>Auth: Verify refresh token
+    Auth-->>Client: Returns NEW Access Token: { "accessToken": "new_xyz... (15m)" }
+    Client->>Filter: Re-tries GET /api/v1/orders with NEW token -> Success!
+```
+
+---
+
+#### Complete Implementation: Custom JWT in Spring Boot 3
+
+##### Step 1: Add Modern JJWT 0.12.x Dependencies to `pom.xml`
+
+```xml
+<!-- Modern Java JWT (JJWT) by Auth0 / io.jsonwebtoken -->
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.12.5</version>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-impl</artifactId>
+    <version>0.12.5</version>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-jackson</artifactId>
+    <version>0.12.5</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+##### Step 2: Configure Secret Key in `application.yml`
+
+The signing key for `HS256` must be at least **256 bits (32 bytes)** long:
+
+```yaml
+application:
+  security:
+    jwt:
+      # Must be a 256-bit base64-encoded secret key
+      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      access-token-expiration-ms: 900000    # 15 minutes
+      refresh-token-expiration-ms: 604800000 # 7 days
+```
+
+##### Step 3: The `JwtService` (Signing & Extraction)
+
+```java
+package com.example.demo.security.jwt;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+@Service
+public class JwtService {
+
+    @Value("${application.security.jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${application.security.jwt.access-token-expiration-ms}")
+    private long accessTokenExpirationMs;
+
+    @Value("${application.security.jwt.refresh-token-expiration-ms}")
+    private long refreshTokenExpirationMs;
+
+    /**
+     * Extracts username (the 'sub' claim) from token.
+     */
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    /**
+     * Generates an access token with custom user roles and claims.
+     */
+    public String generateAccessToken(UserDetails userDetails, Map<String, Object> extraClaims) {
+        return buildToken(extraClaims, userDetails.getUsername(), accessTokenExpirationMs);
+    }
+
+    /**
+     * Generates a long-lived refresh token.
+     */
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails.getUsername(), refreshTokenExpirationMs);
+    }
+
+    private String buildToken(Map<String, Object> extraClaims, String subject, long expirationMs) {
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(subject)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expirationMs))
+                .signWith(getSignInKey(), Jwts.SIG.HS256)
+                .compact();
+    }
+
+    /**
+     * Validates that the token belongs to the user and is not expired.
+     */
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    private SecretKey getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+}
+```
+
+##### Step 4: The `JwtAuthenticationFilter` (`OncePerRequestFilter`)
+
+This filter intercepts every incoming HTTP request, reads the `Authorization: Bearer <token>` header, verifies the signature, and populates Spring's `SecurityContextHolder`:
+
+```java
+package com.example.demo.security.jwt;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+
+    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
+
+        final String authHeader = request.getHeader("Authorization");
+
+        // 1. Check if Authorization header is present and starts with 'Bearer '
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        final String jwt = authHeader.substring(7); // Remove 'Bearer ' prefix
+        final String userEmail;
+
+        try {
+            userEmail = jwtService.extractUsername(jwt);
+        } catch (Exception ex) {
+            // Malformed or invalid token signature -> proceed without authenticating
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 2. If user is present and not yet authenticated in the current security context
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+            // 3. Validate token signature and expiration against user
+            if (jwtService.isTokenValid(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                // 4. Set authentication in Spring Security Context!
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        // 5. Pass request down the remaining filter chain
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+##### Step 5: Integrating Filter into `SecurityFilterChain`
+
+```java
+package com.example.demo.security.config;
+
+import com.example.demo.security.jwt.JwtAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfiguration {
+
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
+
+    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthFilter, AuthenticationProvider authenticationProvider) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.authenticationProvider = authenticationProvider;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // 1. Disable CSRF (Cross-Site Request Forgery) because JWTs are stateless
+            .csrf(AbstractHttpConfigurer::disable)
+            // 2. Configure endpoint authorization rules
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            // 3. Enforce STATELESS session creation (Never store session on server!)
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authenticationProvider(authenticationProvider)
+            // 4. Insert our JwtAuthenticationFilter BEFORE standard username/password filter
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+}
+```
+
+---
+
+#### 3 Essential JWT Security Best Practices
+
+1. **Short Token Lifetimes**: Keep Access Tokens strictly between 5 and 15 minutes.
+2. **Where to Store Tokens on the Frontend?**:
+   - **Bad**: Storing access/refresh tokens in `localStorage` or `sessionStorage`. Any cross-site scripting (XSS) vulnerability allows malicious JavaScript to steal the token via `localStorage.getItem("token")`!
+   - **Good**: Store the long-lived Refresh Token in an **`HttpOnly, Secure, SameSite=Strict` cookie**. JavaScript cannot read `HttpOnly` cookies, preventing XSS token theft! Store the short-lived access token in client application memory (e.g. React state/Redux).
+3. **Token Invalidation / Revocation**:
+   - Since JWTs are stateless, you cannot "delete" a JWT before its expiration date.
+   - **Solution (Blacklist in Redis)**: When a user clicks "Logout" or changes their password, store the token's ID (`jti`) or token string in Redis with a TTL equal to the token's remaining lifetime. In `JwtAuthenticationFilter`, reject requests if the token exists in the Redis blacklist.
+
+---
+
 ### Chapter 2 Exercises & Solutions
 
 Test your knowledge of Spring Security 6, password encoding, and role authorization.
@@ -2865,6 +3570,271 @@ Launch Zipkin using Docker: `docker run -d -p 9411:9411 openzipkin/zipkin`. Open
 
 ---
 
+### 3.5 Enterprise Logging: SLF4J, Logback, and Log4j2
+
+Logging is the primary telemetry source used by engineers during production incidents. A well-designed logging architecture enables instant troubleshooting, audit compliance, and automated alerting.
+
+#### The Architecture of Java Logging: Facade vs. Implementation
+
+In modern Java, logging is split into two distinct tiers: **the logging facade (API)** and **the logging engine (implementation)**.
+
+```mermaid
+flowchart TD
+    App["Your Spring Boot Application Code\n(@Slf4j or LoggerFactory.getLogger)"] --> Facade["SLF4J Facade API\n(org.slf4j.Logger & org.slf4j.MDC)"]
+    
+    subgraph Engines ["Pluggable Logging Implementations"]
+        Facade -->|Default in Spring Boot| Logback["Logback Classic Engine\n(logback-spring.xml)"]
+        Facade -.->|Optional High-Performance| Log4j2["Apache Log4j2 Engine\n(log4j2-spring.xml)"]
+    end
+
+    Logback --> Console["Console Output (Stdout)"]
+    Logback --> RollingFile["Rolling Log Files (/var/log/app.log)"]
+    Logback --> JSON["JSON Stream (ELK / Splunk / Datadog)"]
+
+    style Facade fill:#bbdefb,stroke:#1976d2,stroke-width:2px,color:#000
+    style Logback fill:#c8e6c9,stroke:#388e3c,color:#000
+    style Log4j2 fill:#ffe0b2,stroke:#f57c00,color:#000
+```
+
+- **SLF4J (Simple Logging Facade for Java)**: A standardized Java interface. Your business code imports `org.slf4j.Logger` and never couples directly to concrete logging libraries.
+- **Logback**: The default logging implementation packaged with Spring Boot. Created by the author of Log4j 1.x as an enhanced, modern engine.
+- **Log4j2**: An enterprise-grade logging engine created by Apache, famous for its asynchronous loggers built on the LMAX Disruptor ring buffer.
+
+---
+
+#### Why `System.out.println()` Must Never Be Used in Production
+
+| Problem | `System.out.println()` | SLF4J / Logback |
+| :--- | :--- | :--- |
+| **I/O Performance** | **Synchronous & Blocking**: Acquires a monitor lock on `System.out`, stalling request threads. | **Asynchronous / Buffered**: Writes to memory buffers without blocking the main worker threads. |
+| **Log Levels** | None. Everything prints at 100% volume in production. | Granular control: configure `DEBUG` in dev, `INFO` in staging, `WARN` in prod. |
+| **Log File Rotation** | None. Writes blindly to standard output. | Rotates logs daily or at size thresholds (e.g. 50MB), automatically compressing into `.gz` archives. |
+| **Metadata** | Prints plain strings with no context. | Automatically records: timestamp, thread name, class, line number, traceId, and severity. |
+
+---
+
+#### The Log Level Hierarchy Explained Simply
+
+Log levels form an ordered threshold:
+
+$$\text{TRACE} < \text{DEBUG} < \text{INFO} < \text{WARN} < \text{ERROR} < \text{OFF}$$
+
+```
+TRACE  [ Lowest Level / Verbose ]  -> Step-by-step loop executions, byte dumps
+DEBUG  [ Development Diagnostic ]   -> SQL query parameters, incoming DTO values
+INFO   [ Normal Operations ]        -> App startup, order created, payment confirmed
+WARN   [ Potential Problems ]       -> Retried database query, slow response (> 2s), high heap
+ERROR  [ Severe Failures ]          -> Uncaught exceptions, DB connection down, payment failed
+```
+
+> [!TIP]
+> **Production Recommendation**:
+> Set your root logger to `INFO`. Set third-party framework loggers (Hibernate, Spring, Apache HttpClient) to `WARN`. Temporarily lower specific package loggers to `DEBUG` via Actuator at runtime without restarting the application:
+> `POST /actuator/loggers/com.example.demo.order { "configuredLevel": "DEBUG" }`.
+
+---
+
+#### Parametric Logging: The High-Performance Pattern
+
+In Java, passing string concatenation to a method evaluates the concatenation **before** the method executes, regardless of whether the log level is enabled!
+
+```java
+// ❌ TERRIBLE: String concatenation executes on every request even if DEBUG is disabled!
+// Allocates memory on the heap and consumes CPU cycles pointlessly!
+log.debug("Processing payment for user: " + user.getId() + " with " + order.getItems().size() + " items");
+
+// ✅ EXCELLENT: SLF4J Parameterized Logging
+// If DEBUG is disabled, SLF4J returns immediately without building any string!
+log.debug("Processing payment for user: {} with {} items", user.getId(), order.getItems().size());
+```
+
+---
+
+#### MDC (Mapped Diagnostic Context): Tracing Requests Across Threads
+
+When 50 concurrent users generate thousands of log lines, standard logs become a jumbled mess. How do you find which logs belong to a specific user?
+
+**MDC (Mapped Diagnostic Context)** stores key-value pairs in a `ThreadLocal` map that SLF4J automatically includes in every log line printed by that thread!
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client
+    participant Filter as LoggingMdcFilter
+    participant Controller as OrderController
+    participant Service as OrderService
+
+    Client->>Filter: HTTP GET /api/v1/orders (Header: X-Correlation-ID: req-abc-123)
+    Note over Filter: MDC.put("correlationId", "req-abc-123")<br/>MDC.put("userId", "usr-88")
+    
+    Filter->>Controller: Dispatch request
+    Note over Controller: log.info("Fetching orders")<br/>-> Output: [req-abc-123] [usr-88] Fetching orders
+    
+    Controller->>Service: calculateDiscount()
+    Note over Service: log.info("Applied 10% coupon")<br/>-> Output: [req-abc-123] [usr-88] Applied 10% coupon
+    
+    Service-->>Controller: Return result
+    Controller-->>Filter: HTTP 200 OK
+    Note over Filter: MANDATORY: MDC.clear() to prevent memory leak!
+```
+
+##### Implementing `LoggingMdcFilter`:
+
+```java
+package com.example.demo.logging;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.MDC;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.UUID;
+
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE) // Execute before security and web controllers
+public class LoggingMdcFilter extends OncePerRequestFilter {
+
+    private static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
+    private static final String CORRELATION_ID_KEY = "correlationId";
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+
+        // 1. Extract correlation ID from incoming header or generate a new UUID
+        String correlationId = request.getHeader(CORRELATION_ID_HEADER);
+        if (correlationId == null || correlationId.isBlank()) {
+            correlationId = UUID.randomUUID().toString();
+        }
+
+        // 2. Put into MDC (ThreadLocal storage)
+        MDC.put(CORRELATION_ID_KEY, correlationId);
+        
+        // 3. Return correlation ID in response header for client debugging
+        response.setHeader(CORRELATION_ID_HEADER, correlationId);
+
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            // 4. CRITICAL: Clear MDC! Tomcat reuses worker threads from a pool.
+            // Failing to clear MDC leaks user data across requests!
+            MDC.clear();
+        }
+    }
+}
+```
+
+---
+
+#### Production Configuration: `logback-spring.xml`
+
+Create `src/main/resources/logback-spring.xml` to configure production rolling file logs and colorful console formats:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <!-- Define log output directory and file names -->
+    <property name="LOG_DIR" value="./logs" />
+    <property name="APP_NAME" value="ecommerce-service" />
+
+    <!-- 1. Colorized Console Appender for Local Development -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%blue(%thread)] %cyan([%X{correlationId}]) %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 2. Rolling File Appender with Automatic Compression (.gz) -->
+    <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${APP_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Daily rollover pattern: ecommerce-service.2026-10-27.0.log.gz -->
+            <fileNamePattern>${LOG_DIR}/archived/${APP_NAME}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <!-- Max file size before creating a new split: 50MB -->
+            <maxFileSize>50MB</maxFileSize>
+            <!-- Retain logs for 30 days -->
+            <maxHistory>30</maxHistory>
+            <!-- Total cap of all log files: 5GB -->
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%X{correlationId}] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 3. Profile-Specific Root Logging Rules -->
+    <springProfile name="dev">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+        <logger name="com.example.demo" level="DEBUG" />
+    </springProfile>
+
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="ROLLING_FILE" />
+        </root>
+        <logger name="org.springframework.web" level="WARN" />
+        <logger name="org.hibernate.SQL" level="WARN" />
+    </springProfile>
+
+</configuration>
+```
+
+---
+
+#### How to Switch from Logback to Apache Log4j2
+
+If your application requires extreme throughput (millions of log entries per second), switch to **Log4j2 Async Loggers**:
+
+##### Step 1: Exclude Logback and Include Log4j2 in `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+    <exclusions>
+        <!-- 1. Exclude Spring Boot's default Logback starter -->
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<!-- 2. Include Spring Boot's Log4j2 starter -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-log4j2</artifactId>
+</dependency>
+
+<!-- 3. High-Performance LMAX Disruptor for Async Logging -->
+<dependency>
+    <groupId>com.lmax</groupId>
+    <artifactId>disruptor</artifactId>
+    <version>3.4.4</version>
+</dependency>
+```
+
+##### Step 2: Enable Async Loggers via JVM System Property:
+```properties
+# Add to application.properties or JVM startup flag:
+log4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+```
+
+---
+
 ### Chapter 3 Exercises & Solutions
 
 Test your knowledge of health probes and metrics instrumentation.
@@ -3020,70 +3990,238 @@ spring:
 
 ### 4.3 Fault Tolerance & Circuit Breaking with Resilience4j
 
-A **Circuit Breaker** prevents cascading failures by stopping calls to a failing remote service when an error threshold is crossed.
+In a microservices architecture, remote network calls will inevitably fail. A network partition occurs, a downstream service crashes, or a database query hangs. Without fault tolerance patterns, a single failing service can trigger a **cascading collapse** across your entire infrastructure.
 
-#### Circuit Breaker State Machine
+#### The Cascading Failure Crisis
 
-The circuit breaker transitions between three operational states based on tracked failure rates:
+Imagine an `Order Service` that calls a `Payment Gateway`. Under normal load, the payment gateway replies in $50\text{ ms}$.
+
+```mermaid
+flowchart TD
+    subgraph Collapse ["How a Single Slow Dependency Kills Your System"]
+        direction TB
+        C1["500 User Requests arrive at Order Service"] --> T1["Tomcat assigns 200 worker threads"]
+        T1 --> D1["Payment Gateway hangs (taking 30s per request)"]
+        D1 --> T2["All 200 Tomcat worker threads blocked waiting for Payment Gateway!"]
+        T2 --> C2["Order Service can no longer accept ANY incoming HTTP requests!"]
+        C2 --> C3["CRASH: Entire Order Service goes down (HTTP 504 Timeouts for all users)"]
+    end
+
+    style Collapse fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
+```
+
+> [!IMPORTANT]
+> **Why Simple Timeouts Are Not Enough**:
+> If your HTTP timeout is set to 5 seconds, and 200 requests arrive per second, your server will hold **1,000 concurrent hanging threads** before any timeout fires! This exhausts JVM memory and server CPU. A **Circuit Breaker** solves this by cutting off calls immediately after detecting failure.
+
+---
+
+#### Real-World Analogy: The Electrical Circuit Breaker
+
+In your home, when an electrical appliance short-circuits, the circuit breaker **trips open**, cutting off current to prevent your electrical wires from catching fire. 
+
+In software:
+- **CLOSED**: Everything works normally. Electricity (requests) flows freely.
+- **OPEN**: Downstream service is failing. The breaker trips! Requests are **rejected instantly** (failing fast) and routed to a fallback method without touching the network.
+- **HALF-OPEN**: After a cooling-off period (e.g. 10s), the breaker lets a few test requests pass through to check if the downstream service has recovered.
 
 ```mermaid
 stateDiagram-v2
     [*] --> CLOSED
-    CLOSED --> OPEN : Error rate exceeds threshold (> 50%)
-    OPEN --> HALF_OPEN : Wait duration expires (e.g. 10s)
-    HALF_OPEN --> CLOSED : Trial requests succeed
-    HALF_OPEN --> OPEN : Trial requests fail
+    CLOSED --> OPEN : Error rate exceeds threshold (e.g., > 50% failures in last 100 calls)
+    OPEN --> HALF_OPEN : Wait duration expires (e.g., 10s cooling-off period)
+    HALF_OPEN --> CLOSED : Trial calls succeed -> Service is healthy again!
+    HALF_OPEN --> OPEN : Trial calls fail -> Service still dead, re-trip breaker!
 ```
 
-- **CLOSED**: Normal operation. Requests flow to the downstream service. Failures are tracked.
-- **OPEN**: Downstream service is failing. Requests immediately fail-fast and invoke a local `fallbackMethod` without attempting network calls.
-- **HALF-OPEN**: A small batch of trial requests are permitted through. If successful, the circuit resets to `CLOSED`; if failures persist, it returns to `OPEN`.
+---
 
-#### Complete Implementation: Resilience4j Circuit Breaker
+#### Sliding Window Mechanics: Count-Based vs. Time-Based
 
-Add the Resilience4j starter to `pom.xml`:
+Resilience4j calculates the error rate using a **Sliding Window**:
+
+```
+Count-Based Window (Size = 10):
+[ ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ ]  -> 7 Failures out of 10 calls = 70% Error Rate!
+  Older calls drop off <------------------------ Newest call arrives
+```
+
+1. **Count-Based Sliding Window**: Records the outcome of the last $N$ calls (e.g., last 100 calls).
+2. **Time-Based Sliding Window**: Records the outcome of calls made during the last $N$ seconds (e.g., last 60 seconds).
+3. **Minimum Number of Calls**: Prevents tripping the breaker on the very first failure. If configured with `minimum-number-of-calls: 10`, Resilience4j will not evaluate the error rate until at least 10 calls have been recorded.
+
+---
+
+#### Complete Production Configuration: `application.yml`
+
+Configure Resilience4j with fine-grained production thresholds:
+
+```yaml
+resilience4j:
+  circuitbreaker:
+    instances:
+      paymentService:
+        # 1. Use COUNT_BASED (last N calls) or TIME_BASED (last N seconds)
+        sliding-window-type: COUNT_BASED
+        # 2. Number of calls to evaluate
+        sliding-window-size: 20
+        # 3. Minimum calls before error rate evaluation begins
+        minimum-number-of-calls: 10
+        # 4. Trip breaker if 50% or more calls fail
+        failure-rate-threshold: 50
+        # 5. Trip breaker if 50% or more calls are slow (> 2 seconds)
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 2000ms
+        # 6. How long the breaker stays OPEN before testing in HALF-OPEN (10 seconds)
+        wait-duration-in-open-state: 10000ms
+        # 7. Number of trial calls permitted in HALF-OPEN state
+        permitted-number-of-calls-in-half-open-state: 5
+        # 8. Automatically move from OPEN to HALF-OPEN without waiting for incoming calls
+        automatic-transition-from-open-to-half-open-enabled: true
+        # 9. Register health indicator with Spring Boot Actuator
+        register-health-indicator: true
+
+  # Bonus: Automatic Retries with Exponential Backoff
+  retry:
+    instances:
+      paymentService:
+        max-attempts: 3
+        wait-duration: 500ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - java.io.IOException
+          - org.springframework.web.client.ResourceAccessException
+        ignore-exceptions:
+          - com.example.demo.exception.InvalidPaymentException # Don't retry user input errors!
+```
+
+---
+
+#### Production Code: Circuit Breaker + Fallback + Retry
+
+Add the Resilience4j starters to `pom.xml`:
 
 ```xml
 <dependency>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
 </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
 ```
 
-Annotate remote calls with `@CircuitBreaker`:
+##### The Service Implementation:
 
 ```java
-package com.example.demo.client;
+package com.example.demo.payment.client;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-@Service
-public class InventoryServiceClient {
+import java.math.BigDecimal;
 
+public record PaymentRequest(String orderId, BigDecimal amount) {}
+public record PaymentResponse(String transactionId, String status) {}
+
+@Service
+public class PaymentGatewayClient {
+
+    private static final Logger log = LoggerFactory.getLogger(PaymentGatewayClient.class);
     private final RestClient restClient;
 
-    public InventoryServiceClient(RestClient.Builder builder) {
-        this.restClient = builder.baseUrl("http://inventory-service").build();
+    public PaymentGatewayClient(RestClient.Builder builder) {
+        this.restClient = builder.baseUrl("https://api.external-payment.com").build();
     }
 
-    // Protect remote call with a circuit breaker named "inventoryService"
-    @CircuitBreaker(name = "inventoryService", fallbackMethod = "fallbackInventoryCheck")
-    public boolean checkInventory(Long productId, int quantity) {
-        return Boolean.TRUE.equals(restClient.get()
-                .uri("/api/v1/inventory/{id}?qty={qty}", productId, quantity)
+    /**
+     * Protected by both @CircuitBreaker and @Retry.
+     * Order of execution: Retry runs first; if all retries fail, CircuitBreaker records failure.
+     */
+    @CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
+    @Retry(name = "paymentService")
+    public PaymentResponse processPayment(PaymentRequest request) {
+        log.info("Sending payment request to external gateway for order: {}", request.orderId());
+
+        return restClient.post()
+                .uri("/v1/charge")
+                .body(request)
                 .retrieve()
-                .body(Boolean.class));
+                .body(PaymentResponse.class);
     }
 
-    // Fallback method must match the original signature plus a trailing Throwable
-    public boolean fallbackInventoryCheck(Long productId, int quantity, Throwable throwable) {
-        System.err.println("Inventory service down: " + throwable.getMessage() + ". Defaulting to false.");
-        return false; // Safe fallback: prevent overbooking orders when inventory is unreachable
+    /**
+     * Fallback Method Rules (MANDATORY):
+     * 1. Must have the EXACT same parameter arguments as the original method.
+     * 2. Must accept a trailing Throwable parameter.
+     * 3. Must return the EXACT same return type as the original method.
+     */
+    public PaymentResponse paymentFallback(PaymentRequest request, Throwable ex) {
+        log.error("Circuit breaker tripped or payment gateway unreachable for order: {}. Reason: {}", 
+                request.orderId(), ex.getMessage());
+
+        // Graceful degradation: Return PENDING status and queue order for background processing
+        return new PaymentResponse(
+                "OFFLINE-PAYMENT-" + request.orderId(),
+                "QUEUED_FOR_OFFLINE_PROCESSING"
+        );
     }
 }
 ```
+
+---
+
+#### The Full Resilience4j Annotation Toolbelt
+
+Resilience4j provides 5 composable resilience patterns:
+
+| Annotation | What It Does | When to Use It |
+| :--- | :--- | :--- |
+| **`@CircuitBreaker`** | Stops calling failing remote services when error rate exceeds threshold. | Any network call to downstream microservices, payment gateways, or third-party APIs. |
+| **`@Retry`** | Automatically retries transient network glitches with exponential backoff. | Temporary network blips, 503 Service Unavailable, connection resets. |
+| **`@RateLimiter`** | Restricts execution rate (e.g. max 50 requests per second). | Protecting your API against abusive consumers or honoring third-party API rate quotas. |
+| **`@Bulkhead`** | Limits concurrent calls to a resource (thread pool or semaphore isolation). | Isolating slow reports or export jobs so they don't consume all web server threads. |
+| **`@TimeLimiter`** | Sets strict asynchronous execution timeout. | Killing slow queries or long-running computations. |
+
+> [!WARNING]
+> **Spring AOP Self-Invocation Pitfall**:
+> Just like `@Transactional`, Resilience4j annotations work through **Spring Dynamic Proxies**. If method `A()` inside `PaymentService` calls `@CircuitBreaker` method `B()` in the **same class** via `this.processPayment()`, **the Circuit Breaker will NOT execute**! You must invoke annotated methods across different Spring beans.
+
+---
+
+#### Monitoring Circuit Breakers via Spring Boot Actuator
+
+With `management.endpoints.web.exposure.include: health,metrics`, you can monitor circuit breakers live:
+
+1. **Health Endpoint** (`GET /actuator/health`):
+   ```json
+   {
+     "status": "UP",
+     "components": {
+       "circuitBreakers": {
+         "status": "UP",
+         "details": {
+           "paymentService": {
+             "status": "UP",
+             "state": "CLOSED",
+             "failureRate": "0.0%",
+             "slowCallRate": "0.0%"
+           }
+         }
+       }
+     }
+   }
+   ```
+2. **Prometheus Metrics**:
+   - `resilience4j_circuitbreaker_state{name="paymentService", state="open"}`
+   - `resilience4j_circuitbreaker_calls_seconds_count{kind="successful"}`
+   - `resilience4j_circuitbreaker_calls_seconds_count{kind="failed"}`
 
 ---
 
@@ -4176,6 +5314,294 @@ public Product getProduct(Long id) {
 When `readOnly = true` is set:
 1. Hibernate disables **dirty checking** (it skips taking snapshot copies of entities in memory), reducing CPU usage and memory footprint.
 2. Spring sets the JDBC connection to read-only mode, allowing database engines (like PostgreSQL) to route queries to read-replicas.
+
+---
+
+### 5.8.1 Concurrency Control: Optimistic vs. Pessimistic Locking
+
+When multiple users or background threads read and update the same database row simultaneously, applications face severe data corruption bugs called **Lost Updates** and **Race Conditions**.
+
+#### The Lost Update Disaster Explained
+
+Imagine an e-commerce flash sale where an item has **1 unit left in stock** (`stock = 1`). Two customers, Alice and Bob, click "Buy Now" at the exact same millisecond:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Alice as Alice's Request (Thread 1)
+    participant Bob as Bob's Request (Thread 2)
+    participant DB as PostgreSQL Database
+
+    Alice->>DB: SELECT stock FROM products WHERE id = 42; (Returns stock = 1)
+    Bob->>DB: SELECT stock FROM products WHERE id = 42; (Returns stock = 1)
+
+    Note over Alice: Alice verifies stock > 0.<br/>Computes new stock = 0.
+    Note over Bob: Bob verifies stock > 0.<br/>Computes new stock = 0.
+
+    Alice->>DB: UPDATE products SET stock = 0 WHERE id = 42;
+    Bob->>DB: UPDATE products SET stock = 0 WHERE id = 42;
+
+    Note over DB: DISASTER! Both orders were confirmed,<br/>but only 1 item existed in physical inventory!
+```
+
+To prevent this data corruption, enterprise architectures use **Concurrency Control Locks**.
+
+---
+
+#### Which Layer Does What? (Architectural Taxonomy)
+
+A common point of beginner confusion is not knowing which layer manages locking:
+
+```mermaid
+flowchart TD
+    Web["1. Controller / Web Layer\nCatches Lock Exceptions & Translates to HTTP 409 Conflict"] --> Service["2. Service Layer (@Transactional)\nDefines transaction boundaries & retry policies (@Retryable)"]
+    Service --> Repo["3. Repository Layer (@Lock)\nSpecifies lock type (PESSIMISTIC_WRITE, PESSIMISTIC_READ)"]
+    Repo --> Entity["4. Entity Domain Layer (@Version)\nDeclares version field for Optimistic verification"]
+    Entity --> DB[("5. Database Engine Layer\nExecutes row-level locks (SELECT ... FOR UPDATE)")]
+
+    style Web fill:#e1f5fe,stroke:#0288d1
+    style Service fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
+    style Repo fill:#fff9c4,stroke:#fbc02d
+    style Entity fill:#ffe0b2,stroke:#f57c00
+    style DB fill:#ede7f6,stroke:#7e57c2
+```
+
+| Layer | Annotation Used | Purpose |
+| :--- | :--- | :--- |
+| **Domain Entity** | `@Version` | Tells Hibernate to track an entity modification counter for **Optimistic Locking**. |
+| **Data Repository** | `@Lock(LockModeType.PESSIMISTIC_WRITE)` | Instructs JPA to append `FOR UPDATE` to the SQL query for **Pessimistic Locking**. |
+| **Service Layer** | `@Transactional` & `@Retryable` | Controls transaction boundaries and automatically retries transactions that fail due to optimistic collisions. |
+| **Database Engine** | Engine Lock Tables | Physically blocks competing transactions at the disk/row level. |
+
+---
+
+#### 1. Optimistic Locking: "Hope for the Best, Verify on Write"
+
+##### What is it?
+Optimistic locking **does not lock the database row** while reading or modifying data. Instead, it assumes conflicts are rare. When saving changes, it checks whether another transaction modified the row since it was originally read.
+
+##### How it works:
+1. Add a `@Version` field to the JPA entity (`Integer` or `Long`).
+2. When Hibernate reads the entity, it records the current version (e.g., `version = 1`).
+3. When saving, Hibernate automatically increments the version and appends a `WHERE version = ?` clause to the SQL `UPDATE`:
+   ```sql
+   UPDATE products 
+   SET stock_quantity = 0, version = 2 
+   WHERE id = 42 AND version = 1;
+   ```
+4. If another transaction already committed an update, the database version is now `2`. The `WHERE version = 1` condition matches **0 rows**!
+5. Hibernate notices that 0 rows were updated and immediately throws `OptimisticLockException` (translated by Spring into `ObjectOptimisticLockingFailureException`).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant T1 as Thread 1 (Alice)
+    participant T2 as Thread 2 (Bob)
+    participant DB as Database (Product #42, version = 1)
+
+    T1->>DB: SELECT * FROM products WHERE id = 42; (version = 1)
+    T2->>DB: SELECT * FROM products WHERE id = 42; (version = 1)
+
+    Note over T1: Computes new stock...
+    Note over T2: Computes new stock...
+
+    T1->>DB: UPDATE products SET stock = 0, version = 2 WHERE id = 42 AND version = 1;
+    DB-->>T1: 1 row updated (SUCCESS!)
+
+    T2->>DB: UPDATE products SET stock = 0, version = 2 WHERE id = 42 AND version = 1;
+    DB-->>T2: 0 rows updated! (Version is already 2)
+    Note over T2: Hibernate throws OptimisticLockException! Transaction Rolled Back.
+```
+
+##### Complete Optimistic Locking Code:
+
+```java
+// 1. Entity Definition
+package com.example.demo.product.domain;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "products")
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private int stockQuantity;
+
+    // MANDATORY: The @Version annotation activates JPA Optimistic Locking
+    @Version
+    private Long version;
+
+    // Standard getters, setters, constructors
+    public void deductStock(int quantity) {
+        if (this.stockQuantity < quantity) {
+            throw new IllegalStateException("Insufficient inventory!");
+        }
+        this.stockQuantity -= quantity;
+    }
+}
+```
+
+```java
+// 2. Service Layer with Automated Retries
+package com.example.demo.product.service;
+
+import com.example.demo.product.domain.Product;
+import com.example.demo.product.repository.ProductRepository;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    /**
+     * @Retryable: If an optimistic lock collision occurs, Spring automatically 
+     * retries this method up to 3 times with a 100ms backoff before giving up!
+     */
+    @Retryable(
+            retryFor = ObjectOptimisticLockingFailureException.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100)
+    )
+    @Transactional
+    public void purchaseProductOptimistic(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        product.deductStock(quantity);
+        // Hibernate automatically verifies version on commit!
+    }
+}
+```
+
+---
+
+#### 2. Pessimistic Locking: "Prepare for the Worst, Lock the Door"
+
+##### What is it?
+Pessimistic locking **locks the database row immediately upon reading it**. Any other transaction that attempts to read or update that row is forced to **block and wait** until the locking transaction finishes and commits.
+
+##### How it works:
+1. Define a repository method annotated with `@Lock(LockModeType.PESSIMISTIC_WRITE)`.
+2. JPA translates this into a native SQL `SELECT ... FOR UPDATE`:
+   ```sql
+   SELECT id, name, stock_quantity, version 
+   FROM products 
+   WHERE id = 42 
+   FOR UPDATE;
+   ```
+3. The database engine places an exclusive row-level lock on row `42`.
+4. Any competing transaction trying to query that row with `FOR UPDATE` is paused in the database wait queue until the lock is released.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant T1 as Thread 1 (Alice)
+    participant T2 as Thread 2 (Bob)
+    participant DB as PostgreSQL Database
+
+    T1->>DB: SELECT * FROM products WHERE id = 42 FOR UPDATE;
+    Note over DB: Exclusive Row Lock acquired by Thread 1!
+    DB-->>T1: Returns Product #42
+
+    T2->>DB: SELECT * FROM products WHERE id = 42 FOR UPDATE;
+    Note over DB: Thread 2 BLOCKED! Must wait for Thread 1...
+
+    Note over T1: Thread 1 checks stock, deducts item
+    T1->>DB: UPDATE products SET stock = 0 WHERE id = 42;
+    T1->>DB: COMMIT TRANSACTION;
+    Note over DB: Row Lock RELEASED!
+
+    Note over DB: Thread 2 wakes up and receives updated row
+    DB-->>T2: Returns Product #42 (stock = 0)
+    Note over T2: Thread 2 sees stock == 0! Throws "Insufficient Inventory".
+```
+
+##### Complete Pessimistic Locking Code:
+
+```java
+// 1. Repository with @Lock
+package com.example.demo.product.repository;
+
+import com.example.demo.product.domain.Product;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    /**
+     * PESSIMISTIC_WRITE: Generates SELECT ... FOR UPDATE.
+     * QueryHint: Times out after 3000ms if row lock cannot be acquired,
+     * preventing permanent server thread deadlocks!
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
+    @Query("SELECT p FROM Product p WHERE p.id = :id")
+    Optional<Product> findByIdWithPessimisticLock(@Param("id") Long id);
+}
+```
+
+```java
+// 2. Service Layer
+package com.example.demo.product.service;
+
+import com.example.demo.product.domain.Product;
+import com.example.demo.product.repository.ProductRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class PessimisticOrderService {
+
+    private final ProductRepository productRepository;
+
+    public PessimisticOrderService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @Transactional
+    public void purchaseProductPessimistic(Long productId, int quantity) {
+        // Blocks other threads right here until lock is acquired!
+        Product product = productRepository.findByIdWithPessimisticLock(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        product.deductStock(quantity);
+        // Row lock automatically released on transaction commit!
+    }
+}
+```
+
+---
+
+#### Optimistic vs. Pessimistic Locking: Decision Matrix
+
+| Comparison Criteria | Optimistic Locking (`@Version`) | Pessimistic Locking (`@Lock`) |
+| :--- | :--- | :--- |
+| **Locking Mechanism** | Application/Hibernate level (version counter check). | Database engine level (`SELECT ... FOR UPDATE` row locks). |
+| **Database Overhead** | **Zero DB locks**. High concurrency throughput. | **Heavy**. Holds physical connection and database locks. |
+| **Risk of Deadlocks** | None. | **High**, especially if multiple rows are locked in different orders. |
+| **Behavior on Collision** | Exception thrown (`OptimisticLockException`); requires retry. | Calling thread waits patiently until lock is released. |
+| **Read-Heavy vs Write-Heavy** | **Best for Read-Heavy, Low-Contention**: 95% reads, 5% writes (User profiles, blogs, catalog items). | **Best for Write-Heavy, Extreme Contention**: Flash sales, airline seat reservations, financial account balance debits. |
 
 ---
 
@@ -5687,6 +7113,361 @@ Once Prometheus scrapes metrics from `/actuator/prometheus`, monitor system heal
 
 ---
 
+### 7.6 Task Scheduling and Distributed Locking with ShedLock and Redis
+
+Automated background processing is fundamental to enterprise backends: generating daily financial summaries, sending cart abandonment emails, purging expired user sessions, or warming up caches.
+
+However, scheduling tasks in modern cloud architectures introduces a critical danger: **duplicate execution across multi-instance clusters**.
+
+---
+
+#### Part 1: Building a Task Scheduler in Spring Boot
+
+##### Step 1: Enable Scheduling
+In any `@Configuration` or `@SpringBootApplication` class, add the `@EnableScheduling` annotation:
+
+```java
+package com.example.demo.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@Configuration
+@EnableScheduling
+public class SchedulerConfig {}
+```
+
+##### Step 2: The 3 Flavors of `@Scheduled` Tasks
+
+```mermaid
+flowchart TD
+    subgraph SchedFlavors ["The 3 Scheduling Flavors"]
+        direction TB
+        FR["1. fixedRate = 5000\nExecutes every 5000ms from START to START\n(Fixed interval regardless of execution time)"]
+        FD["2. fixedDelay = 5000\nWaits 5000ms AFTER previous execution FINISHES\n(Prevents overlapping executions)"]
+        CR["3. cron = '0 0 2 * * ?'\nExecutes at exact wall-clock calendar times\n(e.g., 2:00 AM every night)"]
+    end
+
+    style FR fill:#e1f5fe,stroke:#0288d1
+    style FD fill:#e8f5e9,stroke:#2e7d32
+    style CR fill:#fff9c4,stroke:#fbc02d
+```
+
+```
+Timeline Comparison: fixedRate vs. fixedDelay (when task takes 3 seconds):
+
+fixedRate = 5000ms:
+0s [ Task 1 starts ] -------- 3s [ Ends ]
+                      5s [ Task 2 starts ] -------- 8s [ Ends ]
+                                            10s [ Task 3 starts ]
+
+fixedDelay = 5000ms:
+0s [ Task 1 starts ] -------- 3s [ Ends ] === (Waits 5s) ===> 8s [ Task 2 starts ]
+```
+
+##### Demystifying Cron Expressions:
+Spring's `@Scheduled` uses a **6-field cron pattern**:
+
+```
+ ┌───────────── second (0 - 59)
+ │ ┌───────────── minute (0 - 59)
+ │ │ ┌───────────── hour (0 - 23)
+ │ │ │ ┌───────────── day of the month (1 - 31)
+ │ │ │ │ ┌───────────── month (1 - 12 or JAN - DEC)
+ │ │ │ │ │ ┌───────────── day of the week (0 - 7 or SUN - SAT)
+ │ │ │ │ │ │
+ * * * * * *
+```
+
+- `"0 0 2 * * ?"` $\rightarrow$ Run at 2:00:00 AM every night.
+- `"0 */15 * * * ?"` $\rightarrow$ Run every 15 minutes.
+- `"0 0 9-17 * * MON-FRI"` $\rightarrow$ Run at the top of every hour during business hours on weekdays.
+
+##### Production Task Scheduler Service:
+
+```java
+package com.example.demo.scheduler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+@Service
+public class ReportSchedulerService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportSchedulerService.class);
+
+    // 1. Fixed Rate: Fires every 10 seconds (10,000ms) with a 5s initial startup delay
+    @Scheduled(initialDelay = 5000, fixedRate = 10000)
+    public void synchronizeInventory() {
+        log.info("Synchronizing inventory with external supplier at: {}", LocalDateTime.now());
+    }
+
+    // 2. Fixed Delay: Waits 30 seconds AFTER previous audit run completes
+    @Scheduled(fixedDelay = 30000)
+    public void cleanupExpiredSessions() {
+        log.info("Purging expired user sessions from cache...");
+    }
+
+    // 3. Cron Expression: Runs at 00:00 (Midnight) every Sunday
+    @Scheduled(cron = "0 0 0 ? * SUN")
+    public void generateWeeklyFinancialSummary() {
+        log.info("Generating weekly financial PDF report...");
+    }
+}
+```
+
+##### Critical Beginner Trap: The Single-Threaded Default!
+By default, Spring Boot runs all scheduled tasks on a **single worker thread**!
+If `synchronizeInventory()` takes 15 minutes, `cleanupExpiredSessions()` is **blocked and cannot run** until the first task finishes!
+
+**The Fix: Configure a Dedicated `ThreadPoolTaskScheduler`**:
+
+```java
+package com.example.demo.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+@Configuration
+public class SchedulingPoolConfig {
+
+    @Bean
+    public ThreadPoolTaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(5); // Allows up to 5 scheduled tasks to run concurrently in parallel
+        scheduler.setThreadNamePrefix("scheduled-task-");
+        scheduler.setErrorHandler(throwable -> {
+            System.err.println("Scheduled task threw unhandled exception: " + throwable.getMessage());
+        });
+        scheduler.initialize();
+        return scheduler;
+    }
+}
+```
+
+---
+
+#### Part 2: The Multi-Instance Scheduling Disaster
+
+In production Kubernetes or cloud environments, applications run across multiple pods/instances (e.g. `App-Pod-1`, `App-Pod-2`, `App-Pod-3`) behind a load balancer.
+
+```mermaid
+flowchart TD
+    subgraph Disaster ["The Multi-Instance Scheduling Disaster"]
+        Cron["Midnight 00:00 AM Cron Trigger Fires!"]
+        Cron --> P1["App Pod 1: Runs Cron -> Charges Customer Credit Card ($50)"]
+        Cron --> P2["App Pod 2: Runs Cron -> Charges Customer Credit Card ($50)"]
+        Cron --> P3["App Pod 3: Runs Cron -> Charges Customer Credit Card ($50)"]
+    end
+
+    style Disaster fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
+```
+
+> [!CAUTION]
+> **Duplicate Execution Alert**:
+> Spring Boot's built-in `@Scheduled` annotation is **instance-local**. It has zero awareness of other application instances!
+> If you deploy 3 pods of your application, every single pod will execute the midnight batch job, sending 3 duplicate emails and charging customers 3 times!
+
+---
+
+#### Part 3: Distributed Locking with ShedLock
+
+To ensure that a scheduled task executes on **exactly one node at a time**, we use **Distributed Locking**.
+
+**ShedLock** is the industry-standard lightweight library designed specifically for Spring's `@Scheduled`. It coordinates locks using an external shared datastore (PostgreSQL, MySQL, or Redis).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant P1 as App Pod 1
+    participant P2 as App Pod 2
+    participant P3 as App Pod 3
+    participant DB as Shared Store (PostgreSQL / Redis)
+
+    Note over P1,P3: 00:00:00 - Midnight Cron triggers on all 3 pods simultaneously
+    P1->>DB: INSERT / UPDATE lock WHERE name = 'nightlyReport' (Attempt to acquire)
+    P2->>DB: INSERT / UPDATE lock WHERE name = 'nightlyReport' (Attempt to acquire)
+    P3->>DB: INSERT / UPDATE lock WHERE name = 'nightlyReport' (Attempt to acquire)
+
+    DB-->>P1: Lock ACQUIRED! (Pod 1 holds lock until 00:15:00)
+    DB-->>P2: Lock DENIED! (Already held by Pod 1)
+    DB-->>P3: Lock DENIED! (Already held by Pod 1)
+
+    Note over P2: Pod 2 skips execution immediately!
+    Note over P3: Pod 3 skips execution immediately!
+
+    P1->>P1: Executes generateWeeklyFinancialSummary()
+    P1->>DB: Task finished! Updates lock_until
+```
+
+---
+
+#### Understanding `lockAtMostFor` and `lockAtLeastFor`
+
+ShedLock introduces two critical parameters to protect against failure:
+
+1. **`lockAtMostFor` (Safety Against Node Death)**:
+   - If Pod 1 acquires the lock and immediately suffers a hardware failure, kernel panic, or out-of-memory kill, the lock would remain stuck forever without this setting!
+   - `lockAtMostFor = "15m"` guarantees that even if Pod 1 dies without releasing the lock, the lock automatically expires after 15 minutes.
+2. **`lockAtLeastFor` (Safety Against Fast Execution & Clock Drift)**:
+   - If Pod 1 runs a task that completes in $50\text{ ms}$, and releases the lock, Pod 2's clock might be 200ms slower. Pod 2 would see the lock free and run the task a second time!
+   - `lockAtLeastFor = "30s"` guarantees the lock stays held for at least 30 seconds, preventing other pods from running it during that interval.
+
+---
+
+#### Complete Implementation: ShedLock with PostgreSQL / MySQL
+
+##### Step 1: Add ShedLock Dependencies in `pom.xml`:
+
+```xml
+<!-- Core ShedLock Spring Integration -->
+<dependency>
+    <groupId>net.javacrumbs.shedlock</groupId>
+    <artifactId>shedlock-spring</artifactId>
+    <version>5.13.0</version>
+</dependency>
+
+<!-- ShedLock JDBC Provider for Relational Databases (PostgreSQL / MySQL) -->
+<dependency>
+    <groupId>net.javacrumbs.shedlock</groupId>
+    <artifactId>shedlock-provider-jdbc-template</artifactId>
+    <version>5.13.0</version>
+</dependency>
+```
+
+##### Step 2: Create the `shedlock` Database Table (SQL / Flyway):
+
+```sql
+-- PostgreSQL / MySQL Table Schema
+CREATE TABLE shedlock (
+    name VARCHAR(64) NOT NULL,
+    lock_until TIMESTAMP NOT NULL,
+    locked_at TIMESTAMP NOT NULL,
+    locked_by VARCHAR(255) NOT NULL,
+    PRIMARY KEY (name)
+);
+```
+
+##### Step 3: Configure `LockProvider` in Spring:
+
+```java
+package com.example.demo.config;
+
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.sql.DataSource;
+
+@Configuration
+// defaultLockAtMostFor: Fallback safety if a task doesn't specify its own lockAtMostFor
+@EnableSchedulerLock(defaultLockAtMostFor = "10m")
+public class ShedLockConfiguration {
+
+    @Bean
+    public LockProvider lockProvider(DataSource dataSource) {
+        return new JdbcTemplateLockProvider(
+                JdbcTemplateLockProvider.Configuration.builder()
+                        .withJdbcTemplate(new org.springframework.jdbc.core.JdbcTemplate(dataSource))
+                        .usingDbTime() // Use database clock to avoid host clock drift issues!
+                        .build()
+        );
+    }
+}
+```
+
+##### Step 4: Annotate Scheduled Methods with `@SchedulerLock`:
+
+```java
+package com.example.demo.scheduler;
+
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+@Service
+public class DistributedBillingScheduler {
+
+    private static final Logger log = LoggerFactory.getLogger(DistributedBillingScheduler.class);
+
+    /**
+     * Executes at 2:00 AM every night.
+     * ShedLock guarantees that across 10 Kubernetes pods, EXACTLY ONE POD runs this method!
+     */
+    @Scheduled(cron = "0 0 2 * * ?")
+    @SchedulerLock(
+            name = "generateCustomerInvoicesTask",
+            lockAtMostFor = "30m",   // Release lock after 30 mins even if node crashes
+            lockAtLeastFor = "1m"    // Keep lock held for at least 1 min to prevent duplicate runs
+    )
+    public void generateCustomerInvoices() {
+        log.info("Lock acquired! Generating customer monthly invoices...");
+        // Heavy billing calculation...
+    }
+}
+```
+
+---
+
+#### Alternative: Distributed Locking with Redis (Redisson)
+
+For high-speed, non-scheduled application locking (e.g., preventing two users from claiming the same promo code in a REST controller), use **Redisson Distributed Locks**:
+
+```java
+package com.example.demo.service;
+
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
+
+@Service
+public class PromoCodeService {
+
+    private final RedissonClient redissonClient;
+
+    public PromoCodeService(RedissonClient redissonClient) {
+        this.redissonClient = redissonClient;
+    }
+
+    public void redeemCoupon(String couponCode, String userId) {
+        // Create a distributed lock key specific to this coupon
+        RLock lock = redissonClient.getLock("lock:coupon:" + couponCode);
+
+        try {
+            // Wait up to 5 seconds to acquire lock, hold lock for at most 10 seconds (automatic watchdog)
+            boolean isLocked = lock.tryLock(5, 10, TimeUnit.SECONDS);
+            if (!isLocked) {
+                throw new IllegalStateException("Coupon is currently being processed by another user. Try again.");
+            }
+
+            // Critical Section: Only one thread across all clusters can execute here!
+            System.out.println("Processing coupon redemption for user: " + userId);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            // Always unlock in a finally block!
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+}
+```
+
+---
+
 ### Chapter 7 Exercises & Solutions
 
 Test your knowledge of performance tuning, database optimization, and Virtual Threads.
@@ -6292,6 +8073,324 @@ spring:
               requeue-rejected: false
               dlq-name: orders.dlq
 ```
+
+---
+
+### 8.4 Pub/Sub and Event Streaming with Apache Kafka & Reactive Spring
+
+While traditional message brokers (like RabbitMQ) excel at routing discrete messages to point-to-point queues and deleting them once acknowledged, **Apache Kafka** is a distributed, horizontally partitioned, replicated **event streaming platform**.
+
+---
+
+#### Pub/Sub vs. Point-to-Point Queue: Mental Model
+
+```mermaid
+flowchart TD
+    subgraph PTP ["Point-to-Point Queue (RabbitMQ / AWS SQS)"]
+        direction TB
+        PProducer["Publisher"] --> PQueue["Queue: orders"]
+        PQueue -->|Worker 1 consumes| C1["Worker 1 (Message DELETED!)"]
+        PQueue -.->|Worker 2 gets nothing| C2["Worker 2"]
+    end
+
+    subgraph PubSub ["Pub/Sub Distributed Commit Log (Apache Kafka)"]
+        direction TB
+        KProducer["Publisher"] --> KTopic["Topic: orders-topic (Immutable Append-Only Log)\n[Msg 0 | Msg 1 | Msg 2 | Msg 3 | Msg 4]"]
+        KTopic -->|"Consumer Group A (Offset: 4)"| G1["Inventory Service\n(Reads from beginning to end)"]
+        KTopic -->|"Consumer Group B (Offset: 2)"| G2["Analytics Service\n(Reads at its own slower speed)"]
+        KTopic -->|"Consumer Group C (Offset: 0)"| G3["Audit Service\n(Replays all history from Msg 0)"]
+    end
+
+    style PTP fill:#fbe9e7,stroke:#d84315,color:#000
+    style PubSub fill:#e8f5e9,stroke:#2e7d32,color:#000
+```
+
+- **Point-to-Point (Queues)**: A message is delivered to exactly one worker and destroyed once processed.
+- **Pub/Sub (Kafka Commit Log)**: Messages are appended to an immutable disk log and retained for days or months. Multiple independent subscriber groups read the same stream at their own pace, tracking their progress using **Offsets**.
+
+---
+
+#### Core Kafka Architecture: Topics, Partitions, and Offsets
+
+```
+Topic: 'orders-topic' (3 Partitions across Kafka cluster)
+
+Partition 0: [ 0 | 1 | 2 | 3 | 4 | 5 ]  ---> Read by Consumer Instance 1
+Partition 1: [ 0 | 1 | 2 | 3 ]          ---> Read by Consumer Instance 2
+Partition 2: [ 0 | 1 | 2 | 3 | 4 ]      ---> Read by Consumer Instance 3
+```
+
+- **Topic**: A logical category where records are published.
+- **Partition**: Topics are sliced into partitions across multiple servers for horizontal scaling.
+- **Partition Key**: Kafka hashes the message key (`e.g., orderId`). **Messages with the exact same key are guaranteed to land on the same partition, preserving strict chronological ordering!**
+- **Consumer Group**: Multiple instances of the same service join a group to share partitions. If you have 3 partitions and 3 service pods, each pod reads from exactly 1 partition.
+
+---
+
+#### Standard Spring for Apache Kafka (`spring-kafka`)
+
+##### Step 1: Add Dependency to `pom.xml`
+
+```xml
+<dependency>
+    <groupId>org.springframework.kafka</groupId>
+    <artifactId>spring-kafka</artifactId>
+</dependency>
+```
+
+##### Step 2: Configuration in `application.yml`
+
+```yaml
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all # Wait for all in-sync replicas to confirm write (zero data loss)
+      retries: 3
+    consumer:
+      group-id: order-fulfillment-group
+      auto-offset-reset: earliest # Read from beginning if no committed offset exists
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      enable-auto-commit: false # CRITICAL: Disable auto-commit to prevent message loss!
+      properties:
+        spring.json.trusted.packages: "com.example.demo.kafka.dto"
+    listener:
+      ack-mode: MANUAL_IMMEDIATE # Application manually acknowledges offsets after processing
+```
+
+##### Step 3: High-Reliability Kafka Producer with `KafkaTemplate`
+
+```java
+package com.example.demo.kafka.producer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
+
+public record OrderPlacedEvent(String orderId, String customerId, double amount, Instant createdAt) {}
+
+@Service
+public class OrderEventProducer {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderEventProducer.class);
+    private static final String TOPIC = "orders-topic";
+
+    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
+
+    public OrderEventProducer(KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    public void publishOrder(OrderPlacedEvent event) {
+        // We use orderId as the PARTITION KEY to guarantee order sequence for the same order!
+        CompletableFuture<SendResult<String, OrderPlacedEvent>> future = 
+                kafkaTemplate.send(TOPIC, event.orderId(), event);
+
+        // Handle async callback
+        future.whenComplete((result, ex) -> {
+            if (ex == null) {
+                log.info("Event published to topic {} partition {} with offset {}",
+                        result.getRecordMetadata().topic(),
+                        result.getRecordMetadata().partition(),
+                        result.getRecordMetadata().offset());
+            } else {
+                log.error("Failed to publish event for order: {}", event.orderId(), ex);
+            }
+        });
+    }
+}
+```
+
+##### Step 4: Resilient Kafka Consumer with Manual Offset Acknowledgment and Dead Letter Topic (DLT)
+
+```java
+package com.example.demo.kafka.consumer;
+
+import com.example.demo.kafka.producer.OrderPlacedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.annotation.DltHandler;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.stereotype.Service;
+
+@Service
+public class OrderEventConsumer {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderEventConsumer.class);
+
+    /**
+     * @RetryableTopic: If an exception occurs, automatically retries 3 times with exponential backoff
+     * before routing the poisoned message to a Dead Letter Topic (orders-topic-dlt).
+     */
+    @RetryableTopic(
+            attempts = "3",
+            backoff = @Backoff(delay = 1000, multiplier = 2.0),
+            autoCreateTopics = "true"
+    )
+    @KafkaListener(topics = "orders-topic", groupId = "order-fulfillment-group")
+    public void consumeOrder(
+            @Payload OrderPlacedEvent event,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
+            @Header(KafkaHeaders.OFFSET) long offset,
+            Acknowledgment acknowledgment // Manual commit handle
+    ) {
+        log.info("Processing order {} from partition {} at offset {}", event.orderId(), partition, offset);
+
+        if (event.amount() < 0) {
+            throw new IllegalArgumentException("Invalid negative order amount! Poison pill message.");
+        }
+
+        // Business logic: Reserve stock, charge payment...
+
+        // CRITICAL: Acknowledge offset ONLY after processing succeeds!
+        // If the pod crashes before this line, Kafka will redeliver the message to another pod!
+        acknowledgment.acknowledge();
+    }
+
+    /**
+     * DLT Handler: Catches poisoned messages after all retries are exhausted.
+     */
+    @DltHandler
+    public void handleDlt(OrderPlacedEvent event, @Header(KafkaHeaders.EXCEPTION_MESSAGE) String error) {
+        log.error("POISONED MESSAGE MOVED TO DLT: Order {} failed permanently. Error: {}", event.orderId(), error);
+        // Alert on-call engineers via Slack/PagerDuty or save to quarantine database table
+    }
+}
+```
+
+---
+
+#### Reactive Kafka with Project Reactor (`reactor-kafka`) & Backpressure
+
+In high-throughput microservices, a standard imperative listener can be overwhelmed when incoming traffic spikes. If the broker pushes 50,000 events/second, but your database can only persist 1,000 events/second, **memory buffers fill up and trigger `OutOfMemoryError` crashes!**
+
+#### What is Reactive Backpressure?
+
+**Backpressure** is a flow-control mechanism defined in the Reactive Streams specification where the **Consumer tells the Producer exactly how many records it is ready to receive (`request(N)`)**.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Broker as Kafka Broker (Topic: telemetry)
+    participant Receiver as Reactive KafkaReceiver (Reactor Kafka)
+    participant Consumer as Downstream DB / Processing Pipeline
+
+    Note over Receiver,Consumer: Consumer requests only what it has capacity to process
+    Consumer->>Receiver: request(100) (Send me 100 records)
+    Receiver->>Broker: Fetch up to 100 records
+    Broker-->>Receiver: Delivers 100 records
+    Receiver-->>Consumer: onNext(record 1..100)
+
+    Note over Consumer: Consumer is busy saving 100 records to DB...<br/>Zero new records are delivered! Broker buffers data safely on disk!
+
+    Consumer->>Receiver: DB insert done! request(100) (Send me the next 100!)
+    Receiver->>Broker: Fetch next 100 records
+```
+
+##### Step 1: Add Reactor Kafka Dependency
+
+```xml
+<dependency>
+    <groupId>io.projectreactor.kafka</groupId>
+    <artifactId>reactor-kafka</artifactId>
+    <version>1.3.23</version>
+</dependency>
+```
+
+##### Step 2: The Non-Blocking Reactive Kafka Consumer with Backpressure Control
+
+```java
+package com.example.demo.reactive.kafka;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
+import reactor.kafka.receiver.KafkaReceiver;
+import reactor.kafka.receiver.ReceiverOptions;
+import reactor.kafka.receiver.ReceiverRecord;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+@Component
+public class ReactiveKafkaConsumerRunner implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(ReactiveKafkaConsumerRunner.class);
+    private static final String TOPIC = "sensor-telemetry-topic";
+
+    @Override
+    public void run(String... args) {
+        startReactiveConsumer();
+    }
+
+    public void startReactiveConsumer() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "reactive-telemetry-group");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+        ReceiverOptions<String, String> receiverOptions = ReceiverOptions.<String, String>create(props)
+                .subscription(Collections.singleton(TOPIC))
+                .commitInterval(Duration.ofSeconds(1)); // Commit batch offsets periodically
+
+        KafkaReceiver<String, String> receiver = KafkaReceiver.create(receiverOptions);
+
+        Flux<ReceiverRecord<String, String>> inboundFlux = receiver.receive();
+
+        inboundFlux
+                // 1. BACKPRESSURE CONTROL: limitRate bounds in-flight items requested from Kafka
+                .limitRate(50)
+                // 2. Offload heavy non-blocking processing to dedicated thread pool
+                .publishOn(Schedulers.boundedElastic())
+                .flatMap(record -> {
+                    return processTelemetryRecord(record)
+                            // 3. Acknowledge offset asynchronously upon completion
+                            .doOnSuccess(v -> record.receiverOffset().acknowledge())
+                            .doOnError(e -> log.error("Error processing record key {}", record.key(), e));
+                }, 10) // Concurrency factor: process up to 10 records in parallel
+                .subscribe();
+    }
+
+    private reactor.core.publisher.Mono<Void> processTelemetryRecord(ReceiverRecord<String, String> record) {
+        return reactor.core.publisher.Mono.fromRunnable(() -> {
+            log.info("Processing sensor telemetry: Key={}, Value={}, Partition={}, Offset={}",
+                    record.key(), record.value(), record.partition(), record.offset());
+        });
+    }
+}
+```
+
+---
+
+#### 4 Golden Rules for Production Apache Kafka
+
+1. **Always Set a Meaningful Partition Key**: If ordering matters (e.g. sequence of status changes for an order or user account), use the entity's ID as the key. Null keys are assigned round-robin across partitions, destroying ordering guarantees!
+2. **Never Enable Auto-Commit (`enable-auto-commit: false`)**: Auto-commit advances the consumer offset on a background timer, regardless of whether your business logic succeeded or threw an exception. Always acknowledge manually!
+3. **Partition Sizing Rule**: You cannot have more active consumers in a consumer group than partitions on the topic. If a topic has 6 partitions, running 10 consumer pods means 4 pods will sit 100% idle!
+4. **Use Dead Letter Topics (DLT)**: Never retry a poisoned payload (like corrupted JSON) in an infinite loop. Set max retries with exponential backoff, then route to a DLT for post-mortem analysis.
 
 ---
 
