@@ -1245,7 +1245,7 @@ flowchart TD
     subgraph CglibProxy ["2. CGLIB Dynamic Proxy (Class-Based Subclass)"]
         RealClass["UserService (Concrete Class)"]
         CglibP["UserService$$SpringCGLIB$$0 (Generated Subclass)"]
-        CglibP --|>|"Extends & Overrides methods"| RealClass
+        CglibP -->|"Extends & Overrides methods"| RealClass
     end
 ```
 
